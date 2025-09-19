@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4" style="max-width: 600px; margin: 0 auto;">
+    <!-- Conteúdo principal -->
+    <div class="text-center">
+        <div class="logout-icon mb-4">🚪</div>
+        <h2 class="fantasy-title">Você saiu do Reino</h2>
+        
+        <div class="divider my-4"></div>
+        
+        <p class="text-dark mb-4">Sua jornada aguarda seu retorno, aventureiro! 🎲</p>
+        
+        <div class="logout-actions mt-5">
+            <a class="fantasy-btn me-3 mb-3" href="{% url 'login' %}">
+                🗝️ Fazer Login Novamente
+            </a>
+            <a class="fantasy-btn-secondary me-3 mb-3" href="{% url 'home' %}">
+                🏰 Ir para a Página Inicial
+            </a>
+        </div>
+    </div>
+
+    <!-- Mensagem de despedida -->
+    <div class="text-center mt-5">
+        <p class="text-dark mb-0">
+            <small>✨ Que os deuses guiem seus passos até seu retorno! ✨</small>
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página de logout */
+    .logout-icon {
+        font-size: 4rem;
+        animation: fadeOut 2s ease-in-out infinite;
+    }
+    
+    @keyframes fadeOut {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    
+    .logout-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .fantasy-btn, .fantasy-btn-secondary {
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        font-family: 'Cinzel', serif;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        min-width: 200px;
+        text-align: center;
+    }
+    
+    .fantasy-btn {
+        background: linear-gradient(to bottom, #8B4513, #6B3100);
+        border: 1px solid var(--color-secondary);
+        color: var(--color-light) !important;
+    }
+    
+    .fantasy-btn:hover {
+        background: linear-gradient(to bottom, #6B3100, #8B4513);
+        box-shadow: 0 0 10px var(--color-secondary);
+        color: #FFF !important;
+        transform: translateY(-2px);
+    }
+    
+    .fantasy-btn-secondary {
+        background: linear-gradient(to bottom, #654321, #4E342E);
+        border: 1px solid #8D6E63;
+        color: var(--color-light) !important;
+    }
+    
+    .fantasy-btn-secondary:hover {
+        background: linear-gradient(to bottom, #4E342E, #654321);
+        box-shadow: 0 0 10px #8D6E63;
+        color: #FFF !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 576px) {
+        .logout-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .fantasy-btn, .fantasy-btn-secondary {
+            margin: 0.5rem 0;
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Efeito de fade in para a página
+        const container = document.querySelector('.scroll-container');
+        container.style.opacity = '0';
+        container.style.transition = 'opacity 1s ease-in-out';
+        
+        setTimeout(() => {
+            container.style.opacity = '1';
+        }, 100);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4" style="max-width: 600px; margin: 0 auto;">
+    <!-- Cabeçalho -->
+    <div class="text-center mb-5">
+        <h1 class="fantasy-title">Criar Novo Personagem</h1>
+        <p class="text-dark mb-0">Dê vida ao seu avatar no Reino de Eldoria</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Formulário de criação -->
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label for="name" class="form-label fantasy-label">Nome do Personagem</label>
+            <input type="text" class="form-control fantasy-input" id="name" name="name" required 
+                   placeholder="Ex: Aethelred, Elowen, Thorin">
+            <div class="form-text text-dark">Escolha um nome digno de suas futuras conquistas</div>
+        </div>
+        
+        <div class="mb-4">
+            <label for="char_class" class="form-label fantasy-label">Classe</label>
+            <select id="char_class" name="char_class" class="form-select fantasy-select">
+                <option value="mage">🧙 Mago - Poder arcano e conhecimento místico</option>
+                <option value="warrior">⚔️ Guerreiro - Força bruta e resistência</option>
+                <option value="archer">🏹 Arqueiro - Precisão e agilidade</option>
+            </select>
+            <div class="form-text text-dark">Sua classe define suas habilidades e estilo de jogo</div>
+        </div>
+
+        <div class="text-center mt-5">
+            <button type="submit" class="fantasy-btn btn-lg">
+                ⚡ Dar Vida ao Personagem
+            </button>
+        </div>
+    </form>
+
+    <!-- Informações adicionais -->
+    <div class="text-center mt-5">
+        <p class="text-dark mb-0">
+            <small>✨ Escolha sabiamente, pois esta decisão moldará sua jornada! ✨</small>
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página de criação de personagem */
+    .fantasy-label {
+        font-family: 'Cinzel', serif;
+        font-weight: 600;
+        color: #3E2723;
+        margin-bottom: 0.5rem;
+    }
+    
+    .fantasy-input, .fantasy-select {
+        font-family: 'MedievalSharp', cursive !important;
+        background-color: rgba(245, 245, 220, 0.9) !important;
+        border: 2px solid #8B4513 !important;
+        border-radius: 6px !important;
+        color: #3E2723 !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1.1rem;
+    }
+    
+    .fantasy-input:focus, .fantasy-select:focus {
+        background-color: #F5F5DC !important;
+        border-color: var(--color-secondary) !important;
+        box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25) !important;
+    }
+    
+    .fantasy-input::placeholder {
+        color: #8D6E63 !important;
+        opacity: 0.7;
+    }
+    
+    .form-text {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    
+    /* Estilo para as opções do select */
+    .fantasy-select option {
+        background-color: #F5F5DC;
+        color: #3E2723;
+        padding: 0.5rem;
+    }
+    
+    /* Ajuste de responsividade */
+    @media (max-width: 576px) {
+        .fantasy-input, .fantasy-select {
+            padding: 0.6rem 0.8rem !important;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Adicionar efeito de foco suave aos campos
+        const inputs = document.querySelectorAll('.fantasy-input, .fantasy-select');
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('input-focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('input-focused');
+            });
+        });
+        
+        // Validação simples do nome
+        const nameInput = document.getElementById('name');
+        nameInput.addEventListener('input', function() {
+            if (this.value.length > 2) {
+                this.style.borderColor = '#4CAF50';
+            } else {
+                this.style.borderColor = '#8B4513';
+            }
+        });
+    });
+</script>
+{% endblock %}

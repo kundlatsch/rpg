@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if alert %}
+<script>alert("{{ alert }}");</script>
+{% endif %}
+
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho do personagem -->
+    <div class="text-center mb-4">
+        <h1 class="fantasy-title">
+            {{ character.name }}
+            
+            {% if character.char_class == "mage" %}
+                🧙
+            {% elif character.char_class == "warrior" %}
+                ⚔️
+            {% elif character.char_class == "archer" %}
+                🏹
+            {% endif %}
+        </h1>
+        <p class="mb-0 text-dark">Nível <strong>{{ character.level }}</strong> {{ character.get_char_class_display }}</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Estatísticas do personagem -->
+    <div class="row text-dark">
+        <div class="col-md-4 mb-3">
+            <div class="stat-box p-3 text-center">
+                <h5 class="fantasy-title mb-2">Saúde</h5>
+                <div class="progress mb-2" style="height: 20px;">
+                    <div class="progress-bar bg-danger" role="progressbar" 
+                         style="width: {% widthratio character.hp character.max_hp 100 %}%;" 
+                         aria-valuenow="{{ character.hp }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ character.max_hp }}">
+                    </div>
+                </div>
+                <p class="mb-0"><strong>{{ character.hp }}/{{ character.max_hp }} HP</strong></p>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="stat-box p-3 text-center">
+                <h5 class="fantasy-title mb-2">Mana</h5>
+                <div class="progress mb-2" style="height: 20px;">
+                    <div class="progress-bar bg-info" role="progressbar"
+                         style="width: {% widthratio character.mana character.max_mana 100 %}%;" 
+                         aria-valuenow="{{ character.mana }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ character.max_mana }}">
+                    </div>
+                </div>
+                <p class="mb-0"><strong>{{ character.mana }}/{{ character.max_mana }} MP</strong></p>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="stat-box p-3 text-center">
+                <h5 class="fantasy-title mb-2">Energia</h5>
+                <div class="progress mb-2" style="height: 20px;">
+                    <div class="progress-bar bg-success" role="progressbar" 
+                         style="width: {% widthratio character.stamina character.max_stamina 100 %}%;" 
+                         aria-valuenow="{{ character.stamina }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ character.max_stamina }}">
+                    </div>
+                </div>
+                <p class="mb-0"><strong>{{ character.stamina }}/{{ character.max_stamina }} SP</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-dark mt-3">
+        <div class="col-md-6 mb-3">
+            <div class="stat-box p-3 text-center">
+                <h5 class="fantasy-title mb-2">Experiência</h5>
+                <div class="progress mb-2" style="height: 15px;">
+                    <div class="progress-bar bg-warning" role="progressbar" 
+                         style="width: {% widthratio character.exp character.level|add:100 100 %}%;" 
+                         aria-valuenow="{{ character.exp }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ character.level|add:100 }}">
+                    </div>
+                </div>
+                <p class="mb-0"><strong>{{ character.exp }} EXP</strong></p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="stat-box p-3 text-center">
+                <h5 class="fantasy-title mb-2">Classe & Nível</h5>
+                <p class="mb-1"><strong>{{ character.get_char_class_display }}</strong></p>
+                <p class="mb-0">Nível <strong>{{ character.level }}</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider my-4"></div>
+
+    <!-- Status atual -->
+    {% if character.training_start %}
+        <div class="text-center p-4 status-container">
+            <h3 class="fantasy-title mb-3">⚔️ Em Treinamento ⚔️</h3>
+            <p class="text-dark">Seu personagem está se tornando mais forte!</p>
+            <a href="{% url 'training' %}" class="fantasy-btn mt-2">Ver Progresso do Treino</a>
+        </div>
+    {% elif character.resting_start %}
+        <div class="text-center p-4 status-container">
+            <h3 class="fantasy-title mb-3">🛌 Descansando 🛌</h3>
+            <p class="text-dark">Seu personagem está recuperando energias!</p>
+            <a href="{% url 'resting' %}" class="fantasy-btn mt-2">Ver Status de Descanso</a>
+        </div>
+    {% else %}
+        <!-- Ações disponíveis -->
+        <h2 class="fantasy-title text-center mb-4">Ações Disponíveis</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'training' %}" class="action-btn training text-center p-4">
+                            <div class="action-icon mb-2">⚔️</div>
+                            <h4 class="fantasy-title">Treinar</h4>
+                            <p class="mb-0">Aumente suas habilidades</p>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'resting' %}" class="action-btn resting text-center p-4">
+                            <div class="action-icon mb-2">🛌</div>
+                            <h4 class="fantasy-title">Descansar</h4>
+                            <p class="mb-0">Recupere HP e Mana</p>
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'jobs_list' %}" class="action-btn working text-center p-4">
+                            <div class="action-icon mb-2">⚒️</div>
+                            <h4 class="fantasy-title">Trabalhar</h4>
+                            <p class="mb-0">Ganhe recursos</p>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="#" class="action-btn quest text-center p-4">
+                            <div class="action-icon mb-2">🗺️</div>
+                            <h4 class="fantasy-title">Missões</h4>
+                            <p class="mb-0">Embarca em aventuras</p>
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="#" class="action-btn arena text-center p-4">
+                            <div class="action-icon mb-2">🏟️</div>
+                            <h4 class="fantasy-title">Arena</h4>
+                            <p class="mb-0">Desafie outros jogadores</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Estilos específicos para o dashboard */
+    .stat-box {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 8px;
+        border: 1px solid #8B4513;
+        height: 100%;
+    }
+    
+    .progress {
+        background-color: #D4AF37;
+        border: 1px solid #8B4513;
+    }
+    
+    .progress-bar {
+        background-color: #8B4513 !important;
+    }
+    
+    .status-container {
+        background: rgba(139, 69, 19, 0.15);
+        border-radius: 8px;
+        border: 2px solid #8B4513;
+    }
+    
+    .action-btn {
+        display: block;
+        background: rgba(139, 69, 19, 0.1);
+        border: 2px solid #8B4513;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #3E2723;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .action-btn:hover {
+        background: rgba(139, 69, 19, 0.2);
+        border-color: #D4AF37;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        color: #3E2723;
+    }
+    
+    .action-icon {
+        font-size: 2.5rem;
+    }
+</style>
+{% endblock %}

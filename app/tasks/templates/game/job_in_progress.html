@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho -->
+    <div class="text-center mb-4">
+        <h1 class="fantasy-title">{{ char_job.job.emoji }} {{ char_job.job.name }}</h1>
+        <p class="text-dark mb-0">Empenhando-se em suas labutas diárias</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Informações do trabalho -->
+    <div class="working-info p-4 mb-4">
+        <div class="text-center">
+            <div class="working-icon mb-3">⚒️</div>
+            <h3 class="fantasy-title mb-3">Trabalho em Andamento</h3>
+        </div>
+        
+        <div class="row text-dark">
+            <div class="col-md-6 mb-3">
+                <div class="info-stat text-center p-3">
+                    <div class="stat-icon mb-2">⏱️</div>
+                    <h4 class="fantasy-title mb-2">Tempo Restante</h4>
+                    <p class="stat-value" id="timer">{{ time_left }}</p>
+                    <p class="stat-label">minutos</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="info-stat text-center p-3">
+                    <div class="stat-icon mb-2">💰</div>
+                    <h4 class="fantasy-title mb-2">Salário</h4>
+                    <p class="stat-value">{{ char_job.job.gold_per_minute }}</p>
+                    <p class="stat-label">ouro por minuto</p>
+                </div>
+            </div>
+        </div>
+        
+        {% if char_job.job.xp_per_minute %}
+        <div class="row text-dark">
+            <div class="col-12">
+                <div class="info-stat text-center p-3">
+                    <div class="stat-icon mb-2">⭐</div>
+                    <h4 class="fantasy-title mb-2">Experiência</h4>
+                    <p class="stat-value">{{ char_job.job.xp_per_minute }}</p>
+                    <p class="stat-label">XP por minuto</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Mensagem de status -->
+    <div class="text-center mt-4">
+        {% if job_finished %}
+            <form action="{% url 'end_job' char_job.job.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg">
+                    ✅ Coletar Recompensas
+                </button>
+            </form>
+        {% else %}
+            <p>⏳ Tempo restante: <span id="timer">{{ time_left }}</span> minutos</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página de trabalho em andamento */
+    .working-info {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 12px;
+        border: 2px solid #8B4513;
+    }
+    
+    .info-stat {
+        background: rgba(245, 245, 220, 0.2);
+        border-radius: 8px;
+        border: 1px solid #D4AF37;
+        height: 100%;
+    }
+    
+    .working-icon {
+        font-size: 4rem;
+        animation: pulse 2s infinite ease-in-out;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #8B4513;
+        margin: 0;
+        font-family: 'Cinzel', serif;
+    }
+    
+    .stat-label {
+        color: #3E2723;
+        margin: 0;
+        font-size: 1rem;
+    }
+    
+    /* Animação de loading */
+    .loading-animation {
+        display: inline-block;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(139, 69, 19, 0.3);
+        border-radius: 50%;
+        border-top-color: #8B4513;
+        animation: spin 1s ease-in-out infinite;
+        margin: 0 auto;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+</style>
+
+<script>
+    {% if not job_finished %}
+        let timeLeft = {{ time_left }};
+        const timerEl = document.getElementById("timer");
+
+        const interval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+            } else {
+                clearInterval(interval);
+                location.reload(); // ao terminar, recarrega e mostra o botão
+            }
+        }, 60000);
+    {% endif %}
+</script>
+
+<script>
+    let timeLeft = {{ time_left }};
+    const timerEl = document.getElementById("timer");
+    
+    // Atualizar o temporizador a cada minuto
+    setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            timerEl.textContent = timeLeft;
+            
+            // Efeito visual ao atualizar o tempo
+            timerEl.style.transform = "scale(1.2)";
+            setTimeout(() => {
+                timerEl.style.transform = "scale(1)";
+            }, 300);
+        } else {
+            location.reload(); // atualiza quando chegar a zero
+        }
+    }, 60000);
+    
+    // Efeito de entrada para a página
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.scroll-container');
+        container.style.opacity = '0';
+        container.style.transition = 'opacity 1s ease-in-out';
+        
+        setTimeout(() => {
+            container.style.opacity = '1';
+        }, 100);
+    });
+</script>
+
+{% endblock %}

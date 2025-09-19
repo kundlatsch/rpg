@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho -->
+    <div class="text-center mb-5">
+        <h1 class="fantasy-title">💼 Trabalhos Disponíveis</h1>
+        <p class="text-dark mb-0">Ganhe recursos para sua aventura</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Lista de trabalhos -->
+    <div class="row">
+        {% for job in jobs %}
+            {% with progress=progress_dict.job.id %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="job-card p-4 h-100">
+                    <div class="job-header text-center mb-3">
+                        <div class="job-emoji" style="font-size: 3rem;">{{ job.emoji }}</div>
+                        <h3 class="fantasy-title mt-2">{{ job.name }}</h3>
+                    </div>
+
+                    <div class="job-details">
+                        {% if job.duration %}
+                            <div class="job-stat mb-2">
+                                <span class="stat-icon">🕒</span>
+                                <span class="stat-text">Duração: {{ job.duration }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if job.gold_per_minute %}
+                            <div class="job-stat mb-2">
+                                <span class="stat-icon">💰</span>
+                                <span class="stat-text">Ouro/min: {{ job.gold_per_minute }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if job.xp_per_minute %}
+                            <div class="job-stat mb-2">
+                                <span class="stat-icon">✨</span>
+                                <span class="stat-text">XP/min: {{ job.xp_per_minute }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if job.drops %}
+                            <div class="job-stat mb-2">
+                                <span class="stat-icon">🎁</span>
+                                <span class="stat-text">Drops: {{ job.drops }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if job.required_level %}
+                            <div class="job-stat mb-3">
+                                <span class="stat-icon">🔒</span>
+                                <span class="stat-text">Nível requerido: {{ job.required_level }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% with rank=progress.current_rank %}
+                            <div class="job-rank p-3 text-center mb-3">
+                                <h4 class="fantasy-title mb-1">Rank Atual</h4>
+                                <p class="mb-0">{{ rank.name }} (Multiplicador: x{{ rank.multiplier }})</p>
+                            </div>
+                        {% endwith %}
+                    </div>
+
+                    <a href="{% url 'start_job' job.id %}" class="fantasy-btn w-100 text-center mt-3">
+                        💼 Iniciar Trabalho
+                    </a>
+                </div>
+            </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+
+    <!-- Rodapé -->
+    <div class="text-center mt-5">
+        <p class="text-dark mb-0">
+            <small>💡 Escolha um trabalho adequado ao seu nível para melhores recompensas!</small>
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página de trabalhos */
+    .job-card {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 12px;
+        border: 2px solid #8B4513;
+        transition: all 0.3s ease;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        background: rgba(139, 69, 19, 0.2);
+    }
+    
+    .job-header {
+        border-bottom: 2px solid #D4AF37;
+        padding-bottom: 1rem;
+    }
+    
+    .job-details {
+        color: #3E2723;
+    }
+    
+    .job-stat {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        background: rgba(245, 245, 220, 0.3);
+        border-radius: 6px;
+    }
+    
+    .stat-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        width: 30px;
+        text-align: center;
+    }
+    
+    .stat-text {
+        flex: 1;
+    }
+    
+    .job-rank {
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 8px;
+        border: 1px solid #D4AF37;
+    }
+    
+    .fantasy-btn {
+        background: linear-gradient(to bottom, #8B4513, #6B3100);
+        border: 1px solid var(--color-secondary);
+        color: var(--color-light) !important;
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-family: 'Cinzel', serif;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .fantasy-btn:hover {
+        background: linear-gradient(to bottom, #6B3100, #8B4513);
+        box-shadow: 0 0 10px var(--color-secondary);
+        color: #FFF !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Animação para os cards */
+    @keyframes jobCardAppear {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    .job-card {
+        animation: jobCardAppear 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    
+    /* Delay para cada card aparecer sequencialmente */
+    .job-card:nth-child(1) { animation-delay: 0.1s; }
+    .job-card:nth-child(2) { animation-delay: 0.2s; }
+    .job-card:nth-child(3) { animation-delay: 0.3s; }
+    .job-card:nth-child(4) { animation-delay: 0.4s; }
+    .job-card:nth-child(5) { animation-delay: 0.5s; }
+    .job-card:nth-child(6) { animation-delay: 0.6s; }
+</style>
+{% endblock %}
