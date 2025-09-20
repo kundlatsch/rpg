@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Inventário de {{ character.name }}</h2>
+
+<h3>Materiais</h3>
+<ul>
+  {% for inv in materials %}
+    <li>{{ inv.item.name }} x{{ inv.quantity }}</li>
+  {% empty %}
+    <li>Nenhum material.</li>
+  {% endfor %}
+</ul>
+
+<h3>Equipamentos</h3>
+<ul>
+  {% for inv in equipment %}
+    <li>{{ inv.item.name }} x{{ inv.quantity }}</li>
+  {% empty %}
+    <li>Nenhum equipamento.</li>
+  {% endfor %}
+</ul>
+
+<h3>Consumíveis</h3>
+<ul>
+  {% for inv in consumables %}
+    <li>{{ inv.item.name }} x{{ inv.quantity }}</li>
+  {% empty %}
+    <li>Nenhum consumível.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

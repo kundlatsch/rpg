@@ -7,15 +7,10 @@ class CharactersConfig(models.Model):
     level_growth_rate = models.FloatField(default=1.5)  # 50% mais difícil a cada nível
 
 class Character(models.Model):
-    CLASS_CHOICES = [
-        ("mage", "Mago"),
-        ("warrior", "Guerreiro"),
-        ("archer", "Arqueiro"),
-    ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    char_class = models.CharField(max_length=20, choices=CLASS_CHOICES)
+    emoji = models.CharField(max_length=5, default="😃")
 
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
@@ -31,8 +26,36 @@ class Character(models.Model):
     training_start = models.DateTimeField(null=True, blank=True)
     resting_start = models.DateTimeField(null=True, blank=True)
 
+    # --- ATRIBUTOS PRIMÁRIOS ---
+    strength = models.PositiveIntegerField(default=1)       # Força
+    dexterity = models.PositiveIntegerField(default=1)      # Destreza
+    arcane = models.PositiveIntegerField(default=1)         # Arcano
+    constitution = models.PositiveIntegerField(default=1)   # Constituição
+    courage = models.PositiveIntegerField(default=1)        # Coragem
+    luck = models.PositiveIntegerField(default=1)           # Sorte
+
+    # --- SLOTS DE EQUIPAMENTOS ---
+    equipped_head = models.ForeignKey(
+        'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
+    equipped_necklace = models.ForeignKey(
+        'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
+    equipped_shoulders = models.ForeignKey(
+        'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
+    equipped_chest = models.ForeignKey(
+        'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
+    equipped_hands = models.ForeignKey(
+        'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
+    equipped_feet = models.ForeignKey(
+        'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
+
     def __str__(self):
-        return f"{self.name} ({self.get_char_class_display()})"
+        return f"{self.name} (lvl {self.level})"
 
     def is_idle(self):
         return self.training_start is None and self.resting_start is None
@@ -61,3 +84,33 @@ class Character(models.Model):
 
         self.save()
         return leveled_up
+    
+    # --- ATRIBUTOS SECUNDÁRIOS (PROPERTIES) ---
+    @property
+    def physical_damage(self):
+        return self.strength + self.courage * 0.1
+
+    @property
+    def magical_damage(self):
+        return self.arcane + self.courage * 0.1
+
+    @property
+    def accuracy(self):
+        return self.dexterity + self.courage * 0.1
+
+    @property
+    def crit_chance(self):
+        # max 50%
+        return min(self.luck * 0.5, 50)
+
+    @property
+    def crit_damage(self):
+        return 1 + self.dexterity * 0.1 + self.courage * 0.01 + self.arcane * 0.01
+
+    @property
+    def total_hp(self):
+        return self.constitution * 10
+
+    @property
+    def total_mana(self):
+        return self.arcane * 10

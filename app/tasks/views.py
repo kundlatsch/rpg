@@ -32,7 +32,7 @@ def create_character(request):
     if request.method == "POST":
         name = request.POST.get("name")
         char_class = request.POST.get("char_class")
-        Character.objects.create(user=request.user, name=name, char_class=char_class)
+        Character.objects.create(user=request.user, name=name)
         return redirect("dashboard")
     return render(request, "game/create_character.html")
 
@@ -47,8 +47,17 @@ def dashboard(request):
     # pega XP do treino, se houver, e limpa da sessão
     alert = request.session.pop("alert", None)
 
+    slots = [
+        ('Cabeça', '👑', character.equipped_head),
+        ('Colar', '📿', character.equipped_necklace),
+        ('Ombro', '🎗️', character.equipped_shoulders),
+        ('Tronco', '🦺', character.equipped_chest),
+        ('Mãos', '🧤', character.equipped_hands),
+        ('Pés', '👞', character.equipped_feet),
+    ]
+
     return render(
-        request, "game/dashboard.html", {"character": character, "alert": alert}
+        request, "game/dashboard.html", {"character": character, "alert": alert, 'equipment_slots': slots}
     )
 
 

@@ -11,89 +11,150 @@
     <div class="text-center mb-4">
         <h1 class="fantasy-title">
             {{ character.name }}
-            
-            {% if character.char_class == "mage" %}
-                🧙
-            {% elif character.char_class == "warrior" %}
-                ⚔️
-            {% elif character.char_class == "archer" %}
-                🏹
-            {% endif %}
         </h1>
-        <p class="mb-0 text-dark">Nível <strong>{{ character.level }}</strong> {{ character.get_char_class_display }}</p>
+        <p class="mb-0 text-dark">Nível <strong>{{ character.level }}</strong></p>
+    </div>
+
+    <!-- Barra de XP discreta -->
+    <div class="row text-dark mb-4">
+        <div class="col-12">
+            <div class="xp-container">
+                <div class="progress xp-bar mb-1">
+                    <div class="progress-bar bg-xp" role="progressbar" 
+                         style="width: {% widthratio character.exp character.max_exp 100 %}%;" 
+                         aria-valuenow="{{ character.exp }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="{{ character.max_exp }}">
+                    </div>
+                </div>
+                <p class="xp-text text-center mb-0"><small>{{ character.exp }}/{{ character.max_exp }} EXP</small></p>
+            </div>
+        </div>
     </div>
 
     <div class="divider"></div>
 
-    <!-- Estatísticas do personagem -->
-    <div class="row text-dark">
-        <div class="col-md-4 mb-3">
-            <div class="stat-box p-3 text-center">
-                <h5 class="fantasy-title mb-2">Saúde</h5>
-                <div class="progress mb-2" style="height: 20px;">
-                    <div class="progress-bar bg-danger" role="progressbar" 
-                         style="width: {% widthratio character.hp character.max_hp 100 %}%;" 
-                         aria-valuenow="{{ character.hp }}" 
-                         aria-valuemin="0" 
-                         aria-valuemax="{{ character.max_hp }}">
+    <!-- Atributos e Emoji -->
+    <div class="row text-dark mb-4">
+        <!-- Atributos Primários -->
+        <div class="col-md-4 mb-4">
+            <div class="stat-box p-4">
+                <h3 class="fantasy-title text-center mb-3">Atributos Primários</h3>
+                <div class="attribute-list">
+                    <div class="attribute-item">
+                        <span class="attribute-icon">💪</span>
+                        <span class="attribute-name">Força:</span>
+                        <span class="attribute-value">{{ character.strength }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🏹</span>
+                        <span class="attribute-name">Destreza:</span>
+                        <span class="attribute-value">{{ character.dexterity }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🔮</span>
+                        <span class="attribute-name">Arcano:</span>
+                        <span class="attribute-value">{{ character.arcane }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">❤️</span>
+                        <span class="attribute-name">Constituição:</span>
+                        <span class="attribute-value">{{ character.constitution }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🦁</span>
+                        <span class="attribute-name">Coragem:</span>
+                        <span class="attribute-value">{{ character.courage }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🍀</span>
+                        <span class="attribute-name">Sorte:</span>
+                        <span class="attribute-value">{{ character.luck }}</span>
                     </div>
                 </div>
-                <p class="mb-0"><strong>{{ character.hp }}/{{ character.max_hp }} HP</strong></p>
             </div>
         </div>
         
-        <div class="col-md-4 mb-3">
-            <div class="stat-box p-3 text-center">
-                <h5 class="fantasy-title mb-2">Mana</h5>
-                <div class="progress mb-2" style="height: 20px;">
-                    <div class="progress-bar bg-info" role="progressbar"
-                         style="width: {% widthratio character.mana character.max_mana 100 %}%;" 
-                         aria-valuenow="{{ character.mana }}" 
-                         aria-valuemin="0" 
-                         aria-valuemax="{{ character.max_mana }}">
-                    </div>
+        <!-- Emoji do Personagem com Slots de Equipamento -->
+        <div class="col-md-4 mb-4">
+            <div class="character-equipment-section text-center">
+                <!-- Slots superiores -->
+                <div class="equipment-row mb-3">
+                    {% include "items/_equipment_slot.html" with slot_name="Cabeça" slot_icon="👑" slot_equipment=character.equipped_head %}
+                    {% include "items/_equipment_slot.html" with slot_name="Colar" slot_icon="📿" slot_equipment=character.equipped_necklace %}
+                    {% include "items/_equipment_slot.html" with slot_name="Ombro" slot_icon="🎗️" slot_equipment=character.equipped_shoulders %}
                 </div>
-                <p class="mb-0"><strong>{{ character.mana }}/{{ character.max_mana }} MP</strong></p>
-            </div>
-        </div>
-        
-        <div class="col-md-4 mb-3">
-            <div class="stat-box p-3 text-center">
-                <h5 class="fantasy-title mb-2">Energia</h5>
-                <div class="progress mb-2" style="height: 20px;">
-                    <div class="progress-bar bg-success" role="progressbar" 
-                         style="width: {% widthratio character.stamina character.max_stamina 100 %}%;" 
-                         aria-valuenow="{{ character.stamina }}" 
-                         aria-valuemin="0" 
-                         aria-valuemax="{{ character.max_stamina }}">
-                    </div>
-                </div>
-                <p class="mb-0"><strong>{{ character.stamina }}/{{ character.max_stamina }} SP</strong></p>
-            </div>
-        </div>
-    </div>
 
-    <div class="row text-dark mt-3">
-        <div class="col-md-6 mb-3">
-            <div class="stat-box p-3 text-center">
-                <h5 class="fantasy-title mb-2">Experiência</h5>
-                <div class="progress mb-2" style="height: 15px;">
-                    <div class="progress-bar bg-warning" role="progressbar" 
-                         style="width: {% widthratio character.exp character.level|add:100 100 %}%;" 
-                         aria-valuenow="{{ character.exp }}" 
-                         aria-valuemin="0" 
-                         aria-valuemax="{{ character.level|add:100 }}">
+                <!-- Personagem central -->
+                <div class="character-center mb-3">
+                    <div class="character-emoji-bg">
+                    <div class="character-emoji">
+                        {{ character.emoji }}
+                    </div>
                     </div>
                 </div>
-                <p class="mb-0"><strong>{{ character.exp }} EXP</strong></p>
+
+                <!-- Slots inferiores -->
+                <div class="equipment-row mt-3">
+                    {% include "items/_equipment_slot.html" with slot_name="Tronco" slot_icon="🦺" slot_equipment=character.equipped_chest %}
+                    {% include "items/_equipment_slot.html" with slot_name="Mãos" slot_icon="🧤" slot_equipment=character.equipped_hands %}
+                    {% include "items/_equipment_slot.html" with slot_name="Pés" slot_icon="👞" slot_equipment=character.equipped_feet %}
+                </div>
+            </div>
+
+            <!-- Menu mock -->
+            <div class="character-menu mt-4">
+                <ul class="menu-list">
+                    <li><a href="{% url 'character_detail' %}" class="menu-btn">👤 Personagem</a></li>
+                    <li><a href="{% url 'inventory' %}" class="menu-btn">🎒 Inventário</a></li>
+                    <li><a href="#" class="menu-btn">🏪 Mercado</a></li>
+                    <li><a href="#" class="menu-btn">🏰 Guilda</a></li>
+                    <li><a href="#" class="menu-btn">🏆 Ranking</a></li>
+                </ul>
             </div>
         </div>
         
-        <div class="col-md-6 mb-3">
-            <div class="stat-box p-3 text-center">
-                <h5 class="fantasy-title mb-2">Classe & Nível</h5>
-                <p class="mb-1"><strong>{{ character.get_char_class_display }}</strong></p>
-                <p class="mb-0">Nível <strong>{{ character.level }}</strong></p>
+        <!-- Atributos Secundários -->
+        <div class="col-md-4 mb-4">
+            <div class="stat-box p-4">
+                <h3 class="fantasy-title text-center mb-3">Atributos Secundários</h3>
+                <div class="attribute-list">
+                    <div class="attribute-item">
+                        <span class="attribute-icon">⚔️</span>
+                        <span class="attribute-name">Dano Físico:</span>
+                        <span class="attribute-value">{{ character.physical_damage }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">✨</span>
+                        <span class="attribute-name">Dano Mágico:</span>
+                        <span class="attribute-value">{{ character.magical_damage }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🎯</span>
+                        <span class="attribute-name">Precisão:</span>
+                        <span class="attribute-value">{{ character.accuracy }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🔥</span>
+                        <span class="attribute-name">Chance de Crítico:</span>
+                        <span class="attribute-value">{{ character.crit_chance }}%</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">💥</span>
+                        <span class="attribute-name">Dano Crítico:</span>
+                        <span class="attribute-value">{{ character.crit_damage }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">❤️</span>
+                        <span class="attribute-name">Vida Total:</span>
+                        <span class="attribute-value">{{ character.total_hp }}</span>
+                    </div>
+                    <div class="attribute-item">
+                        <span class="attribute-icon">🔮</span>
+                        <span class="attribute-name">Mana Total:</span>
+                        <span class="attribute-value">{{ character.total_mana }}</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -164,9 +225,15 @@
     /* Estilos específicos para o dashboard */
     .stat-box {
         background: rgba(139, 69, 19, 0.1);
-        border-radius: 8px;
-        border: 1px solid #8B4513;
+        border-radius: 12px;
+        border: 2px solid #8B4513;
         height: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-box:hover {
+        transform: translateY(-5px);
+        background: rgba(139, 69, 19, 0.2);
     }
     
     .progress {
@@ -206,5 +273,153 @@
     .action-icon {
         font-size: 2.5rem;
     }
+    
+    /* Estilos para os atributos */
+    .attribute-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .attribute-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+        background: rgba(245, 245, 220, 0.2);
+        border-radius: 6px;
+    }
+    
+    .attribute-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        width: 30px;
+        text-align: center;
+    }
+    
+    .attribute-name {
+        flex: 1;
+        font-weight: 600;
+        color: #3E2723;
+    }
+    
+    .attribute-value {
+        font-weight: bold;
+        color: #8B4513;
+        font-family: 'Cinzel', serif;
+    }
+    
+    /* Barra de XP discreta */
+    .xp-container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .xp-bar {
+        height: 8px !important;
+        background-color: rgba(212, 175, 55, 0.3) !important;
+        border: 1px solid rgba(139, 69, 19, 0.3);
+    }
+    
+    .bg-xp {
+        background: linear-gradient(to right, #8B4513, #D4AF37) !important;
+    }
+    
+    .xp-text {
+        color: #8B4513;
+        font-size: 0.85rem;
+    }
+    
+    /* Seção de equipamentos */
+    .character-equipment-section {
+        padding: 1rem;
+        {% comment %} margin: 0 auto;           /* horizontal */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;  /* vertical */
+        height: 100%;             /* precisa altura no pai */ {% endcomment %}
+    }
+    
+    .equipment-row {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    
+    /* Personagem central */
+    .character-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .character-emoji-bg {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #1ce647ff, #5937d4ff);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px rgba(139, 69, 19, 0.3);
+    }
+    
+    .character-emoji {
+        font-size: 4rem;
+        animation: float 3s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .character-menu {
+        max-width: 200px; /* ou outra largura que quiser */
+        margin: 0 auto;   /* centraliza */
+    }
+
+    .character-menu .menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .character-menu .menu-list li {
+        margin-bottom: 0.5rem;
+    }
+
+    .character-menu .menu-btn {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        background: rgba(139, 69, 19, 0.1);
+        border: 2px solid #8B4513;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #3E2723;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .character-menu .menu-btn:hover {
+        background: rgba(139, 69, 19, 0.2);
+        border-color: #D4AF37;
+        transform: translateY(-3px);
+    }
+
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Efeito de entrada para a página
+        const container = document.querySelector('.scroll-container');
+        container.style.opacity = '0';
+        container.style.transition = 'opacity 1s ease-in-out';
+        
+        setTimeout(() => {
+            container.style.opacity = '1';
+        }, 100);
+    });
+</script>
+
 {% endblock %}

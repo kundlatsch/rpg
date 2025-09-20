@@ -1,0 +1,262 @@
+{# recebe slot_name, slot_icon e slot_equipment no context #}
+<div class="equipment-slot {{ slot_name }}-slot {% if slot_equipment %}{{ slot_equipment.item.rarity }}{% endif %}"
+     data-toggle="tooltip" 
+     data-placement="top"
+     title="{% if not slot_equipment %}Slot vazio{% endif %}">
+  <div class="slot-icon">
+    {% if slot_equipment %}
+      {{ slot_equipment.item.emoji }}
+    {% else %}
+      {% comment %} {{ slot_icon }} {% endcomment %}
+    {% endif %}
+  </div>
+  <div class="slot-label">
+    {{ slot_name|capfirst }}
+  </div>
+  
+  {% if slot_equipment %}
+  <div class="item-tooltip">
+    <div class="tooltip-header {{ slot_equipment.item.rarity }}">
+      <span class="item-emoji">{{ slot_equipment.item.emoji }}</span>
+      <span class="item-name">{{ slot_equipment.item.name }}</span>
+    </div>
+    <div class="tooltip-body">
+      <div class="item-rarity {{ slot_equipment.item.rarity }}">{{ slot_equipment.item.get_rarity_display }}</div>
+      <div class="item-description">{{ slot_equipment.item.description }}</div>
+      
+      {% if slot_equipment.attribute_bonuses %}
+      <div class="item-bonuses">
+        <div class="bonus-title">Bônus de Atributos:</div>
+        {% for attr, value in slot_equipment.attribute_bonuses.items %}
+        <div class="bonus-item">
+          <span class="bonus-attr">{{ attr|capfirst }}:</span>
+          <span class="bonus-value">+{{ value }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      {% if slot_equipment.combat_skill %}
+      <div class="item-skill">
+        <div class="skill-title">Habilidade de Combate:</div>
+        <div class="skill-name">{{ slot_equipment.combat_skill }}</div>
+      </div>
+      {% endif %}
+      
+      {% if slot_equipment.passive_skill %}
+      <div class="item-skill">
+        <div class="skill-title">Habilidade Passiva:</div>
+        <div class="skill-name">{{ slot_equipment.passive_skill }}</div>
+      </div>
+      {% endif %}
+      
+      <div class="item-level">Requer nível {{ slot_equipment.min_level }}</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .equipment-slot {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background: rgba(139, 69, 19, 0.1);
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  /* Cores de raridade */
+  .equipment-slot.common {
+    background: rgba(192, 192, 192, 0.2);
+    border-color: #C0C0C0;
+  }
+  
+  .equipment-slot.rare {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: #00FF00;
+  }
+  
+  .equipment-slot.epic {
+    background: rgba(128, 0, 128, 0.2);
+    border-color: #800080;
+  }
+  
+  .equipment-slot.legendary {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #FFD700;
+  }
+  
+  .equipment-slot:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .slot-icon {
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+  }
+  
+  .slot-label {
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    font-size: 0.7rem;
+    color: #3E2723;
+    text-align: center;
+    opacity: 0.8;
+  }
+  
+  /* Tooltip */
+  .item-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    background: rgba(26, 19, 11, 0.95);
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    padding: 0;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .equipment-slot:hover .item-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  
+  .tooltip-header {
+    padding: 0.75rem;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+  }
+  
+  .tooltip-header.common { background: #C0C0C0; color: #000; }
+  .tooltip-header.rare { background: #00FF00; color: #000; }
+  .tooltip-header.epic { background: #800080; color: #FFF; }
+  .tooltip-header.legendary { background: #FFD700; color: #000; }
+  
+  .item-emoji {
+    font-size: 1.2rem;
+  }
+  
+  .tooltip-body {
+    padding: 0.75rem;
+    color: #F5F5DC;
+  }
+  
+  .item-rarity {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .item-rarity.common { background: #C0C0C0; color: #000; }
+  .item-rarity.rare { background: #00FF00; color: #000; }
+  .item-rarity.epic { background: #800080; color: #FFF; }
+  .item-rarity.legendary { background: #FFD700; color: #000; }
+  
+  .item-description {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    color: #D4AF37;
+  }
+  
+  .item-bonuses, .item-skill {
+    margin-bottom: 0.75rem;
+  }
+  
+  .bonus-title, .skill-title {
+    font-weight: bold;
+    color: #D4AF37;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .bonus-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.1rem;
+  }
+  
+  .bonus-value {
+    color: #00FF00;
+  }
+  
+  .skill-name {
+    font-size: 0.85rem;
+    color: #F5F5DC;
+  }
+  
+  .item-level {
+    font-size: 0.8rem;
+    color: #D4AF37;
+    text-align: center;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #8B4513;
+  }
+
+  .equipment-slot {
+    width: 60px;
+    height: 60px;
+    background: rgba(139, 69, 19, 0.1);
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .equipment-slot:hover {
+    border-color: #D4AF37;
+    transform: translateY(-3px);
+  }
+
+  .slot-icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+    
+  .slot-label {
+    font-size: 0.7rem;
+    color: #3E2723;
+    text-align: center;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap (se estiver usando)
+    if (typeof bootstrap !== 'undefined') {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      })
+    }
+  });
+</script>

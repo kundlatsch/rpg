@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ character.name }}</h1>
+<p>Nível: {{ character.level }} - XP: {{ character.exp }}/{{ character.max_exp }}</p>
+
+<h2>Atributos Primários</h2>
+<ul>
+  <li>Força: {{ character.strength }}</li>
+  <li>Destreza: {{ character.dexterity }}</li>
+  <li>Arcano: {{ character.arcane }}</li>
+  <li>Constituição: {{ character.constitution }}</li>
+  <li>Coragem: {{ character.courage }}</li>
+  <li>Sorte: {{ character.luck }}</li>
+</ul>
+
+<h2>Atributos Secundários</h2>
+<ul>
+  <li>Dano Físico: {{ character.physical_damage }}</li>
+  <li>Dano Mágico: {{ character.magical_damage }}</li>
+  <li>Precisão: {{ character.accuracy }}</li>
+  <li>Chance de Crítico: {{ character.crit_chance }}%</li>
+  <li>Dano Crítico: {{ character.crit_damage }}</li>
+  <li>Vida Total: {{ character.total_hp }}</li>
+  <li>Mana Total: {{ character.total_mana }}</li>
+</ul>
+
+{% endblock %}
