@@ -26,8 +26,8 @@ class Command(BaseCommand):
             InventoryItem.objects.filter(character=char).delete()
 
             # Adiciona de 3 a 5 itens aleatórios
-            sample_items = random.sample(items, k=min(5, len(items)))
-            for item in sample_items:
+            # sample_items = random.sample(items, k=min(5, len(items)))
+            for item in items:
                 qty = random.randint(1, 5)  # quantidade aleatória
                 InventoryItem.objects.create(character=char, item=item, quantity=qty)
                 self.stdout.write(f"  {qty}x {item.name}")

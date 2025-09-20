@@ -35,36 +35,32 @@ class Command(BaseCommand):
         )
         Material.objects.create(item=ferro)
 
-        # Equipamento
-        espada = Item.objects.create(
-            name="Espada de Treinamento",
-            description="Uma espada simples para iniciantes.",
-            emoji="🗡️",
-            drop_chance=0.1,
-            rarity=ItemRarity.COMMON,
-            item_type=ItemType.EQUIPMENT,
-        )
-        Equipment.objects.create(
-            item=espada,
-            min_level=1,
-            attribute_bonuses={"strength": 2},
-        )
+        # Equipamentos de teste (10)
+        equipamentos = [
+            ("Espada de Treinamento", "Uma espada simples para iniciantes.", "🗡️", {"strength": 2}),
+            ("Arco Curto", "Um arco curto para arqueiros iniciantes.", "🏹", {"dexterity": 2}),
+            ("Machado de Madeira", "Um machado leve de madeira.", "🪓", {"strength": 1}),
+            ("Cajado Rústico", "Um cajado para magos iniciantes.", "🪄", {"intelligence": 2}),
+            ("Escudo Pequeno", "Um escudo leve para defesa básica.", "🛡️", {"constitution": 1}),
+            ("Elmo de Couro", "Proteção básica para a cabeça.", "🥽", {"constitution": 1}),
+            ("Armadura de Couro", "Proteção básica para o corpo.", "🥋", {"constitution": 2}),
+            ("Luvas de Couro", "Luvas reforçadas para mais destreza.", "🧤", {"dexterity": 1}),
+            ("Botas Rápidas", "Botas que aumentam agilidade.", "👢", {"agility": 1}),
+            ("Anel do Iniciante", "Um anel simples que aumenta energia.", "💍", {"energy": 5}),
+        ]
 
-        arco = Item.objects.create(
-            name="Arco Curto",
-            description="Um arco curto para arqueiros iniciantes.",
-            emoji="🏹",
-            drop_chance=0.1,
-            rarity=ItemRarity.COMMON,
-            item_type=ItemType.EQUIPMENT,
-        )
-        Equipment.objects.create(
-            item=arco,
-            min_level=1,
-            attribute_bonuses={"dexterity": 2},
-        )
+        for nome, desc, emoji, bonus in equipamentos:
+            item = Item.objects.create(
+                name=nome,
+                description=desc,
+                emoji=emoji,
+                drop_chance=0.1,
+                rarity=ItemRarity.COMMON,
+                item_type=ItemType.EQUIPMENT,
+            )
+            Equipment.objects.create(item=item, min_level=1, attribute_bonuses=bonus)
 
-        # Consumíveis
+        # Consumível
         pocao = Item.objects.create(
             name="Poção de Cura",
             description="Recupera 50 de vida.",
