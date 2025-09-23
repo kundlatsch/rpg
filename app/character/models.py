@@ -54,6 +54,30 @@ class Character(models.Model):
         'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
     )
 
+    def total_attributes(self):
+        """
+        Retorna dicionário com atributos base + somatório dos equipamentos
+        """
+        attrs = {
+            "strength": self.strength,
+            "dexterity": self.dexterity,
+            "arcane": self.arcane,
+            "constitution": self.constitution,
+            "courage": self.courage,
+            "luck": self.luck,
+        }
+
+        # Somar todos atributos dos equips
+        equipped_items = [
+            self.equipped_head, self.equipped_necklace, self.equipped_shoulders,
+            self.equipped_chest, self.equipped_hands, self.equipped_feet,
+        ]
+        for eq in filter(None, equipped_items):
+            for attr, val in (eq.attribute_bonuses or {}).items():
+                attrs[attr] = attrs.get(attr, 0) + val
+
+        return attrs
+
     def __str__(self):
         return f"{self.name} (lvl {self.level})"
 
@@ -114,3 +138,4 @@ class Character(models.Model):
     @property
     def total_mana(self):
         return self.arcane * 10
+    

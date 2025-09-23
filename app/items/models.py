@@ -33,6 +33,13 @@ class Item(models.Model):
     def __str__(self):
         return f"{self.emoji} {self.name}"
 
+class EquipmentSlot(models.TextChoices):
+    HEAD = "head", "Cabeça"
+    NECK = "necklace", "Colar"
+    SHOULDERS = "shoulders", "Ombros"
+    CHEST = "chest", "Tronco"
+    HANDS = "hands", "Mãos"
+    FEET = "feet", "Pés"
 
 class Equipment(models.Model):
     item = models.OneToOneField(
@@ -42,16 +49,49 @@ class Equipment(models.Model):
     min_level = models.PositiveIntegerField(
         default=1, validators=[MinValueValidator(1)]
     )
+    slot = models.CharField(
+        max_length=20, choices=EquipmentSlot.choices, default=EquipmentSlot.HEAD
+    )
     # atributos bonus será um JSON até definirmos sistema de atributos
     attribute_bonuses = models.JSONField(default=dict, blank=True)
-    combat_skill = models.CharField(max_length=100, blank=True, null=True)
-    passive_skill = models.CharField(max_length=100, blank=True, null=True)
+    # combat_skill = models.CharField(max_length=100, blank=True, null=True)
+    # passive_skill = models.CharField(max_length=100, blank=True, null=True)
     # lista de materiais: [{"material_id": 1, "quantity": 2}, ...]
     recipe = models.JSONField(default=list, blank=True, null=True)
 
     def __str__(self):
         return f"Equipamento: {self.item.name}"
 
+class PassiveSkill(models.Model):
+    equipment = models.ForeignKey(
+        Equipment, on_delete=models.CASCADE, related_name="passive_skills"
+    )
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    trigger = models.CharField(
+        max_length=100,
+        help_text="ex: 'on_turn_start', 'on_receive_damage', 'every_3_turns'..."
+    )
+
+    def __str__(self):
+        return f"{self.name} ({self.trigger})"
+
+class PassiveEffect(models.Model):
+    passive_skill = models.ForeignKey(
+        PassiveSkill, on_delete=models.CASCADE, related_name="effects"
+    )
+    effect_type = models.CharField(
+        max_length=50,
+        help_text="ex: 'attribute_mod', 'status_effect', 'deal_damage', etc."
+    )
+    # Alvo (self / enemy)
+    target = models.CharField(max_length=10, default="self")
+    # Payload em JSON para você definir detalhes (qual atributo, quanto, duração, etc.)
+    payload = models.JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return f"{self.effect_type} ({self.target})"
 
 class Consumable(models.Model):
     item = models.OneToOneField(

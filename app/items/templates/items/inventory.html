@@ -170,9 +170,21 @@
                 
                 <!-- Slots superiores -->
                 <div class="equipment-row mb-3">
-                    {% include "items/_equipment_slot.html" with slot_name="Cabeça" slot_icon="👑" slot_equipment=character.equipped_head %}
-                    {% include "items/_equipment_slot.html" with slot_name="Colar" slot_icon="📿" slot_equipment=character.equipped_necklace %}
-                    {% include "items/_equipment_slot.html" with slot_name="Ombro" slot_icon="🎗️" slot_equipment=character.equipped_shoulders %}
+                    {% for slot in upper_slots %}
+                        <div class="meta-equipment-slot"
+                            data-type="equipment"
+                            data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
+                            data-name="{{ slot.equipment.item.name|default:slot.name }}"
+                            data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
+                            data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
+                            data-min-level="{{ slot.equipment.item.min_level|default:0 }}"
+                            data-attribute-bonuses="{{ slot.equipment.item.attribute_bonuses|default:'{}'|escapejs }}"
+                            data-combat-skill="{{ slot.equipment.item.combat_skill|default:'' }}"
+                            data-passive-skill="{{ slot.equipment.item.passive_skill|default:'' }}"
+                        >
+                            {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
+                        </div>
+                    {% endfor %}
                 </div>
 
                 <!-- Personagem central -->
@@ -185,10 +197,22 @@
                 </div>
 
                 <!-- Slots inferiores -->
-                <div class="equipment-row mt-3">
-                    {% include "items/_equipment_slot.html" with slot_name="Tronco" slot_icon="🦺" slot_equipment=character.equipped_chest %}
-                    {% include "items/_equipment_slot.html" with slot_name="Mãos" slot_icon="🧤" slot_equipment=character.equipped_hands %}
-                    {% include "items/_equipment_slot.html" with slot_name="Pés" slot_icon="👞" slot_equipment=character.equipped_feet %}
+                <div class="equipment-row mb-3">
+                    {% for slot in lower_slots %}
+                        <div class="meta-equipment-slot"
+                            data-type="equipment"
+                            data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
+                            data-name="{{ slot.equipment.item.name|default:slot.name }}"
+                            data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
+                            data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
+                            data-min-level="{{ slot.equipment.item.min_level|default:0 }}"
+                            data-attribute-bonuses="{{ slot.equipment.item.attribute_bonuses|default:'{}'|escapejs }}"
+                            data-combat-skill="{{ slot.equipment.item.combat_skill|default:'' }}"
+                            data-passive-skill="{{ slot.equipment.item.passive_skill|default:'' }}"
+                        >
+                            {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -476,6 +500,10 @@
             font-size: 1rem;
         }
     }
+
+    .meta-equipment-slot {
+        display: contents; /* faz o navegador renderizar só os filhos, como se não houvesse a div */
+    }
 </style>
 
 <script>
@@ -483,6 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Elementos do DOM
     const itemFilter = document.getElementById('itemFilter');
     const itemCards = document.querySelectorAll('.item-card');
+    const equipmentSlots = document.querySelectorAll('.meta-equipment-slot');
     const noItemSelected = document.getElementById('no-item-selected');
     const itemDetailsContent = document.getElementById('item-details-content');
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -513,8 +542,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return fallback;
       }
     }
-
-    itemCards.forEach(card => {
+    
+    [...itemCards, ...equipmentSlots].forEach(card => {
       card.addEventListener('click', function() {
         // Mostrar conteúdo de detalhes e esconder placeholder
         noItemSelected.classList.add('d-none');
@@ -536,9 +565,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const itemActions = document.getElementById('item-actions');
         itemActions.innerHTML = '';
 
+        const emptySlot = this.dataset.description == "Nenhum item equipado"
+
         switch (this.dataset.type) {
           case 'equipment':
-            statsContainer.innerHTML += `<div class="stat-item">Nível mínimo: ${this.dataset.minLevel}</div>`;
+            if (!emptySlot) {
+              statsContainer.innerHTML += `<div class="stat-item">Nível mínimo: ${this.dataset.minLevel}</div>`;
+            }
             const bonusesEq = safeParse(this.dataset.attributeBonuses, {});
             for (const [attr, value] of Object.entries(bonusesEq)) {
               statsContainer.innerHTML += `<div class="stat-item">${attr}: ${value > 0 ? '+'+value : value}</div>`;
@@ -549,7 +582,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.dataset.passiveSkill) {
               statsContainer.innerHTML += `<div class="stat-item">Passiva: ${this.dataset.passiveSkill}</div>`;
             }
-            itemActions.innerHTML = '<button class="btn-equip">Equipar</button>';
+            if (!emptySlot) {
+              itemActions.innerHTML = '<button class="btn-equip">Equipar</button>';
+            }
             break;
 
           case 'consumable':
