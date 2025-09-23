@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Combate: {{ character.name }} vs {{ monster.name }}</h1>
+  <div class="card p-3 mt-3">
+    <h4>Registro do Combate</h4>
+    <pre style="white-space:pre-wrap; font-family:monospace;">{% for line in battle_log %}{{ line }}
+{% endfor %}</pre>
+  </div>
+
+  <div class="mt-3">
+    {% if winner == request.user.username %}
+      <div class="alert alert-success">Você venceu!</div>
+    {% elif winner == "monster" %}
+      <div class="alert alert-danger">Você foi derrotado.</div>
+    {% else %}
+      <div class="alert alert-info">Empate / limite de turnos.</div>
+    {% endif %}
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Voltar</a>
+  </div>
+</div>
+{% endblock %}

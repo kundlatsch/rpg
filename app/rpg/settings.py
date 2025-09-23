@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "character",
     "tasks",
     "items",
+    "combat",
 ]
 
 LOGIN_REDIRECT_URL = "/dashboard/"  # ou "dashboard" se usar nomes de URL
