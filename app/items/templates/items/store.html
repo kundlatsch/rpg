@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho da loja -->
+    <div class="text-center mb-4">
+        <h1 class="store-title">
+            🏪 Loja do Mercador
+        </h1>
+        <p class="text-dark mb-0">Compre e venda itens com o comerciante local</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Dinheiro do personagem -->
+    <div class="gold-display text-center mb-4">
+        <div class="gold-box p-3">
+            <span class="gold-icon">💰</span>
+            <span class="gold-text">Ouro: <strong>{{ character.gold }}</strong></span>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Coluna da esquerda - Comprar itens -->
+        <div class="col-md-6 mb-4">
+            <div class="store-section p-4">
+                <h2 class="store-title text-center mb-4">🛒 Comprar Itens</h2>
+                
+                <div class="item-list scrollable">
+                    {% for si in store_items %}
+                    <div class="store-item-card rarity-{{ si.item.rarity }}">
+                        <div class="d-flex align-items-start">
+                            <span class="item-emoji me-3">{{ si.item.emoji }}</span>
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{ si.item.name }}</h5>
+                                <p class="mb-1 text-dark small">{{ si.item.description }}</p>
+                                
+                                <div class="item-details">
+                                    <div class="price-info">
+                                        <span class="price-tag">💰 {{ si.buy_price }} ouro</span>
+                                    </div>
+                                    <div class="stock-info">
+                                        {% if si.unlimited %}
+                                            <span class="stock-unlimited">∞</span>
+                                        {% else %}
+                                            <span class="stock-limited">📦 Estoque: {{ si.stock }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn-buy" onclick="buyItem({{ si.id }})">
+                                🛒 Comprar
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-dark mt-3">
+                        <p>Nenhum item disponível na loja.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da direita - Vender itens -->
+        <div class="col-md-6 mb-4">
+            <div class="inventory-section p-4">
+                <h2 class="store-title text-center mb-4">💰 Vender Itens</h2>
+                
+                <div class="item-list scrollable">
+                    {% for inv in inventory %}
+                    <div class="inventory-item-card rarity-{{ inv.item.rarity }}">
+                        <div class="d-flex align-items-start">
+                            <span class="item-emoji me-3">{{ inv.item.emoji }}</span>
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1">{{ inv.item.name }}</h5>
+                                <p class="mb-1 text-dark small">{{ inv.item.description }}</p>
+                                
+                                <div class="item-details">
+                                    <div class="quantity-info">
+                                        <span class="quantity-tag">📦 Você tem: {{ inv.quantity }}</span>
+                                    </div>
+                                    <div class="sell-price-info">
+                                        <span class="sell-price">Valor: {{ inv.item.sell_price }} 💰</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn-sell" onclick="sellItem({{ inv.item.id }})">
+                                💰 Vender
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-dark mt-3">
+                        <p>Seu inventário está vazio.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página da loja */
+    .store-section, .inventory-section {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 12px;
+        border: 2px solid #8B4513;
+        height: 70vh;
+    }
+
+    .gold-display {
+        margin: 2rem 0;
+    }
+
+    .gold-box {
+        background: linear-gradient(135deg, #FFD700, #D4AF37);
+        border: 2px solid #B8860B;
+        border-radius: 20px;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .gold-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .gold-text {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: #3E2723;
+        font-size: 1.2rem;
+    }
+
+    /* Cards de itens */
+    .store-item-card, .inventory-item-card {
+        background: rgba(245, 245, 220, 0.3);
+        border: 1px solid #8B4513;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .store-item-card:hover, .inventory-item-card:hover {
+        background: rgba(245, 245, 220, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Cores de raridade */
+    .store-item-card.rarity-common, .inventory-item-card.rarity-common {
+        border-left: 4px solid #C0C0C0;
+    }
+
+    .store-item-card.rarity-rare, .inventory-item-card.rarity-rare {
+        border-left: 4px solid #00FF00;
+    }
+
+    .store-item-card.rarity-epic, .inventory-item-card.rarity-epic {
+        border-left: 4px solid #800080;
+    }
+
+    .store-item-card.rarity-legendary, .inventory-item-card.rarity-legendary {
+        border-left: 4px solid #FFD700;
+    }
+
+    .item-emoji {
+        font-size: 2.5rem;
+    }
+
+    .item-list.scrollable {
+        max-height: 55vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    /* Custom scrollbar */
+    .item-list.scrollable::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .item-list.scrollable::-webkit-scrollbar-track {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 10px;
+    }
+
+    .item-list.scrollable::-webkit-scrollbar-thumb {
+        background: #8B4513;
+        border-radius: 10px;
+    }
+
+    /* Informações dos itens */
+    .item-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .price-info, .stock-info, .quantity-info, .sell-price-info {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .price-tag, .sell-price, .quantity-tag {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .price-tag {
+        color: #D4AF37;
+    }
+
+    .sell-price {
+        color: #28a745;
+    }
+
+    .stock-unlimited {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    .stock-limited {
+        color: #3E2723;
+    }
+
+    .quantity-tag {
+        color: #3E2723;
+    }
+
+    /* Botões de ação */
+    .btn-buy {
+        background: linear-gradient(to bottom, #D4AF37, #B8860B);
+        border: 1px solid #8B4513;
+        color: white;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .btn-buy:hover {
+        background: linear-gradient(to bottom, #B8860B, #D4AF37);
+        box-shadow: 0 0 8px #D4AF37;
+        transform: translateY(-1px);
+    }
+
+    .btn-sell {
+        background: linear-gradient(to bottom, #28a745, #20c997);
+        border: 1px solid #2E8B57;
+        color: white;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-family: 'Cinzel', serif;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .btn-sell:hover {
+        background: linear-gradient(to bottom, #20c997, #28a745);
+        box-shadow: 0 0 8px #2E8B57;
+        transform: translateY(-1px);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .item-details {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .store-section, .inventory-section {
+            height: auto;
+            max-height: 70vh;
+        }
+        
+        .item-emoji {
+            font-size: 2rem;
+        }
+    }
+
+    /* Melhorias para textos */
+    .store-title {
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .divider {
+        height: 2px;
+        background: linear-gradient(to right, transparent, #8B4513, transparent);
+        margin: 2rem 0;
+    }
+</style>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+function buyItem(storeItemId) {
+    if (!confirm('Deseja comprar este item?')) return;
+    
+    fetch("/items/store/buy/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken
+        },
+        body: JSON.stringify({
+            store_item_id: storeItemId,
+            quantity: 1
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showNotification('success', data.message || 'Item comprado com sucesso!');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification('error', data.error || 'Erro ao comprar item');
+        }
+    }).catch(error => {
+        showNotification('error', 'Erro de conexão');
+    });
+}
+
+function sellItem(itemId) {
+    if (!confirm('Deseja vender este item?')) return;
+    
+    fetch("/items/store/sell/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken
+        },
+        body: JSON.stringify({
+            item_id: itemId,
+            quantity: 1
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showNotification('success', data.message || 'Item vendido com sucesso!');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification('error', data.error || 'Erro ao vender item');
+        }
+    }).catch(error => {
+        showNotification('error', 'Erro de conexão');
+    });
+}
+
+function showNotification(type, message) {
+    // Criar elemento de notificação
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        ${type === 'success' ? 'background: linear-gradient(135deg, #28a745, #20c997);' : ''}
+        ${type === 'error' ? 'background: linear-gradient(135deg, #dc3545, #c82333);' : ''}
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Animação de entrada
+    setTimeout(() => notification.style.opacity = '1', 100);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(notification), 300);
+    }, 3000);
+}
+</script>
+
+{% endblock %}

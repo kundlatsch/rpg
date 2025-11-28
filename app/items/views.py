@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import InventoryItem, Equipment, MarketListing
+from .models import InventoryItem, Equipment, MarketListing, StoreItem
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from character.models import Character
@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 #########################
-###      INVENTORY    ###
+###     INVENTORY     ###
 #########################
 
 @login_required
@@ -349,3 +349,129 @@ def market_view(request):
             "market_consumables": market_consumables,
         },
     )
+
+#########################
+###       STORE        ###
+#########################
+
+@login_required
+def store_view(request):
+    """
+    Página da loja NPC
+    """
+    store_items = StoreItem.objects.select_related("item").all()
+    character = request.user.character
+
+    inventory = InventoryItem.objects.filter(character=character).select_related("item")
+
+    return render(
+        request,
+        "items/store.html",
+        {
+            "character": character,
+            "store_items": store_items,
+            "inventory": inventory,
+        },
+    )
+
+
+@login_required
+@require_POST
+def store_buy(request):
+    """
+    Comprar item da loja NPC
+    """
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
+
+    store_item_id = data.get("store_item_id")
+    quantity = data.get("quantity")
+
+    if not store_item_id or not quantity:
+        return JsonResponse({"success": False, "error": "Dados incompletos"}, status=400)
+
+    try:
+        store_item = StoreItem.objects.select_related("item").get(id=store_item_id)
+    except StoreItem.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Item inexistente"}, status=404)
+
+    character = request.user.character
+    total_cost = store_item.buy_price * quantity
+
+    if character.gold < total_cost:
+        return JsonResponse({"success": False, "error": "Ouro insuficiente"}, status=400)
+
+    # Se a loja não tem estoque infinito, verifica
+    if not store_item.unlimited and store_item.stock < quantity:
+        return JsonResponse({"success": False, "error": "Loja sem estoque suficiente"}, status=400)
+
+    # Comprar
+    character.gold -= total_cost
+    character.save()
+
+    # Dar item ao personagem
+    inv, created = InventoryItem.objects.get_or_create(
+        character=character,
+        item=store_item.item,
+        defaults={"quantity": 0},
+    )
+    inv.quantity += quantity
+    inv.save()
+
+    # Reduz estoque da loja
+    if not store_item.unlimited:
+        store_item.stock -= quantity
+        store_item.save()
+
+    return JsonResponse({"success": True, "message": "Compra realizada!"})
+
+
+@login_required
+@require_POST
+def store_sell(request):
+    try:
+        data = json.loads(request.body)
+        item_id = data.get("item_id")
+        quantity = data.get("quantity")
+    except:
+        return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
+
+    if not item_id or not quantity:
+        return JsonResponse({"success": False, "error": "Parâmetros faltando"}, status=400)
+
+    if quantity <= 0:
+        return JsonResponse({"success": False, "error": "Quantidade inválida"}, status=400)
+
+    character = request.user.character
+
+    # Item no inventário
+    try:
+        inv_item = InventoryItem.objects.get(character=character, item_id=item_id)
+    except InventoryItem.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Item não existe no inventário"}, status=400)
+
+    if inv_item.quantity < quantity:
+        return JsonResponse({"success": False, "error": "Quantidade insuficiente"}, status=400)
+
+    # Calcula preço
+    item_price = inv_item.item.sell_price
+    total_gold = item_price * quantity
+
+    # Dá o ouro
+    character.gold += total_gold
+    character.save()
+
+    # Remove item
+    inv_item.quantity -= quantity
+    if inv_item.quantity <= 0:
+        inv_item.delete()
+    else:
+        inv_item.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"Você vendeu {quantity}x {inv_item.item.name} por {total_gold} gold!",
+        "gold_gained": total_gold
+    })

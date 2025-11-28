@@ -52,3 +52,16 @@ STAT_LABELS = {
     "pierce": "perfuração",
     "blunt": "esmagamento",
 }
+
+ITEM_RARITY_BASE_PRICE = {
+    "common": 10,
+    "rare": 25,
+    "epic": 50,
+    "legendary": 200,
+}
+
+ITEM_PRICE_MULTIPLIER = {
+    "material": 1,
+    "consumable": 2,
+    "equipment": 4,
+}

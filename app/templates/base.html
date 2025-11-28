@@ -44,6 +44,15 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7), 0 0 10px var(--color-secondary);
             letter-spacing: 1px;
         }
+
+        .fantasy-title a {
+            all: unset;           /* remove todo estilo padrão do a */
+            cursor: pointer;      /* deixa clicável novamente */
+        }
+
+        .fantasy-title a:hover {
+            text-decoration: underline; /* opcional, se quiser feedback visual */
+        }
         
         .fantasy-header {
             background: linear-gradient(to bottom, #2A1F14, #1A130B);
@@ -198,7 +207,7 @@
 
     <header class="fantasy-header">
         <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="fantasy-title mb-0">Reino de Eldoria</h1>
+            <h1 class="fantasy-title mb-0"><a href="/dashboard/">Reino de Eldoria</a></h1>
             <nav class="fantasy-nav">
                 <a class="text-white" href="/">Início</a>
                 

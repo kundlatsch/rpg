@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField  # se precisar
 from django.core.validators import MinValueValidator
 
-from .constants import ATTRIBUTE_LABELS, TRIGGER_LABELS, RECIPE_LABELS, STAT_LABELS
+from .constants import ATTRIBUTE_LABELS, TRIGGER_LABELS, RECIPE_LABELS, STAT_LABELS, ITEM_RARITY_BASE_PRICE, ITEM_PRICE_MULTIPLIER
 from .utils import SafeStats
 
 class ItemType(models.TextChoices):
@@ -34,6 +34,12 @@ class Item(models.Model):
 
     def __str__(self):
         return f"{self.emoji} {self.name}"
+    
+    @property
+    def sell_price(self):
+        base = ITEM_RARITY_BASE_PRICE.get(self.rarity, 10)
+        mult = ITEM_PRICE_MULTIPLIER.get(self.item_type, 1)
+        return base * mult
 
 class EquipmentSlot(models.TextChoices):
     HEAD = "head", "Cabeça"
@@ -302,3 +308,16 @@ class MarketListing(models.Model):
 
     def __str__(self):
         return f"{self.seller.username} vende {self.quantity}x {self.item}"
+
+
+class StoreItem(models.Model):
+    """
+    Itens disponíveis na loja do NPC.
+    """
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    buy_price = models.PositiveIntegerField()
+    unlimited = models.BooleanField(default=True)
+    stock = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.item.name} (Loja)"
