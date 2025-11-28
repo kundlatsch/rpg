@@ -23,31 +23,54 @@
     <div class="tooltip-body">
       <div class="item-rarity {{ slot_equipment.item.rarity }}">{{ slot_equipment.item.get_rarity_display }}</div>
       <div class="item-description">{{ slot_equipment.item.description }}</div>
+
+      {% if slot_equipment.stats %}
+        {% if slot_equipment.formatted_equipment_stats %}
+          <div style="margin-bottom: 5px;">
+              {{ slot_equipment.formatted_equipment_stats }}
+          </div>
+        {% endif %}
+      {% endif %}
       
-      {% if slot_equipment.attribute_bonuses %}
+      {% if slot_equipment.attribute_bonuses_strings %}
       <div class="item-bonuses">
         <div class="bonus-title">Bônus de Atributos:</div>
-        {% for attr, value in slot_equipment.attribute_bonuses.items %}
+        {% for attr, value in slot_equipment.attribute_bonuses_strings.items %}
         <div class="bonus-item">
-          <span class="bonus-attr">{{ attr|capfirst }}:</span>
+          <span class="bonus-attr">{{ attr|capfirst }}</span>
           <span class="bonus-value">+{{ value }}</span>
         </div>
         {% endfor %}
       </div>
       {% endif %}
       
-      {% if slot_equipment.combat_skill %}
-      <div class="item-skill">
-        <div class="skill-title">Habilidade de Combate:</div>
-        <div class="skill-name">{{ slot_equipment.combat_skill }}</div>
-      </div>
-      {% endif %}
-      
       {% if slot_equipment.passive_skill %}
-      <div class="item-skill">
-        <div class="skill-title">Habilidade Passiva:</div>
-        <div class="skill-name">{{ slot_equipment.passive_skill }}</div>
-      </div>
+        <div class="item-skill">
+            <div class="skill-title">Habilidade Passiva:</div>
+
+            <div class="skill-name">
+                <strong>{{ slot_equipment.passive_skill.name }}</strong>
+            </div>
+
+            {% if slot_equipment.passive_skill.description %}
+            <div style="font-size: 0.7rem; font-style: italic">
+                <em>{{ slot_equipment.passive_skill.description }}</em>
+            </div>
+            {% endif %}
+
+            {% if slot_equipment.passive_skill.trigger %}
+            <div style="font-size: 0.8rem;">
+                <strong>Ativação:</strong>
+                {{ slot_equipment.trigger_string }}
+            </div>
+            {% endif %}
+
+            {% if slot_equipment.formatted_passive_skill_effects %}
+            <div style="font-size: 0.8rem;">
+                <strong>Efeitos:</strong> {{ slot_equipment.formatted_passive_skill_effects }}
+            </div>
+            {% endif %}
+        </div>
       {% endif %}
       
       <div class="item-level">Requer nível {{ slot_equipment.min_level }}</div>
@@ -196,7 +219,8 @@
   
   .bonus-item {
     display: flex;
-    justify-content: space-between;
+    gap: 5px;
+    justify-content: center;
     font-size: 0.85rem;
     margin-bottom: 0.1rem;
   }

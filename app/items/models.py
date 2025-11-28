@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField, JSONField  # se precisar
 from django.core.validators import MinValueValidator
 
+from .constants import ATTRIBUTE_LABELS, TRIGGER_LABELS, RECIPE_LABELS, STAT_LABELS
+from .utils import SafeStats
 
 class ItemType(models.TextChoices):
     MATERIAL = "material", "Material"
@@ -52,46 +54,192 @@ class Equipment(models.Model):
     slot = models.CharField(
         max_length=20, choices=EquipmentSlot.choices, default=EquipmentSlot.HEAD
     )
-    # atributos bonus será um JSON até definirmos sistema de atributos
-    attribute_bonuses = models.JSONField(default=dict, blank=True)
-    # combat_skill = models.CharField(max_length=100, blank=True, null=True)
-    # passive_skill = models.CharField(max_length=100, blank=True, null=True)
-    # lista de materiais: [{"material_id": 1, "quantity": 2}, ...]
+
     recipe = models.JSONField(default=list, blank=True, null=True)
+
+    attribute_bonuses = models.JSONField(default=dict, blank=True)
+
+    stats = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="""
+        Exemplo:
+        {
+            "attack": {
+                "type": "physical",
+                "style": "slash",
+                "value": 10
+            },
+            "defense": {
+                "type": "magic",
+                "weakness": "slash",
+                "value": 5
+            }
+        }
+        """
+    )
+
+    passive_skill = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="""
+        Exemplo:
+        {
+            "name": "Espírito Guardião",
+            "trigger": "on_turn_start",
+            "description": "Flavor text",
+            "cost": 10,
+            "effects": [
+                {"type": "attribute_mod", "target": "self", "payload": {"attr": "strength", "value": 2}},
+                {"type": "status_effect", "target": "enemy", "payload": {"status": "burn", "duration": 2}}
+            ]
+        }
+        """
+    )
+
+    @property
+    def formatted_passive_skill_effects(self):
+        """Retorna uma string formatada com os efeitos da habilidade passiva (com tradução)."""
+        if not self.passive_skill or 'effects' not in self.passive_skill:
+            return ""
+
+        effects = self.passive_skill['effects']
+        if not effects:
+            return ""
+        
+        effect_strings = []
+        for effect in effects:
+            effect_type = effect.get('type')
+            target = effect.get('target', 'self')
+            cost = effect.get("cost", 0)
+            payload = effect.get('payload', {})
+
+            def translate_attr(attr_key: str) -> str:
+                if not attr_key:
+                    return ""
+                return ATTRIBUTE_LABELS.get(attr_key, attr_key.replace("_", " ").title())
+
+            if effect_type == 'attribute_mod':
+                attr_key = payload.get('attr', '')
+                attr = translate_attr(attr_key)
+                value = payload.get('value', 0)
+                sign = '+' if value > 0 else ''
+                effect_str = f"{sign}{value} {attr}"
+
+            elif effect_type == 'status_effect':
+                status = payload.get('status', '').title()
+                duration = payload.get('duration', 0)
+                effect_str = f"Aplica {status} por {duration} turno(s)"
+
+            elif effect_type == 'heal':
+                amount = payload.get('amount', 0) or payload.get('value', 0)
+                effect_str = f"Cura {amount} de vida"
+
+            elif effect_type == 'damage':
+                amount = payload.get('amount', 0) or payload.get('value', 0)
+                damage_type = payload.get('damage_type', '').title()
+                effect_str = f"Causa {amount} de dano {damage_type}".strip()
+
+            elif effect_type == 'defense_buff':
+                amount = payload.get('amount', 0) or payload.get('value', 0)
+                effect_str = f"+{amount} de Defesa"
+
+            else:
+                # fallback
+                effect_str = f"{effect_type}: {payload}"
+
+            if target != 'self':
+                target_map = {
+                    "enemy": "inimigo",
+                    "ally": "aliado",
+                }
+                target_str = target_map.get(target, target)
+                effect_str += f" no {target_str}"
+
+            effect_strings.append(effect_str)
+
+        return ", ".join(effect_strings)
+    
+
+
+    @property
+    def formatted_equipment_stats(self) -> str:
+        """
+        Converte o JSONField 'stats' em uma string amigável em português.
+        """
+        def translate(key: str) -> str:
+            return STAT_LABELS.get(key, key.replace("_", " "))
+        
+        stats = self.stats
+        if not stats:
+            return ""
+
+        lines = []
+
+        for key, data in stats.items():
+            if not isinstance(data, dict):
+                continue
+
+            stat_name = translate(key).capitalize()  # ex: defense → Defesa
+            line = stat_name
+
+            value = data.get("value")
+            stype = data.get("type")
+            style = data.get("style")
+            weakness = data.get("weakness")
+
+            desc_parts = []
+
+            if stype:
+                line += " " + translate(stype)
+            line += ":"
+            if value:
+                line += " +" + str(value)
+            if style:
+                line += " " + translate(style)
+            if weakness:
+                line += " " + "(fraco contra " + translate(weakness) + ")"
+
+            lines.append(line)
+
+        return "\n".join(lines)
+
+
+    @property
+    def attribute_bonuses_strings(self):
+        translated = {}
+        for key, value in self.attribute_bonuses.items():
+            label = ATTRIBUTE_LABELS.get(key, key.replace("_", " ").title())
+            translated[label] = value
+        return translated
 
     def __str__(self):
         return f"Equipamento: {self.item.name}"
+    
+    @property
+    def recipe_strings(self):
+        if not self.recipe:
+            return {}
 
-class PassiveSkill(models.Model):
-    equipment = models.ForeignKey(
-        Equipment, on_delete=models.CASCADE, related_name="passive_skills"
-    )
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+        translated = {}
+        for key, value in self.recipe.items():
+            label = RECIPE_LABELS.get(key, key.replace("_", " ").title())
+            translated[label] = value
 
-    trigger = models.CharField(
-        max_length=100,
-        help_text="ex: 'on_turn_start', 'on_receive_damage', 'every_3_turns'..."
-    )
-
-    def __str__(self):
-        return f"{self.name} ({self.trigger})"
-
-class PassiveEffect(models.Model):
-    passive_skill = models.ForeignKey(
-        PassiveSkill, on_delete=models.CASCADE, related_name="effects"
-    )
-    effect_type = models.CharField(
-        max_length=50,
-        help_text="ex: 'attribute_mod', 'status_effect', 'deal_damage', etc."
-    )
-    # Alvo (self / enemy)
-    target = models.CharField(max_length=10, default="self")
-    # Payload em JSON para você definir detalhes (qual atributo, quanto, duração, etc.)
-    payload = models.JSONField(default=dict, blank=True)
-
-    def __str__(self):
-        return f"{self.effect_type} ({self.target})"
+        return translated
+    
+    @property
+    def trigger_string(self):
+        if not self.passive_skill:
+            return ""
+        cost = self.passive_skill.get("cost", 0)
+        trigger_key = self.passive_skill.get("trigger", "")
+        trigger_label = TRIGGER_LABELS.get(trigger_key, trigger_key.replace("_", " ").title())
+        return f"{trigger_label} ({cost} PM)"
+    
+    @property
+    def parsed_stats(self):
+        return SafeStats(self.stats)
 
 class Consumable(models.Model):
     item = models.OneToOneField(
@@ -140,3 +288,17 @@ class InventoryItem(models.Model):
 
     def __str__(self):
         return f"{self.character.name} - {self.quantity}x {self.item.name}"
+
+
+class MarketListing(models.Model):
+    seller = models.ForeignKey(
+        "character.Character", on_delete=models.CASCADE, related_name="listings"
+    )
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    price = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.seller.username} vende {self.quantity}x {self.item}"

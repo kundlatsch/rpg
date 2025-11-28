@@ -18,6 +18,62 @@
     <!-- Barra de XP discreta -->
     <div class="row text-dark mb-4">
         <div class="col-12">
+                        <!-- Barras de HP, Mana e Stamina -->
+            <div class="row text-dark mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="resource-bar">
+                        <div class="resource-header">
+                            <span class="resource-icon">❤️</span>
+                            <span class="resource-name">Vida</span>
+                            <span class="resource-value">{{ character.hp }}/{{ character.max_hp }}</span>
+                        </div>
+                        <div class="progress resource-progress mb-1">
+                            <div class="progress-bar bg-hp" role="progressbar" 
+                                style="width: {% widthratio character.hp character.max_hp 100 %}%;" 
+                                aria-valuenow="{{ character.hp }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="{{ character.max_hp }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="resource-bar">
+                        <div class="resource-header">
+                            <span class="resource-icon">🔮</span>
+                            <span class="resource-name">Mana</span>
+                            <span class="resource-value">{{ character.mana }}/{{ character.max_mana }}</span>
+                        </div>
+                        <div class="progress resource-progress mb-1">
+                            <div class="progress-bar bg-mana" role="progressbar" 
+                                style="width: {% widthratio character.mana character.max_mana 100 %}%;" 
+                                aria-valuenow="{{ character.mana }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="{{ character.max_mana }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="resource-bar">
+                        <div class="resource-header">
+                            <span class="resource-icon">⚡</span>
+                            <span class="resource-name">Energia</span>
+                            <span class="resource-value">{{ character.stamina }}/{{ character.max_stamina }}</span>
+                        </div>
+                        <div class="progress resource-progress mb-1">
+                            <div class="progress-bar bg-stamina" role="progressbar" 
+                                style="width: {% widthratio character.stamina character.max_stamina 100 %}%;" 
+                                aria-valuenow="{{ character.stamina }}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="{{ character.max_stamina }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="xp-container">
                 <div class="progress xp-bar mb-1">
                     <div class="progress-bar bg-xp" role="progressbar" 
@@ -107,7 +163,7 @@
                 <ul class="menu-list">
                     <li><a href="{% url 'character_detail' %}" class="menu-btn">👤 Personagem</a></li>
                     <li><a href="{% url 'inventory' %}" class="menu-btn">🎒 Inventário</a></li>
-                    <li><a href="#" class="menu-btn">🏪 Mercado</a></li>
+                    <li><a href="{% url 'market' %}" class="menu-btn">🏪 Mercado</a></li>
                     <li><a href="#" class="menu-btn">🏰 Guilda</a></li>
                     <li><a href="#" class="menu-btn">🏆 Ranking</a></li>
                 </ul>
@@ -412,6 +468,55 @@
         background: rgba(139, 69, 19, 0.2);
         border-color: #D4AF37;
         transform: translateY(-3px);
+    }
+
+    /* Barras de recursos */
+    .resource-bar {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 8px;
+        border: 1px solid #8B4513;
+        padding: 0.75rem;
+    }
+    
+    .resource-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    .resource-icon {
+        font-size: 1.2rem;
+    }
+    
+    .resource-name {
+        font-weight: 600;
+        color: #3E2723;
+        font-family: 'Cinzel', serif;
+    }
+    
+    .resource-value {
+        font-size: 0.85rem;
+        color: #8B4513;
+        font-weight: bold;
+    }
+    
+    .resource-progress {
+        height: 10px !important;
+        background-color: rgba(212, 175, 55, 0.2) !important;
+        border: 1px solid rgba(139, 69, 19, 0.3);
+    }
+    
+    .bg-hp {
+        background: linear-gradient(to right, #DC143C, #FF6B6B) !important;
+    }
+    
+    .bg-mana {
+        background: linear-gradient(to right, #4B0082, #9370DB) !important;
+    }
+    
+    .bg-stamina {
+        background: linear-gradient(to right, #32CD32, #90EE90) !important;
     }
 
 </style>

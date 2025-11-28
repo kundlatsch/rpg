@@ -1,28 +1,409 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>{{ character.name }}</h1>
-<p>Nível: {{ character.level }} - XP: {{ character.exp }}/{{ character.max_exp }}</p>
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho -->
+    <div class="text-center mb-4">
+        <h1 class="fantasy-title">{{ character.name }}</h1>
+        <p class="text-dark mb-0">Nível: {{ character.level }} - XP: {{ character.exp }}/{{ character.max_exp }}</p>
+    </div>
 
-<h2>Atributos Primários</h2>
-<ul>
-  <li>Força: {{ character.strength }}</li>
-  <li>Destreza: {{ character.dexterity }}</li>
-  <li>Arcano: {{ character.arcane }}</li>
-  <li>Constituição: {{ character.constitution }}</li>
-  <li>Coragem: {{ character.courage }}</li>
-  <li>Sorte: {{ character.luck }}</li>
-</ul>
+    <div class="divider"></div>
 
-<h2>Atributos Secundários</h2>
-<ul>
-  <li>Dano Físico: {{ character.physical_damage }}</li>
-  <li>Dano Mágico: {{ character.magical_damage }}</li>
-  <li>Precisão: {{ character.accuracy }}</li>
-  <li>Chance de Crítico: {{ character.crit_chance }}%</li>
-  <li>Dano Crítico: {{ character.crit_damage }}</li>
-  <li>Vida Total: {{ character.total_hp }}</li>
-  <li>Mana Total: {{ character.total_mana }}</li>
-</ul>
+    <!-- Pontos de Atributo -->
+    <div class="inventory-sidebar p-4 text-center mb-4">
+        <h3 class="fantasy-title mb-3">Pontos de Atributo Disponíveis</h3>
+        <div class="points-display">
+            <span class="points-value">{{ character.attribute_points }}</span>
+        </div>
+        {% if character.attribute_points == 0 %}
+        <p class="text-dark mt-2">Use os pontos ganhos ao subir de nível para melhorar seus atributos</p>
+        {% endif %}
+    </div>
 
+    <div class="row">
+        <!-- Coluna da Esquerda - Atributos Primários -->
+        <div class="col-md-6 mb-4">
+            <div class="inventory-sidebar p-4">
+                <h3 class="fantasy-title text-center mb-4">Atributos Primários</h3>
+                
+                <div class="attributes-list">
+                    <!-- Força -->
+                    <div class="attribute-item">
+                        <div class="attribute-info">
+                            <span class="attribute-emoji">💪</span>
+                            <div class="attribute-details">
+                                <span class="attribute-name">Força</span>
+                                <span class="attribute-value">{{ character.strength }}</span>
+                            </div>
+                        </div>
+                        {% if character.attribute_points > 0 %}
+                        <form method="POST" class="attribute-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="attribute" value="strength">
+                            <button type="submit" class="btn-upgrade">+</button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Destreza -->
+                    <div class="attribute-item">
+                        <div class="attribute-info">
+                            <span class="attribute-emoji">🎯</span>
+                            <div class="attribute-details">
+                                <span class="attribute-name">Destreza</span>
+                                <span class="attribute-value">{{ character.dexterity }}</span>
+                            </div>
+                        </div>
+                        {% if character.attribute_points > 0 %}
+                        <form method="POST" class="attribute-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="attribute" value="dexterity">
+                            <button type="submit" class="btn-upgrade">+</button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Arcano -->
+                    <div class="attribute-item">
+                        <div class="attribute-info">
+                            <span class="attribute-emoji">🔮</span>
+                            <div class="attribute-details">
+                                <span class="attribute-name">Arcano</span>
+                                <span class="attribute-value">{{ character.arcane }}</span>
+                            </div>
+                        </div>
+                        {% if character.attribute_points > 0 %}
+                        <form method="POST" class="attribute-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="attribute" value="arcane">
+                            <button type="submit" class="btn-upgrade">+</button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Constituição -->
+                    <div class="attribute-item">
+                        <div class="attribute-info">
+                            <span class="attribute-emoji">🛡️</span>
+                            <div class="attribute-details">
+                                <span class="attribute-name">Constituição</span>
+                                <span class="attribute-value">{{ character.constitution }}</span>
+                            </div>
+                        </div>
+                        {% if character.attribute_points > 0 %}
+                        <form method="POST" class="attribute-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="attribute" value="constitution">
+                            <button type="submit" class="btn-upgrade">+</button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Coragem -->
+                    <div class="attribute-item">
+                        <div class="attribute-info">
+                            <span class="attribute-emoji">⚡</span>
+                            <div class="attribute-details">
+                                <span class="attribute-name">Coragem</span>
+                                <span class="attribute-value">{{ character.courage }}</span>
+                            </div>
+                        </div>
+                        {% if character.attribute_points > 0 %}
+                        <form method="POST" class="attribute-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="attribute" value="courage">
+                            <button type="submit" class="btn-upgrade">+</button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Sorte -->
+                    <div class="attribute-item">
+                        <div class="attribute-info">
+                            <span class="attribute-emoji">🍀</span>
+                            <div class="attribute-details">
+                                <span class="attribute-name">Sorte</span>
+                                <span class="attribute-value">{{ character.luck }}</span>
+                            </div>
+                        </div>
+                        {% if character.attribute_points > 0 %}
+                        <form method="POST" class="attribute-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="attribute" value="luck">
+                            <button type="submit" class="btn-upgrade">+</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da Direita - Atributos Secundários -->
+        <div class="col-md-6 mb-4">
+            <div class="inventory-sidebar p-4">
+                <h3 class="fantasy-title text-center mb-4">Atributos Secundários</h3>
+                
+                <div class="secondary-attributes-grid">
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">⚔️</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Dano Físico</span>
+                            <span class="secondary-value">{{ character.physical_damage }}</span>
+                        </div>
+                    </div>
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">✨</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Dano Mágico</span>
+                            <span class="secondary-value">{{ character.magical_damage }}</span>
+                        </div>
+                    </div>
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">🎯</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Precisão</span>
+                            <span class="secondary-value">{{ character.accuracy }}</span>
+                        </div>
+                    </div>
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">💥</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Chance de Crítico</span>
+                            <span class="secondary-value">{{ character.crit_chance }}%</span>
+                        </div>
+                    </div>
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">🔥</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Dano Crítico</span>
+                            <span class="secondary-value">{{ character.crit_damage }}</span>
+                        </div>
+                    </div>
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">❤️</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Vida Total</span>
+                            <span class="secondary-value">{{ character.total_hp }}</span>
+                        </div>
+                    </div>
+                    <div class="secondary-attribute">
+                        <span class="secondary-emoji">🔷</span>
+                        <div class="secondary-details">
+                            <span class="secondary-name">Mana Total</span>
+                            <span class="secondary-value">{{ character.total_mana }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão de Voltar -->
+    <div class="text-center mt-4">
+        <a href="{% url 'dashboard' %}" class="btn-equip">🏰 Voltar ao Dashboard</a>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para a página de atributos - Mantendo cores existentes */
+.points-display {
+    background: rgba(212, 175, 55, 0.2);
+    border: 2px solid #D4AF37;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.points-value {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #8B4513;
+}
+
+.attributes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.attribute-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(245, 245, 220, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #8B4513;
+    transition: all 0.3s ease;
+}
+
+.attribute-item:hover {
+    background: rgba(245, 245, 220, 0.5);
+    transform: translateX(5px);
+}
+
+.attribute-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.attribute-emoji {
+    font-size: 1.8rem;
+    width: 40px;
+    text-align: center;
+}
+
+.attribute-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.attribute-name {
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    color: #8B4513;
+    font-size: 1rem;
+}
+
+.attribute-value {
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    color: #3E2723;
+    font-size: 1.2rem;
+}
+
+.attribute-form {
+    margin: 0;
+}
+
+.btn-upgrade {
+    background: linear-gradient(to bottom, #8B4513, #6B3100);
+    border: 1px solid #D4AF37;
+    color: #F5F5DC;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-upgrade:hover {
+    background: linear-gradient(to bottom, #6B3100, #8B4513);
+    box-shadow: 0 0 10px #D4AF37;
+    transform: scale(1.1);
+}
+
+.secondary-attributes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+}
+
+.secondary-attribute {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(245, 245, 220, 0.3);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #8B4513;
+    transition: all 0.3s ease;
+}
+
+.secondary-attribute:hover {
+    background: rgba(245, 245, 220, 0.5);
+    transform: translateX(5px);
+}
+
+.secondary-emoji {
+    font-size: 1.5rem;
+    width: 30px;
+    text-align: center;
+}
+
+.secondary-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+}
+
+.secondary-name {
+    font-family: 'MedievalSharp', cursive;
+    color: #3E2723;
+    font-weight: bold;
+}
+
+.secondary-value {
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    color: #8B4513;
+    background: rgba(212, 175, 55, 0.2);
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.btn-equip {
+    background: linear-gradient(to bottom, #8B4513, #6B3100);
+    border: 1px solid #D4AF37;
+    color: #F5F5DC;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-family: 'Cinzel', serif;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-equip:hover {
+    background: linear-gradient(to bottom, #6B3100, #8B4513);
+    box-shadow: 0 0 10px #D4AF37;
+    color: #FFF;
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .attribute-info {
+        gap: 0.5rem;
+    }
+    
+    .attribute-emoji {
+        font-size: 1.5rem;
+        width: 30px;
+    }
+    
+    .attribute-name {
+        font-size: 0.9rem;
+    }
+    
+    .attribute-value {
+        font-size: 1rem;
+    }
+    
+    .btn-upgrade {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+}
+</style>
 {% endblock %}

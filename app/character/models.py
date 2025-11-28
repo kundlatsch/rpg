@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from .constants import SLOT_WEAKNESS_MULTIPLIER
 
 class CharactersConfig(models.Model):
     # Progressão de nível
@@ -11,6 +12,7 @@ class Character(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     emoji = models.CharField(max_length=5, default="😃")
+    gold = models.IntegerField(default=0)
 
     level = models.IntegerField(default=1)
     exp = models.IntegerField(default=0)
@@ -54,6 +56,26 @@ class Character(models.Model):
         'items.Equipment', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
     )
 
+    def get_total_weakness(self, style: str) -> float:
+        """
+        Retorna o multiplicador total de fraqueza do personagem contra
+        um tipo de ataque (style), somando todos os equipamentos.
+        """
+        total_multiplier = 0.0
+
+        for slot, extra in SLOT_WEAKNESS_MULTIPLIER.items():
+            equip = getattr(self, slot)
+
+            if not equip:
+                continue
+
+            weakness = equip.parsed_stats.defense.weakness
+
+            if weakness == style:
+                total_multiplier += extra
+
+        return total_multiplier
+
     def total_attributes(self):
         """
         Retorna dicionário com atributos base + somatório dos equipamentos
@@ -77,6 +99,10 @@ class Character(models.Model):
                 attrs[attr] = attrs.get(attr, 0) + val
 
         return attrs
+    
+    @property
+    def final_attr(self):
+        return self.total_attributes()
 
     def __str__(self):
         return f"{self.name} (lvl {self.level})"
@@ -109,33 +135,40 @@ class Character(models.Model):
         self.save()
         return leveled_up
     
-    # --- ATRIBUTOS SECUNDÁRIOS (PROPERTIES) ---
+    # --- ATRIBUTOS SECUNDÁRIOS ---
     @property
     def physical_damage(self):
-        return self.strength + self.courage * 0.1
+        final = self.final_attr
+        return final["strength"] + final["courage"] * 0.1
 
     @property
     def magical_damage(self):
-        return self.arcane + self.courage * 0.1
+        final = self.final_attr
+        return final["arcane"] + final["courage"] * 0.1
 
     @property
     def accuracy(self):
-        return self.dexterity + self.courage * 0.1
+        final = self.final_attr
+        return final["dexterity"] + final["courage"] * 0.1
 
     @property
     def crit_chance(self):
-        # max 50%
-        return min(self.luck * 0.5, 50)
+        final = self.final_attr
+        return min(final["luck"] * 0.5, 50)
 
     @property
     def crit_damage(self):
-        return 1 + self.dexterity * 0.1 + self.courage * 0.01 + self.arcane * 0.01
+        final = self.final_attr
+        value = 1 + final["dexterity"] * 0.1 + final["courage"] * 0.01 + final["arcane"] * 0.01
+        return round(value, 2)
 
     @property
     def total_hp(self):
-        return self.constitution * 10
+        final = self.final_attr
+        return final["constitution"] * 10
 
     @property
     def total_mana(self):
-        return self.arcane * 10
+        final = self.final_attr
+        return final["arcane"] * 10
     

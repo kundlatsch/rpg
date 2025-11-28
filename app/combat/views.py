@@ -4,10 +4,12 @@ from django.utils import timezone
 from django.db import transaction
 from django.http import HttpResponseBadRequest
 import logging
-from .utils import (
+from .battle import (
     compute_hit_chance, compute_damage, apply_effects_from_passives,
-    safe_get_equipment_passives, roll_chance
+    safe_get_equipment_passives, roll_chance, group_battle_log_by_turns
 )
+from items.models import EquipmentSlot
+from combat.utils import create_mock_equipment
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,6 @@ from .models import EncounterLog
 
 @login_required
 def hunt(request, monster_id=None):
-    print("BOCA")
     try:
         character = request.user.character
     except Exception:
@@ -57,10 +58,31 @@ def hunt(request, monster_id=None):
         monster.luck = 1
         monster.hp = monster.constitution * 10
         monster.max_hp = monster.hp
-        monster.emoji = "🐾"
+        monster.mana = monster.arcane * 10
+        monster.max_mana = monster.mana
+        monster.emoji = "🤖"
         monster.xp_reward = 10 * monster.level
         monster.gold_reward = 5 * monster.level
         monster.equipment = []
+        monster.final_attr = {
+            "strength": monster.strength,
+            "dexterity": monster.dexterity,
+            "arcane": monster.arcane,
+            "constitution": monster.constitution,
+            "courage": monster.courage,
+            "luck": monster.luck,
+        }
+        slots = [
+            EquipmentSlot.HEAD,
+            EquipmentSlot.SHOULDERS,
+            EquipmentSlot.CHEST,
+            EquipmentSlot.FEET,
+            EquipmentSlot.HANDS,   # opcional
+        ]
+
+        for slot in slots:
+            equip = create_mock_equipment(slot)
+            setattr(monster, f"equipped_{slot}", equip)
 
     battle_log = []
     battle_state = {
@@ -80,6 +102,31 @@ def hunt(request, monster_id=None):
         "_temp_attrs": {},
     }
 
+    # Inicializar estatísticas
+    battle_stats = {
+        "total_damage_dealt": 0,
+        "total_damage_taken": 0,
+        "hits": 0,
+        "misses": 0,
+        "crits": 0,
+        "turns_taken": 0
+    }
+
+    char_passives = []
+    for slot in ("equipped_head","equipped_necklace","equipped_shoulders","equipped_chest","equipped_hands","equipped_feet"):
+        eq = getattr(character, slot, None)
+        if eq:
+            char_passives += safe_get_equipment_passives(eq)
+
+    mon_passives = []
+    for eq in getattr(monster, "equipment", []) or []:
+        mon_passives += safe_get_equipment_passives(eq)
+    
+    char_atk = character.equipped_hands.parsed_stats.attack
+    mon_atk_type = "physical"
+    char_state["weakness"] = character.get_total_weakness("slash")
+    mon_state["weakness"] = 1.1
+
     MAX_TURNS = 50
     while char_state["hp"] > 0 and mon_state["hp"] > 0 and battle_state["turn"] < MAX_TURNS:
         battle_state["turn"] += 1
@@ -87,18 +134,6 @@ def hunt(request, monster_id=None):
         battle_log.append(f"--- Turno {t} ---")
 
         # Turn start passives (both sides)
-        # coletar passivas do equipamento do character
-        char_passives = []
-        for slot in ("equipped_head","equipped_necklace","equipped_shoulders","equipped_chest","equipped_hands","equipped_feet"):
-            eq = getattr(character, slot, None)
-            if eq:
-                char_passives += safe_get_equipment_passives(eq)
-        print(char_passives)
-
-        mon_passives = []
-        for eq in getattr(monster, "equipment", []) or []:
-            mon_passives += safe_get_equipment_passives(eq)
-
         apply_effects_from_passives(char_passives, "on_turn_start", char_state, mon_state, battle_state, battle_log)
         apply_effects_from_passives(mon_passives, "on_turn_start", mon_state, char_state, battle_state, battle_log)
 
@@ -106,13 +141,18 @@ def hunt(request, monster_id=None):
         hit_chance = compute_hit_chance(character, monster)
         hit_roll = roll_chance(hit_chance)
         if hit_roll:
-            damage, crit = compute_damage(character, monster, physical=True)
+            damage, crit = compute_damage(char_state, mon_state, damage_type=char_atk.type)
             # apply on_attack passives BEFORE applying damage
             apply_effects_from_passives(char_passives, "on_attack", char_state, mon_state, battle_state, battle_log)
             mon_state["hp"] -= damage
+            battle_stats["hits"] += 1
+            if crit:
+                battle_stats["crits"] += 1
+            battle_stats["total_damage_dealt"] += damage
             battle_log.append(f"{character.name} acerta {damage} dano {'(CRÍTICO)' if crit else ''} em {monster.name} (hp restante: {max(0, mon_state['hp'])}).")
             apply_effects_from_passives(mon_passives, "on_receive_damage", mon_state, char_state, battle_state, battle_log)
         else:
+            battle_stats["misses"] += 1
             battle_log.append(f"{character.name} errou o ataque em {monster.name}.")
 
         if mon_state["hp"] <= 0:
@@ -121,12 +161,12 @@ def hunt(request, monster_id=None):
             break
 
         # Monster attacks
-        # monster's hit chance using same function; wrap monster as object with needed props
         hit_chance_m = compute_hit_chance(monster, character)
         if roll_chance(hit_chance_m):
-            damage_m, crit_m = compute_damage(monster, character, physical=True)
+            damage_m, crit_m = compute_damage(mon_state, char_state, damage_type=mon_atk_type)
             apply_effects_from_passives(mon_passives, "on_attack", mon_state, char_state, battle_state, battle_log)
             char_state["hp"] -= damage_m
+            battle_stats["total_damage_taken"] += damage_m
             battle_log.append(f"{monster.name} acerta {damage_m} dano {'(CRÍTICO)' if crit_m else ''} em {character.name} (hp restante: {max(0, char_state['hp'])}).")
             apply_effects_from_passives(char_passives, "on_receive_damage", char_state, mon_state, battle_state, battle_log)
         else:
@@ -136,6 +176,9 @@ def hunt(request, monster_id=None):
             battle_state["winner"] = "monster"
             battle_log.append(f"{character.name} foi derrotado!")
             break
+
+    # Atualizar turns_taken
+    battle_stats["turns_taken"] = battle_state["turn"]
 
     # Resultado
     if battle_state["winner"] == "character":
@@ -172,4 +215,7 @@ def hunt(request, monster_id=None):
         "winner": winner,
         "monster": monster,
         "character": character,
+        "battle_stats": battle_stats,
+        "char_state": char_state,
+        "mon_state": mon_state,
     })

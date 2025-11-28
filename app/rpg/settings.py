@@ -137,3 +137,20 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TIME_ZONE = "America/Sao_Paulo"
 USE_TZ = True
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        # mostra logs INFO e DEBUG de TODO o projeto
+        "": {
+            "handlers": ["console"],
+            "level": "DEBUG",   # <-- MUITO IMPORTANTE
+        },
+    },
+}

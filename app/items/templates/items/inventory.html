@@ -45,17 +45,21 @@
                         <div class="item-list scrollable pt-2">
                             {% for inv in equipment %}
                             <div class="item-card rarity-{{ inv.item.rarity }}" 
-                              data-id="{{ inv.id }}" 
+                              data-id="{{ inv.id }}"
                               data-type="equipment" 
+                              data-equipped="false"
                               data-name="{{ inv.item.name }}" 
                               data-description="{{ inv.item.description }}" 
                               data-emoji="{{ inv.item.emoji }}" 
                               data-rarity="{{ inv.item.rarity }}"
+                              data-rarity-display="{{ inv.item.get_rarity_display }}"
                               data-min-level="{{ inv.item.equipment.min_level }}"
-                              data-attribute-bonuses='{{ inv.item.equipment.attribute_bonuses|safe }}'
-                              data-combat-skill="{{ inv.item.equipment.combat_skill }}"
-                              data-passive-skill="{{ inv.item.equipment.passive_skill }}"
-                              data-recipe='{{ inv.item.equipment.recipe|safe }}'
+                            data-stats="{{ inv.item.equipment.formatted_equipment_stats|default:'' }}"
+                              data-attribute-bonuses="{{ inv.item.equipment.attribute_bonuses_strings }}"
+                              data-passive-skill="{{ inv.item.equipment.passive_skill|default:'{}'|escapejs }}"
+                              data-formatted-effects="{{ inv.item.equipment.formatted_passive_skill_effects }}"
+                              data-trigger="{{ inv.item.equipment.trigger_string }}"
+                              data-crafting-recipe="{{ inv.item.equipment.recipe_strings|default:'{}'|escapejs }}"
                             >
                                 <div class="d-flex align-items-center">
                                     <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
@@ -150,7 +154,9 @@
                         <span id="detail-rarity" class="badge"></span>
                     </div>
                     
-                    <p id="detail-description" class="mb-3 text-dark"></p>
+                    <div class="text-center">
+                        <p id="detail-description" class="mb-3 text-dark" style="font-size: 0.8rem"></p>
+                    </div>
                     
                     <div class="stats-grid mb-3" id="detail-stats">
                         <!-- As estatísticas serão preenchidas via JavaScript -->
@@ -173,14 +179,20 @@
                     {% for slot in upper_slots %}
                         <div class="meta-equipment-slot"
                             data-type="equipment"
+                            data-equipped="true"
+                            data-id="{{ slot.equipment.item.id|default:'' }}"
                             data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
                             data-name="{{ slot.equipment.item.name|default:slot.name }}"
                             data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
                             data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
-                            data-min-level="{{ slot.equipment.item.min_level|default:0 }}"
-                            data-attribute-bonuses="{{ slot.equipment.item.attribute_bonuses|default:'{}'|escapejs }}"
-                            data-combat-skill="{{ slot.equipment.item.combat_skill|default:'' }}"
-                            data-passive-skill="{{ slot.equipment.item.passive_skill|default:'' }}"
+                            data-rarity-display="{{ slot.equipment.item.get_rarity_display }}"
+                            data-min-level="{{ slot.equipment.min_level|default:1 }}"
+                            data-stats="{{ slot.equipment.formatted_equipment_stats|default:'' }}"
+                            data-attribute-bonuses="{{ slot.equipment.attribute_bonuses_strings|default:'{}'|escapejs }}"
+                            data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
+                            data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
+                            data-trigger="{{ slot.equipment.trigger_string }}"
+                            data-crafting-recipe="{{ slot.equipment.recipe_strings|default:'{}'|escapejs }}"
                         >
                             {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
                         </div>
@@ -201,14 +213,20 @@
                     {% for slot in lower_slots %}
                         <div class="meta-equipment-slot"
                             data-type="equipment"
+                            data-equipped="true"
+                            data-id="{{ slot.equipment.item.id|default:'' }}"
                             data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
                             data-name="{{ slot.equipment.item.name|default:slot.name }}"
                             data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
                             data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
-                            data-min-level="{{ slot.equipment.item.min_level|default:0 }}"
-                            data-attribute-bonuses="{{ slot.equipment.item.attribute_bonuses|default:'{}'|escapejs }}"
-                            data-combat-skill="{{ slot.equipment.item.combat_skill|default:'' }}"
-                            data-passive-skill="{{ slot.equipment.item.passive_skill|default:'' }}"
+                            data-rarity-display="{{ slot.equipment.item.get_rarity_display }}"
+                            data-min-level="{{ slot.equipment.min_level|default:1 }}"
+                            data-stats="{{ slot.equipment.formatted_equipment_stats|default:'' }}"
+                            data-attribute-bonuses="{{ slot.equipment.attribute_bonuses_strings|default:'{}'|escapejs }}"
+                            data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
+                            data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
+                            data-trigger="{{ slot.equipment.trigger_string }}"
+                            data-crafting-recipe="{{ slot.equipment.recipe_strings|default:'{}'|escapejs }}"
                         >
                             {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
                         </div>
@@ -395,8 +413,8 @@
     }
     
     .stats-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 10px;
         margin-bottom: 1.5rem;
     }
@@ -409,24 +427,27 @@
         border: 1px solid #8B4513;
     }
     
-    .btn-equip {
-        background: linear-gradient(to bottom, #8B4513, #6B3100);
+    .btn-unequip {
+        background: linear-gradient(to bottom, var(--color-primary), #6B3100);
         border: 1px solid var(--color-secondary);
         color: var(--color-light);
-        border-radius: 6px;
-        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        padding: 0.4rem 0.8rem;
         font-family: 'Cinzel', serif;
+        font-weight: bold;
+        font-size: 0.8rem;
         transition: all 0.3s ease;
         text-decoration: none;
         display: inline-block;
         width: 100%;
+        margin-top: 0.5rem;
     }
-    
-    .btn-equip:hover {
-        background: linear-gradient(to bottom, #6B3100, #8B4513);
-        box-shadow: 0 0 10px var(--color-secondary);
+
+    .btn-unequip:hover {
+        background: linear-gradient(to bottom, #6B3100, var(--color-primary));
+        box-shadow: 0 0 8px var(--color-secondary);
         color: #FFF;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
     
     .btn-consume {
@@ -504,6 +525,175 @@
     .meta-equipment-slot {
         display: contents; /* faz o navegador renderizar só os filhos, como se não houvesse a div */
     }
+
+    
+    /* Estilo Tooltip MMO - Cores Consistente com o Tema */
+    .equipment-header {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.3rem;
+        border-bottom: 1px solid var(--color-primary);
+    }
+
+    .equipment-level {
+        font-family: 'Cinzel', serif;
+        color: var(--color-secondary);
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    /* Atributos em lista compacta */
+    .attributes-section {
+        margin-bottom: 0.5rem;
+    }
+
+    .attribute-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .attribute-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        padding: 0.1rem 0;
+        color: #3E2723;
+    }
+
+    .attribute-name {
+        font-family: 'MedievalSharp', cursive;
+        font-weight: bold;
+        color: #3E2723;
+    }
+
+    .attribute-value {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: var(--color-primary);
+    }
+
+    .attribute-value.positive {
+        color: #2E7D32;
+    }
+
+    .attribute-value.negative {
+        color: var(--color-accent);
+    }
+
+    /* Habilidade passiva compacta */
+    .passive-skill-section {
+        margin-bottom: 0.5rem;
+        padding: 0.3rem;
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 3px;
+        border-left: 2px solid var(--color-primary);
+    }
+
+    .skill-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.2rem;
+    }
+
+    .skill-name {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: var(--color-primary);
+        font-size: 0.9rem;
+    }
+
+    .skill-trigger {
+        background: var(--color-primary);
+        color: var(--color-light);
+        padding: 0.1rem 0.4rem;
+        border-radius: 8px;
+        font-size: 0.6rem;
+    }
+
+    .skill-description {
+        font-style: italic;
+        color: #3E2723;
+        font-size: 0.7rem;
+        line-height: 2;
+    }
+
+    .skill-effects {
+        color: #3E2723;
+        font-size: 0.8rem;
+        line-height: 1.2;
+    }
+
+    /* Receita compacta */
+    .recipe-section {
+        margin-bottom: 0.5rem;
+    }
+
+    .recipe-title {
+        font-family: 'Cinzel', serif;
+        color: var(--color-primary);
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+        text-align: center;
+    }
+
+    .recipe-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        justify-content: center;
+    }
+
+    .recipe-item {
+        display: flex;
+        align-items: center;
+        gap: 0.2rem;
+        background: rgba(139, 69, 19, 0.1);
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        border: 1px solid rgba(139, 69, 19, 0.3);
+    }
+
+    .material-emoji {
+        font-size: 0.7rem;
+    }
+
+    .material-name {
+        font-family: 'MedievalSharp', cursive;
+        color: #3E2723;
+    }
+
+    .material-quantity {
+        color: var(--color-primary);
+        font-weight: bold;
+    }
+
+    /* Botão consistente com o tema */
+    .btn-equip {
+        background: linear-gradient(to bottom, var(--color-primary), #6B3100);
+        border: 1px solid var(--color-secondary);
+        color: var(--color-light);
+        border-radius: 4px;
+        padding: 0.4rem 0.8rem;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .btn-equip:hover {
+        background: linear-gradient(to bottom, #6B3100, var(--color-primary));
+        box-shadow: 0 0 8px var(--color-secondary);
+        color: #FFF;
+        transform: translateY(-1px);
+    }
 </style>
 
 <script>
@@ -533,14 +723,86 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
     
     // helper no topo do script
     function safeParse(str, fallback) {
-      try {
-        return JSON.parse(str);
-      } catch (e) {
+        if (str === undefined || str === null || str === '') {
+            return fallback;
+        }
+
+        // Se já for um objeto, retorne-o
+        if (typeof str === 'object') {
+            return str;
+        }
+
+        let parsed;
+        // Tentativa 1: Parse direto
+        try {
+            parsed = JSON.parse(str);
+            return parsed;
+        } catch (e) {
+            // Ignora e tenta outras abordagens
+        }
+
+        // Tentativa 2: Substituir aspas simples escapadas (\u0027) por aspas duplas
+        try {
+            const fixedStr = str.replace(/\\u0027/g, '"');
+            parsed = JSON.parse(fixedStr);
+            return parsed;
+        } catch (e) {
+            // Ignora e tenta outra abordagem
+        }
+
+        // Tentativa 3: Substituir todas as aspas simples por aspas duplas (para o caso de não estarem escapadas)
+        try {
+            const fixedStr = str.replace(/'/g, '"');
+            parsed = JSON.parse(fixedStr);
+            return parsed;
+        } catch (e) {
+            // Ignora e tenta outra abordagem
+        }
+
+        // Tentativa 4: Substituir outros caracteres Unicode escapados comuns
+        try {
+            const fixedStr = str
+            .replace(/\\u0022/g, '"')  // Aspas duplas escapadas
+            .replace(/\\u005C/g, '\\') // Barra invertida escapada
+            .replace(/\\u002F/g, '/')  // Barra escapada
+            .replace(/\\u000A/g, '\n') // Nova linha
+            .replace(/\\u000D/g, '\r') // Retorno de carro
+            .replace(/\\u0009/g, '\t') // Tabulação
+            .replace(/\\u0008/g, '\b') // Backspace
+            .replace(/\\u000C/g, '\f'); // Form feed
+            parsed = JSON.parse(fixedStr);
+            return parsed;
+        } catch (e) {
+            // Ignora e retorna o fallback
+        }
+
+        console.error('Failed to parse string:', str);
         return fallback;
-      }
+    }
+
+    function safeIsEmpty(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return false; // Or handle as appropriate for non-objects
+        }
+        return Object.keys(obj).length === 0;
     }
     
     [...itemCards, ...equipmentSlots].forEach(card => {
@@ -556,7 +818,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Atualizar badge de raridade
         const rarityBadge = document.getElementById('detail-rarity');
-        rarityBadge.textContent = this.dataset.rarity.charAt(0).toUpperCase() + this.dataset.rarity.slice(1);
+        rarityBadge.textContent = this.dataset.rarityDisplay.charAt(0).toUpperCase() + this.dataset.rarityDisplay.slice(1);
         rarityBadge.className = 'badge rarity-' + this.dataset.rarity;
         
         // Limpar estatísticas e ações
@@ -569,21 +831,146 @@ document.addEventListener('DOMContentLoaded', function() {
 
         switch (this.dataset.type) {
           case 'equipment':
+            let equipmentHTML = '';
+            
             if (!emptySlot) {
-              statsContainer.innerHTML += `<div class="stat-item">Nível mínimo: ${this.dataset.minLevel}</div>`;
+                equipmentHTML += `
+                    <div class="equipment-header">
+                        <div class="equipment-level">📊 Nível ${this.dataset.minLevel}+</div>
+                    </div>
+                    
+                    <div class="attribute-line" style="font-size: 1.0rem">${this.dataset.stats}</div>
+                `;
             }
+
+            // Atributos em lista vertical única
             const bonusesEq = safeParse(this.dataset.attributeBonuses, {});
-            for (const [attr, value] of Object.entries(bonusesEq)) {
-              statsContainer.innerHTML += `<div class="stat-item">${attr}: ${value > 0 ? '+'+value : value}</div>`;
+            if (Object.keys(bonusesEq).length > 0) {
+                equipmentHTML += `
+                    <div class="attributes-section">
+                        ${Object.entries(bonusesEq).map(([attr, value]) => `
+                            <div class="attribute-line">
+                                <span class="attribute-name">${attr.replace(/_/g, ' ').toUpperCase()}</span>
+                                <span class="attribute-value ${value > 0 ? '' : 'negative'}">
+                                    ${value > 0 ? '+' : ''}${value}
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
             }
-            if (this.dataset.combatSkill) {
-              statsContainer.innerHTML += `<div class="stat-item">Skill: ${this.dataset.combatSkill}</div>`;
+
+            // Habilidade Passiva compacta
+            const passiveSkill = safeParse(this.dataset.passiveSkill, {});
+            if (!safeIsEmpty(passiveSkill)) {
+                let effectsHTML = '';
+                
+                // Usar a string formatada do modelo
+                const formattedEffects = this.dataset.formattedEffects;
+                if (formattedEffects) {
+                    effectsHTML = `
+                        <div class="skill-effects">
+                            <strong>Efeitos:</strong> ${formattedEffects}
+                        </div>
+                    `;
+                }
+
+                equipmentHTML += `
+                    <div class="passive-skill-section">
+                        <div class="skill-header">
+                            <span class="skill-name">${passiveSkill.name}</span>
+                            <span class="skill-trigger">${this.dataset.trigger}</span>
+                        </div>
+                        <div class="skill-description">
+                            ${passiveSkill.description || ""}
+                        </div>
+                        ${effectsHTML}
+                    </div>
+                `;
             }
-            if (this.dataset.passiveSkill) {
-              statsContainer.innerHTML += `<div class="stat-item">Passiva: ${this.dataset.passiveSkill}</div>`;
+
+            // Receita de Crafting compacta
+            const eqRecipe = safeParse(this.dataset.craftingRecipe, {});
+            if (!safeIsEmpty(eqRecipe)) {
+                equipmentHTML += `
+                    <div class="recipe-section">
+                        <div class="recipe-title">⚒️ Receita</div>
+                        <div class="recipe-items">
+                            ${Object.entries(eqRecipe).map(([material, qty]) => `
+                                <div class="recipe-item">
+                                    <span class="material-emoji">📦</span>
+                                    <span class="material-name">${material}</span>
+                                    <span class="material-quantity">${qty}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
             }
+            
+            statsContainer.innerHTML = equipmentHTML;
+            
+            const isEquipped = this.dataset.equipped === "true";
             if (!emptySlot) {
-              itemActions.innerHTML = '<button class="btn-equip">Equipar</button>';
+                const csrftoken = getCookie('csrftoken');
+                if (isEquipped) {
+                    itemActions.innerHTML = '<button class="btn-unequip">❌ Remover Item</button>';
+                    const itemId = this.dataset.id;
+                    
+                    const unequipButton = itemActions.querySelector('.btn-unequip');
+
+                    unequipButton.addEventListener('click', async () => {
+                        const response = await fetch('/items/inventory/equip/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrftoken
+                            },
+                            body: JSON.stringify({
+                                item_id: itemId,
+                                action: "unequip"
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            alert("Item removido e devolvido ao inventário!");
+                            window.location.reload();
+                        } else {
+                            alert("Erro ao remover: " + result.error);
+                        }
+                    });
+                }
+                else {
+                    itemActions.innerHTML = '<button class="btn-equip">🎯 Equipar Item</button>';
+                    const itemId = this.dataset.id;
+                    
+                    const equipButton = itemActions.querySelector('.btn-equip');
+
+                    equipButton.addEventListener('click', async () => {
+                        const response = await fetch('/items/inventory/equip/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrftoken
+                            },
+                            body: JSON.stringify({
+                                item_id: itemId,
+                                action: "equip"
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            alert("Item equipado com sucesso!");
+                            window.location.reload(); // opcional
+                        } else {
+                            alert("Erro ao equipar: " + result.error);
+                        }
+                    });
+                }
             }
             break;
 

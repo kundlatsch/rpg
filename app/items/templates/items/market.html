@@ -1,0 +1,600 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho do mercado -->
+    <div class="text-center mb-4">
+        <h1 class="fantasy-title">
+            🏪 Mercado
+        </h1>
+        <p class="text-dark mb-0">Compre e venda itens com outros aventureiros</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Dinheiro do personagem -->
+    <div class="gold-display text-center mb-4">
+        <div class="gold-box p-3">
+            <span class="gold-icon">💰</span>
+            <span class="gold-text">Ouro: <strong>{{ character.gold }}</strong></span>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Coluna da esquerda - Inventário do usuário -->
+        <div class="col-md-6 mb-4">
+            <div class="inventory-section p-4">
+                <h2 class="fantasy-title text-center mb-4">📦 Seu Inventário</h2>
+                
+                <!-- Tabs para tipos de itens -->
+                <div class="d-flex justify-content-between mb-3" id="inventoryTabs" role="tablist">
+                    <button class="tab-button active" data-bs-target="#inv-materials" type="button" role="tab" title="Materiais">
+                        <span class="tab-icon">📦</span>
+                        <span class="tab-text">Mater.</span>
+                    </button>
+                    <button class="tab-button" data-bs-target="#inv-equipment" type="button" role="tab" title="Equipamentos">
+                        <span class="tab-icon">🛡️</span>
+                        <span class="tab-text">Equip.</span>
+                    </button>
+                    <button class="tab-button" data-bs-target="#inv-consumables" type="button" role="tab" title="Consumíveis">
+                        <span class="tab-icon">🧪</span>
+                        <span class="tab-text">Consum.</span>
+                    </button>
+                </div>
+
+                <!-- Conteúdo das tabs do inventário -->
+                <div class="tab-content">
+                    <!-- Materiais -->
+                    <div class="tab-pane fade show active" id="inv-materials" role="tabpanel">
+                        <div class="item-list scrollable pt-2">
+                            {% for inv in user_materials %}
+                            <div class="market-item-card rarity-{{ inv.item.rarity }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
+                                        <div>
+                                            <h6 class="mb-0">{{ inv.item.name }}</h6>
+                                            <small class="text-dark">x{{ inv.quantity }}</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn-sell" data-item-id="{{ inv.item.id }}">
+                                        💸 Vender
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-center text-dark mt-3">Nenhum material.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Equipamentos -->
+                    <div class="tab-pane fade" id="inv-equipment" role="tabpanel">
+                        <div class="item-list scrollable pt-2">
+                            {% for inv in user_equipment %}
+                            <div class="market-item-card rarity-{{ inv.item.rarity }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
+                                        <div>
+                                            <h6 class="mb-0">{{ inv.item.name }}</h6>
+                                            <small class="text-dark">x{{ inv.quantity }}</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn-sell" data-item-id="{{ inv.item.id }}">
+                                        💸 Vender
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-center text-dark mt-3">Nenhum equipamento.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Consumíveis -->
+                    <div class="tab-pane fade" id="inv-consumables" role="tabpanel">
+                        <div class="item-list scrollable pt-2">
+                            {% for inv in user_consumables %}
+                            <div class="market-item-card rarity-{{ inv.item.rarity }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
+                                        <div>
+                                            <h6 class="mb-0">{{ inv.item.name }}</h6>
+                                            <small class="text-dark">x{{ inv.quantity }}</small>
+                                        </div>
+                                    </div>
+                                    <button class="btn-sell" data-item-id="{{ inv.item.id }}">
+                                        💸 Vender
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-center text-dark mt-3">Nenhum consumível.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da direita - Mercado -->
+        <div class="col-md-6 mb-4">
+            <div class="market-section p-4">
+                <h2 class="fantasy-title text-center mb-4">🛒 Itens à Venda</h2>
+                
+                <!-- Tabs para tipos de itens no mercado -->
+                <div class="d-flex justify-content-between mb-3" id="marketTabs" role="tablist">
+                    <button class="tab-button active" data-bs-target="#market-materials" type="button" role="tab" title="Materiais">
+                        <span class="tab-icon">📦</span>
+                        <span class="tab-text">Mater.</span>
+                    </button>
+                    <button class="tab-button" data-bs-target="#market-equipment" type="button" role="tab" title="Equipamentos">
+                        <span class="tab-icon">🛡️</span>
+                        <span class="tab-text">Equip.</span>
+                    </button>
+                    <button class="tab-button" data-bs-target="#market-consumables" type="button" role="tab" title="Consumíveis">
+                        <span class="tab-icon">🧪</span>
+                        <span class="tab-text">Consum.</span>
+                    </button>
+                </div>
+
+                <!-- Conteúdo das tabs do mercado -->
+                <div class="tab-content">
+                    <!-- Materiais no mercado -->
+                    <div class="tab-pane fade show active" id="market-materials" role="tabpanel">
+                        <div class="item-list scrollable pt-2">
+                            {% for listing in market_materials %}
+                                {% include "items/_market_listing_card.html" %}
+                            {% empty %}
+                            <p class="text-center text-dark mt-3">Nenhum material à venda.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Equipamentos no mercado -->
+                    <div class="tab-pane fade" id="market-equipment" role="tabpanel">
+                        <div class="item-list scrollable pt-2">
+                            {% for listing in market_equipment %}
+                                {% include "items/_market_listing_card.html" %}
+                            {% empty %}
+                            <p class="text-center text-dark mt-3">Nenhum equipamento à venda.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Consumíveis no mercado -->
+                    <div class="tab-pane fade" id="market-consumables" role="tabpanel">
+                        <div class="item-list scrollable pt-2">
+                            {% for listing in market_consumables %}
+                                {% include "items/_market_listing_card.html" %}
+                            {% empty %}
+                            <p class="text-center text-dark mt-3">Nenhum consumível à venda.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página do mercado */
+    .inventory-section, .market-section {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 12px;
+        border: 2px solid #8B4513;
+        height: 70vh;
+    }
+
+    .gold-display {
+        margin: 2rem 0;
+    }
+
+    .gold-box {
+        background: linear-gradient(135deg, #FFD700, #D4AF37);
+        border: 2px solid #B8860B;
+        border-radius: 20px;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .gold-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .gold-text {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: #3E2723;
+        font-size: 1.2rem;
+    }
+
+    /* Tabs - reutilizando do inventário */
+    #inventoryTabs, #marketTabs {
+        display: flex;
+        gap: 5px;
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 8px;
+        padding: 5px;
+    }
+
+    .tab-button {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 5px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 0;
+    }
+
+    .tab-button.active {
+        background: rgba(139, 69, 19, 0.2);
+        border-color: #8B4513;
+    }
+
+    .tab-button:hover {
+        background: rgba(139, 69, 19, 0.15);
+    }
+
+    .tab-icon {
+        font-size: 1.2rem;
+        margin-bottom: 3px;
+    }
+
+    .tab-text {
+        font-size: 0.75rem;
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .market-item-card {
+        background: rgba(245, 245, 220, 0.3);
+        border: 1px solid #8B4513;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .market-item-card:hover {
+        background: rgba(245, 245, 220, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Cores de raridade para os cards do mercado */
+    .market-item-card.rarity-common {
+        border-left: 4px solid #C0C0C0;
+    }
+
+    .market-item-card.rarity-rare {
+        border-left: 4px solid #00FF00;
+    }
+
+    .market-item-card.rarity-epic {
+        border-left: 4px solid #800080;
+    }
+
+    .market-item-card.rarity-legendary {
+        border-left: 4px solid #FFD700;
+    }
+
+    .item-emoji {
+        font-size: 1.8rem;
+    }
+
+    .item-list.scrollable {
+        max-height: 50vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    /* Custom scrollbar */
+    .item-list.scrollable::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .item-list.scrollable::-webkit-scrollbar-track {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 10px;
+    }
+
+    .item-list.scrollable::-webkit-scrollbar-thumb {
+        background: #8B4513;
+        border-radius: 10px;
+    }
+
+    /* Botões de ação */
+    .btn-sell {
+        background: linear-gradient(to bottom, #28a745, #20c997);
+        border: 1px solid #2E8B57;
+        color: white;
+        border-radius: 6px;
+        padding: 0.4rem 0.8rem;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-sell:hover {
+        background: linear-gradient(to bottom, #20c997, #28a745);
+        box-shadow: 0 0 8px #2E8B57;
+        transform: translateY(-1px);
+    }
+
+    .btn-buy {
+        background: linear-gradient(to bottom, #D4AF37, #B8860B);
+        border: 1px solid #8B4513;
+        color: white;
+        border-radius: 6px;
+        padding: 0.4rem 0.8rem;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-buy:hover {
+        background: linear-gradient(to bottom, #B8860B, #D4AF37);
+        box-shadow: 0 0 8px #D4AF37;
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel-listing {
+        background: linear-gradient(to bottom, #dc3545, #c82333);
+        border: 1px solid #8B0000;
+        color: white;
+        border-radius: 6px;
+        padding: 0.4rem 0.8rem;
+        font-family: 'Cinzel', serif;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-cancel-listing:hover {
+        background: linear-gradient(to bottom, #c82333, #dc3545);
+        box-shadow: 0 0 8px #dc3545;
+        transform: translateY(-1px);
+    }
+
+    /* Cards de listagem do mercado */
+    .market-listing-card {
+        background: rgba(245, 245, 220, 0.5);
+        border: 2px solid #8B4513;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .market-listing-card:hover {
+        background: rgba(245, 245, 220, 0.7);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .listing-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .listing-emoji {
+        font-size: 2.5rem;
+        margin-right: 15px;
+    }
+
+    .listing-info {
+        flex-grow: 1;
+    }
+
+    .listing-price {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: #D4AF37;
+        font-size: 1.1rem;
+    }
+
+    .listing-seller {
+        color: #3E2723;
+        font-size: 0.9rem;
+    }
+
+    .listing-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .tab-text {
+            font-size: 0.65rem;
+        }
+        
+        .tab-icon {
+            font-size: 1rem;
+        }
+        
+        .listing-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .listing-emoji {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        
+        .listing-actions {
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Controle das tabs do inventário
+    const inventoryTabButtons = document.querySelectorAll('#inventoryTabs .tab-button');
+    inventoryTabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            inventoryTabButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const target = this.dataset.bsTarget;
+            const tabPanes = document.querySelectorAll('#inventoryTabs ~ .tab-content .tab-pane');
+            
+            tabPanes.forEach(pane => {
+                pane.classList.remove('show', 'active');
+                if (pane.id === target.substring(1)) {
+                    pane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+
+    // Controle das tabs do mercado
+    const marketTabButtons = document.querySelectorAll('#marketTabs .tab-button');
+    marketTabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            marketTabButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const target = this.dataset.bsTarget;
+            const tabPanes = document.querySelectorAll('#marketTabs ~ .tab-content .tab-pane');
+            
+            tabPanes.forEach(pane => {
+                pane.classList.remove('show', 'active');
+                if (pane.id === target.substring(1)) {
+                    pane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+
+    // Função para obter o token CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrfToken = getCookie('csrftoken');
+
+    /* =====================================================
+                    BOTÃO DE VENDER
+    ===================================================== */
+    document.querySelectorAll(".btn-sell").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const item_id = btn.dataset.itemId;
+
+            const quantity = prompt("Quantidade para vender:");
+            if (!quantity) return;
+
+            const price = prompt("Preço por unidade:");
+            if (!price) return;
+
+            fetch("/items/market/sell/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({
+                    item_id: Number(item_id),
+                    quantity: Number(quantity),
+                    price: Number(price),
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                alert(data.message || data.error);
+                if (data.success) window.location.reload();
+            });
+        });
+    });
+
+    /* =====================================================
+                    CANCELAR ANÚNCIO
+    ===================================================== */
+    document.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("btn-cancel-listing")) return;
+
+        const listingId = e.target.dataset.listingId;
+
+        fetch("/items/market/cancel/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+            },
+            body: JSON.stringify({
+                listing_id: Number(listingId)
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(data.message || data.error);
+            if (data.success) window.location.reload();
+        });
+    });
+
+    /* =====================================================
+                    COMPRAR ITEM
+    ===================================================== */
+    document.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("btn-buy")) return;
+
+        const listingId = e.target.dataset.listingId;
+
+        const quantity = prompt("Quantidade para comprar:");
+        if (!quantity) return;
+
+        fetch("/items/market/buy/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+            },
+            body: JSON.stringify({
+                listing_id: Number(listingId),
+                quantity: Number(quantity)
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            alert(data.message || data.error);
+            if (data.success) window.location.reload();
+        });
+    });
+});
+</script>
+
+{% endblock %}
