@@ -9,7 +9,18 @@ class CharactersConfig(models.Model):
 
 class Character(models.Model):
 
+    CHARACTER_TYPES = [
+        ("player", "Player"),
+        ("npc", "NPC"),
+        ("monster", "Monster"),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    type = models.CharField(
+        max_length=20,
+        choices=CHARACTER_TYPES,
+        default="player",
+    )
     name = models.CharField(max_length=100)
     emoji = models.CharField(max_length=5, default="😃")
     gold = models.IntegerField(default=0)

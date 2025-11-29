@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho do ranking -->
+    <div class="text-center mb-4">
+        <h1 class="ranking-title">
+            🏆 Ranking dos Heróis
+        </h1>
+        <p class="text-dark mb-0">Os aventureiros mais poderosos do reino</p>
+    </div>
+
+    {% comment %} <div class="divider"></div> {% endcomment %}
+
+    <!-- Tabela de ranking -->
+    <div class="ranking-container mt-4">
+        <div class="ranking-table-container">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th class="rank-header">Posição</th>
+                        <th class="name-header">Herói</th>
+                        <th class="level-header">Nível</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in page_obj %}
+                    <tr class="ranking-row {% if c.id == character.id %}current-player{% endif %} {% if forloop.counter0|add:page_obj.start_index == 1 %}top-three{% endif %}">
+                        <td class="rank-cell">
+                            <div class="rank-badge">
+                                {% with position=forloop.counter0|add:page_obj.start_index %}
+                                    {% if position == 1 %}
+                                        <span class="crown">👑</span>
+                                    {% elif position == 2 %}
+                                        <span class="medal">🥈</span>
+                                    {% elif position == 3 %}
+                                        <span class="medal">🥉</span>
+                                    {% else %}
+                                        <span class="rank-number">#{{ position }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        </td>
+                        <td class="name-cell">
+                            <div class="player-info">
+                                {% comment %} <span class="player-name">{{ c.name }}</span> {% endcomment %}
+                                <a href="{% url 'public_character' c.id %}" class="player-name">
+                                    {{ c.name }}
+                                </a>
+                                {% if c.id == character.id %}
+                                    <span class="you-badge">(Você)</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="level-cell">
+                            <div class="level-display">
+                                <span class="level-icon">⭐</span>
+                                <span class="level-text">Nv. {{ c.level }}</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação estilizada -->
+        <div class="pagination-container mt-4">
+            <nav class="pagination-nav">
+                <ul class="pagination-list">
+                    {% if page_obj.has_previous %}
+                    <li class="pagination-item">
+                        <a class="pagination-link prev" href="?page={{ page_obj.previous_page_number }}">
+                            <span class="pagination-arrow">←</span>
+                            Anterior
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="pagination-item disabled">
+                        <span class="pagination-link prev disabled">
+                            <span class="pagination-arrow">←</span>
+                            Anterior
+                        </span>
+                    </li>
+                    {% endif %}
+
+                    <li class="pagination-item">
+                        <span class="pagination-info">
+                            Página <strong>{{ page_obj.number }}</strong> de <strong>{{ page_obj.paginator.num_pages }}</strong>
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="pagination-item">
+                        <a class="pagination-link next" href="?page={{ page_obj.next_page_number }}">
+                            Próxima
+                            <span class="pagination-arrow">→</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="pagination-item disabled">
+                        <span class="pagination-link next disabled">
+                            Próxima
+                            <span class="pagination-arrow">→</span>
+                        </span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos específicos para a página de ranking */
+    .ranking-container {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 12px;
+        border: 2px solid #8B4513;
+        padding: 2rem;
+    }
+
+    .ranking-table-container {
+        overflow-x: auto;
+    }
+
+    .ranking-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: rgba(245, 245, 220, 0.9);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .ranking-table thead {
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+    }
+
+    .ranking-table th {
+        padding: 1rem;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: #F5F5DC;
+        text-align: center;
+        border-bottom: 2px solid #D4AF37;
+    }
+
+    .ranking-table td {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+        font-family: 'MedievalSharp', cursive;
+    }
+
+    .ranking-row {
+        transition: all 0.3s ease;
+        background: rgba(245, 245, 220, 0.7);
+    }
+
+    .ranking-row:hover {
+        background: rgba(212, 175, 55, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .ranking-row.current-player {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(139, 69, 19, 0.2));
+        border-left: 4px solid #D4AF37;
+        font-weight: bold;
+    }
+
+    .ranking-row.top-three {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.1));
+    }
+
+    /* Células específicas */
+    {% comment %} .rank-cell {
+        width: 100px;
+    }
+
+    .name-cell {
+        text-align: left;
+        width: 40%;
+    }
+
+    .level-cell, .xp-cell {
+        width: 20%;
+    } {% endcomment %}
+
+    /* Badge de posição */
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        color: #F5F5DC;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        font-size: 0.9rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .crown, .medal {
+        font-size: 1.5rem;
+    }
+
+    .rank-number {
+        font-size: 1rem;
+    }
+
+    /* Informações do jogador */
+    .player-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .player-name {
+        font-weight: bold;
+        color: #3E2723;
+        font-size: 1.1rem;
+    }
+
+    .you-badge {
+        background: #D4AF37;
+        color: #3E2723;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        font-family: 'Cinzel', serif;
+    }
+
+    /* Display de nível e XP */
+    .level-display, .xp-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        {% comment %} background: rgba(139, 69, 19, 0.1); {% endcomment %}
+        {% comment %} border-radius: 8px; {% endcomment %}
+        {% comment %} border: 1px solid rgba(139, 69, 19, 0.3); {% endcomment %}
+    }
+
+    .level-icon, .xp-icon {
+        font-size: 1.2rem;
+    }
+
+    .level-text, .xp-text {
+        font-weight: bold;
+        color: #3E2723;
+        font-family: 'Cinzel', serif;
+    }
+
+    /* Paginação estilizada */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .pagination-list {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .pagination-item {
+        display: flex;
+    }
+
+    .pagination-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        color: #F5F5DC;
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid #D4AF37;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .pagination-link:hover {
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .pagination-link.disabled {
+        background: rgba(139, 69, 19, 0.3);
+        color: rgba(245, 245, 220, 0.5);
+        border-color: rgba(212, 175, 55, 0.3);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .pagination-link.disabled:hover {
+        background: rgba(139, 69, 19, 0.3);
+        transform: none;
+        box-shadow: none;
+    }
+
+    .pagination-info {
+        padding: 0.75rem 1.5rem;
+        background: rgba(245, 245, 220, 0.9);
+        border-radius: 8px;
+        border: 1px solid #8B4513;
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        font-weight: bold;
+    }
+
+    .pagination-arrow {
+        font-size: 1.2rem;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .ranking-container {
+            padding: 1rem;
+        }
+        
+        .ranking-table {
+            font-size: 0.8rem;
+        }
+        
+        .ranking-table th,
+        .ranking-table td {
+            padding: 0.5rem;
+        }
+        
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            font-size: 0.8rem;
+        }
+        
+        .crown, .medal {
+            font-size: 1.2rem;
+        }
+        
+        .player-info {
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        
+        .pagination-list {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .pagination-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .name-cell {
+            width: 35%;
+        }
+        
+        .level-cell, .xp-cell {
+            width: 22.5%;
+        }
+    }
+
+    /* Melhorias para textos */
+    .ranking-title {
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .divider {
+        height: 2px;
+        background: linear-gradient(to right, transparent, #8B4513, transparent);
+        margin: 2rem 0;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar animação de entrada para as linhas
+    const rows = document.querySelectorAll('.ranking-row');
+    rows.forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            row.style.transition = 'all 0.5s ease';
+            row.style.opacity = '1';
+            row.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+
+    // Efeito de destaque para o jogador atual
+    const currentPlayerRow = document.querySelector('.ranking-row.current-player');
+    if (currentPlayerRow) {
+        setInterval(() => {
+            currentPlayerRow.style.boxShadow = currentPlayerRow.style.boxShadow ? 
+                '' : '0 0 20px rgba(212, 175, 55, 0.5)';
+        }, 1000);
+    }
+});
+</script>
+
+{% endblock %}

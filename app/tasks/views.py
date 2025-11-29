@@ -298,7 +298,7 @@ def job_in_progress(request):
 def end_job(request, job_id):
     character = Character.objects.get(user=request.user)
     char_job = CharacterJob.objects.filter(character=character, job_id=job_id).first()
-
+ 
     if not char_job:
         request.session["alert"] = "Você não está nesse trabalho."
         return redirect("jobs_list")
@@ -309,10 +309,6 @@ def end_job(request, job_id):
 
     # só libera se já passou o duration do job
     if elapsed_minutes < job.duration:
-        minutes_left = int(job.duration - elapsed_minutes)
-        messages.warning(
-            request, f"Você ainda não concluiu este trabalho! Falta {minutes_left} min."
-        )
         return redirect("job_in_progress")
 
     # recompensa

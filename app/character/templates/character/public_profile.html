@@ -1,0 +1,500 @@
+{% comment %} {% extends "base.html" %}
+
+{% block content %}
+<div class="card fantasy-card">
+    <h1 class="fantasy-title">{{ character.emoji }} {{ character.name }}</h1>
+
+    <p><strong>Nível:</strong> {{ character.level }}</p>
+    <p><strong>Classe:</strong> {{ character.type|title }}</p>
+
+    <h3>Atributos</h3>
+    <ul>
+        <li>Força: {{ character.final_attr.strength }}</li>
+        <li>Destreza: {{ character.final_attr.dexterity }}</li>
+        <li>Arcano: {{ character.final_attr.arcane }}</li>
+        <li>Constituição: {{ character.final_attr.constitution }}</li>
+        <li>Coragem: {{ character.final_attr.courage }}</li>
+        <li>Sorte: {{ character.final_attr.luck }}</li>
+    </ul>
+
+    <h3>Equipamentos</h3>
+    <ul>
+        <li>Elmo: {{ character.equipped_head }}</li>
+        <li>Colar: {{ character.equipped_necklace }}</li>
+        <li>Ombreiras: {{ character.equipped_shoulders }}</li>
+        <li>Peito: {{ character.equipped_chest }}</li>
+        <li>Mãos: {{ character.equipped_hands }}</li>
+        <li>Pés: {{ character.equipped_feet }}</li>
+    </ul>
+</div>
+{% endblock %} {% endcomment %}
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="scroll-container p-4 p-md-5 mt-4">
+    <!-- Cabeçalho do personagem -->
+    <div class="text-center mb-4">
+        <div class="character-header">
+            <span class="character-emoji-header">{{ character.emoji }}</span>
+            <h1 class="char-detail-title">{{ character.name }}</h1>
+            <div class="character-subtitle">
+                <span class="character-level">⭐ Nível {{ character.level }}</span>
+                {% comment %} <span class="character-class">🏹 {{ character.type|title }}</span> {% endcomment %}
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row mt-4">
+        <!-- Coluna da esquerda - Atributos -->
+        <div class="col-md-6 mb-4">
+            <div class="attributes-section p-4">
+                <h2 class="char-detail-title text-center mb-4">📊 Atributos</h2>
+                
+                <div class="attributes-grid">
+                    <div class="attribute-card strength">
+                        <div class="attribute-header">
+                            <span class="attribute-emoji">💪</span>
+                            <span class="attribute-name">Força</span>
+                        </div>
+                        <div class="attribute-value">
+                            {{ character.final_attr.strength }}
+                        </div>
+                    </div>
+                    
+                    <div class="attribute-card dexterity">
+                        <div class="attribute-header">
+                            <span class="attribute-emoji">🏹</span>
+                            <span class="attribute-name">Destreza</span>
+                        </div>
+                        <div class="attribute-value">
+                            {{ character.final_attr.dexterity }}
+                        </div>
+                    </div>
+                    
+                    <div class="attribute-card arcane">
+                        <div class="attribute-header">
+                            <span class="attribute-emoji">🔮</span>
+                            <span class="attribute-name">Arcano</span>
+                        </div>
+                        <div class="attribute-value">
+                            {{ character.final_attr.arcane }}
+                        </div>
+                    </div>
+                    
+                    <div class="attribute-card constitution">
+                        <div class="attribute-header">
+                            <span class="attribute-emoji">❤️</span>
+                            <span class="attribute-name">Constituição</span>
+                        </div>
+                        <div class="attribute-value">
+                            {{ character.final_attr.constitution }}
+                        </div>
+                    </div>
+                    
+                    <div class="attribute-card courage">
+                        <div class="attribute-header">
+                            <span class="attribute-emoji">🛡️</span>
+                            <span class="attribute-name">Coragem</span>
+                        </div>
+                        <div class="attribute-value">
+                            {{ character.final_attr.courage }}
+                        </div>
+                    </div>
+                    
+                    <div class="attribute-card luck">
+                        <div class="attribute-header">
+                            <span class="attribute-emoji">🍀</span>
+                            <span class="attribute-name">Sorte</span>
+                        </div>
+                        <div class="attribute-value">
+                            {{ character.final_attr.luck }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da direita - Equipamentos -->
+        <div class="col-md-6 mb-4">
+            <div class="equipment-section p-4">
+                <h2 class="char-detail-title text-center mb-4">🛡️ Equipamentos</h2>
+                
+                <div class="equipment-layout">
+                    <!-- Slot superior - Elmo -->
+                    <div class="equipment-slot-row top-row">
+                        <div class="slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Elmo" slot_icon="⛑️" slot_equipment=character.equipped_head %}
+                        </div>
+                    </div>
+                    
+                    <!-- Slot do meio - Colar e Ombreiras -->
+                    <div class="equipment-slot-row middle-row">
+                        <div class="slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Colar" slot_icon="📿" slot_equipment=character.equipped_necklace %}
+                        </div>
+                        <div class="slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Ombreiras" slot_icon="🔰" slot_equipment=character.equipped_shoulders %}
+                        </div>
+                    </div>
+                    
+                    <!-- Slot inferior - Peito, Mãos e Pés -->
+                    <div class="equipment-slot-row bottom-row">
+                        <div class="slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Peito" slot_icon="👕" slot_equipment=character.equipped_chest %}
+                        </div>
+                        <div class="slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Mãos" slot_icon="🧤" slot_equipment=character.equipped_hands %}
+                        </div>
+                        <div class="slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Pés" slot_icon="👢" slot_equipment=character.equipped_feet %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Estatísticas Resumidas -->
+    {% comment %} <div class="row mt-4">
+        <div class="col-12">
+            <div class="stats-section p-4">
+                <h2 class="char-detail-title text-center mb-4">📈 Estatísticas do Herói</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ character.level }}</div>
+                            <div class="stat-label">Nível</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ character.experience }}</div>
+                            <div class="stat-label">Experiência</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ character.gold }}</div>
+                            <div class="stat-label">Ouro</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <div class="stat-value">{{ character.total_combats }}</div>
+                            <div class="stat-label">Combates</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+</div>
+
+<style>
+    /* Estilos específicos para a página de perfil */
+    .character-header {
+        background: linear-gradient(135deg, rgba(139, 69, 19, 0.2), rgba(212, 175, 55, 0.1));
+        border-radius: 15px;
+        padding: 2rem;
+        border: 2px solid #8B4513;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .character-emoji-header {
+        font-size: 4rem;
+        display: block;
+        margin-bottom: 1rem;
+        animation: float 3s infinite ease-in-out;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .character-subtitle {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .character-level, .character-class {
+        background: rgba(139, 69, 19, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 1px solid #8B4513;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: #3E2723;
+    }
+
+    /* Seções */
+    .attributes-section, .equipment-section, .stats-section {
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 12px;
+        border: 2px solid #8B4513;
+    }
+
+    /* Grid de Atributos */
+    .attributes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .attribute-card {
+        background: rgba(245, 245, 220, 0.3);
+        border: 1px solid #8B4513;
+        border-radius: 10px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .attribute-card:hover {
+        background: rgba(245, 245, 220, 0.5);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .attribute-card.strength { border-left: 4px solid #DC143C; }
+    .attribute-card.dexterity { border-left: 4px solid #32CD32; }
+    .attribute-card.arcane { border-left: 4px solid #8A2BE2; }
+    .attribute-card.constitution { border-left: 4px solid #FF6347; }
+    .attribute-card.courage { border-left: 4px solid #1E90FF; }
+    .attribute-card.luck { border-left: 4px solid #FFD700; }
+
+    .attribute-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .attribute-emoji {
+        font-size: 1.5rem;
+    }
+
+    .attribute-name {
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        color: #3E2723;
+        font-size: 1rem;
+    }
+
+    .attribute-value {
+        font-family: 'Cinzel', serif;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #8B4513;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Layout de Equipamentos */
+    .equipment-layout {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+
+    .equipment-slot-row {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .top-row {
+        /* Apenas o elmo no topo */
+    }
+
+    .middle-row {
+        gap: 4rem;
+    }
+
+    .bottom-row {
+        gap: 1rem;
+    }
+
+    .slot-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Estatísticas */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .stat-card {
+        background: rgba(245, 245, 220, 0.3);
+        border: 1px solid #8B4513;
+        border-radius: 10px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        background: rgba(245, 245, 220, 0.5);
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(139, 69, 19, 0.2);
+        border-radius: 50%;
+        border: 2px solid #8B4513;
+    }
+
+    .stat-info {
+        flex-grow: 1;
+    }
+
+    .stat-value {
+        font-family: 'Cinzel', serif;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #8B4513;
+    }
+
+    .stat-label {
+        font-family: 'MedievalSharp', cursive;
+        color: #3E2723;
+        font-size: 0.9rem;
+    }
+
+    /* Melhorias para textos */
+    .char-detail-title {
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .divider {
+        height: 2px;
+        background: linear-gradient(to right, transparent, #8B4513, transparent);
+        margin: 2rem 0;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .character-subtitle {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .attributes-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .equipment-slot-row {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .middle-row {
+            gap: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        
+        .character-emoji-header {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .equipment-slot-row {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap
+    if (typeof bootstrap !== 'undefined') {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+
+    // Animação de entrada para os cards
+    const attributeCards = document.querySelectorAll('.attribute-card');
+    attributeCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0)';
+        }, index * 100);
+    });
+
+    // Animação para os slots de equipamento
+    const equipmentSlots = document.querySelectorAll('.equipment-slot');
+    equipmentSlots.forEach((slot, index) => {
+        slot.style.opacity = '0';
+        slot.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            slot.style.transition = 'all 0.4s ease';
+            slot.style.opacity = '1';
+            slot.style.transform = 'scale(1)';
+        }, 400 + (index * 100));
+    });
+
+    // Efeito de brilho para slots com equipamento raro
+    equipmentSlots.forEach(slot => {
+        if (slot.classList.contains('rare') || slot.classList.contains('epic') || slot.classList.contains('legendary')) {
+            setInterval(() => {
+                slot.style.boxShadow = slot.style.boxShadow ? 
+                    '' : '0 0 20px rgba(212, 175, 55, 0.5)';
+            }, 1500);
+        }
+    });
+});
+</script>
+
+{% endblock %}
