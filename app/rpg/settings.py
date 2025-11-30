@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "character",
-    "tasks",
+    "tasks.apps.GameConfig",
     "items",
     "combat",
 ]

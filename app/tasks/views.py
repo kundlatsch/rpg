@@ -10,12 +10,12 @@ from django.utils import timezone
 from .models import (
     TasksConfig,
     Job,
-    JobRank,
-    CharacterJobProgress,
     CharacterJob,
+    Profession
 )
 
 from character.models import Character
+from items.models import InventoryItem
 
 from datetime import timedelta
 
@@ -220,25 +220,34 @@ def end_resting(request):
 
 @login_required
 def jobs_list(request):
-    character = Character.objects.get(user=request.user)
-
-    if CharacterJob.objects.filter(character=character).exists():
-        return redirect("job_in_progress")
-
+    character = get_object_or_404(Character, user=request.user)
     jobs = Job.objects.all()
 
-    # Pegar progresso de cada job para o personagem
-    progress_dict = {}
+    jobs_with_prof = []
+
     for job in jobs:
-        progress, created = CharacterJobProgress.objects.get_or_create(
-            character=character, job=job
-        )
-        progress_dict[job.id] = progress
+        try:
+            prof, created = Profession.objects.get_or_create(
+                character=character,
+                profession_type=job.profession_type,
+                defaults={"level": 1, "exp": 0, "max_exp": 100}
+            )
+        except Profession.DoesNotExist:
+            prof = None
+
+        jobs_with_prof.append({
+            "job": job,
+            "prof": prof,
+            "is_unlocked": prof and prof.level >= job.required_level,
+        })
 
     return render(
         request,
         "game/jobs.html",
-        {"character": character, "jobs": jobs, "progress_dict": progress_dict},
+        {
+            "character": character,
+            "jobs_with_prof": jobs_with_prof,
+        },
     )
 
 
@@ -247,24 +256,27 @@ def start_job(request, job_id):
     character = Character.objects.get(user=request.user)
     job = get_object_or_404(Job, id=job_id)
 
-    # Verificar nível
-    if character.level < job.required_level:
-        logger.warning(
-            "Nível insuficiente: level %s < requerido %s",
-            character.level,
-            job.required_level,
+    # Verificar se o personagem tem a profissão necessária
+    try:
+        profession = Profession.objects.get(
+            character=character,
+            profession_type=job.profession_type
         )
-        request.session["alert"] = "Você não tem nível suficiente para este trabalho!"
+    except Profession.DoesNotExist:
+        request.session["alert"] = "Você não possui a profissão necessária!"
         return redirect("jobs_list")
 
-    # Se já estiver em trabalho, não deixa começar outro
+    # Verificar nível da profissão
+    if profession.level < job.required_level:
+        request.session["alert"] = "Seu nível nessa profissão é insuficiente!"
+        return redirect("jobs_list")
+
+    # Checar se já está em um job
     if CharacterJob.objects.filter(character=character).exists():
-        logger.warning("Character %s já está em um trabalho", character)
-        request.session["alert"] = "Você já está em um trabalho!"
+        request.session["alert"] = "Você já está trabalhando!"
         return redirect("jobs_list")
 
-    CharacterJob.objects.create(character=character, job=job, start_time=timezone.now())
-    logger.info("CharacterJob criado com sucesso para %s no job %s", character, job)
+    CharacterJob.objects.create(character=character, job=job)
     return redirect("job_in_progress")
 
 
@@ -298,44 +310,59 @@ def job_in_progress(request):
 def end_job(request, job_id):
     character = Character.objects.get(user=request.user)
     char_job = CharacterJob.objects.filter(character=character, job_id=job_id).first()
- 
+
     if not char_job:
         request.session["alert"] = "Você não está nesse trabalho."
         return redirect("jobs_list")
 
     job = char_job.job
-    elapsed = timezone.now() - char_job.start_time
-    elapsed_minutes = elapsed.total_seconds() / 60
 
-    # só libera se já passou o duration do job
-    if elapsed_minutes < job.duration:
+    # Verifica se terminou
+    if char_job.time_left() > 0:
         return redirect("job_in_progress")
 
-    # recompensa
+    # Recupera a profissão vinculada a esse job
+    profession = Profession.objects.get(
+        character=character,
+        profession_type=job.profession_type
+    )
+
+    # Recompensas
     gold_earned = job.gold_per_minute * job.duration
     xp_earned = job.xp_per_minute * job.duration
 
-    character.add_experience(xp_earned)
-    # se você tiver um campo de ouro no Character:
-    # character.gold += gold_earned
+    # Aplica XP na profissão
+    leveled = profession.add_experience(xp_earned)
 
-    # calcula drops
-    dropped_items = []
-    for drop in job.drops.all():
-        if random.uniform(0, 100) <= drop.item.drop_chance:
-            dropped_items.append(drop)
-            # aqui você pode salvar no inventário do personagem
-            # CharacterInventory.objects.create(character=character, item=drop.item, quantity=1)
-
+    # Ouro no personagem
+    character.gold += gold_earned
     character.save()
+
+    # Drops
+    dropped_items = []
+    for item in job.drops.all():
+        # Se o item tem drop_chance (precisa existir no model)
+        if hasattr(item, "drop_chance"):
+            chance = item.drop_chance
+        else:
+            chance = 100  # fallback
+
+        if random.uniform(0, 100) <= chance:
+            dropped_items.append(item)
+            InventoryItem.objects.create(character=character, item=item, quantity=1)
+
     char_job.delete()
 
-    drops_names = (
-        ", ".join(str(drop.item.name) for drop in dropped_items)
+    drops_text = (
+        ", ".join(i.name for i in dropped_items)
         if dropped_items
         else "nenhum item"
     )
+
     request.session["alert"] = (
-        f"Você recebeu {gold_earned} ouro, {xp_earned} XP e dropou {drops_names}."
+        f"Você recebeu {gold_earned} ouro, {xp_earned} XP "
+        f"e encontrou {drops_text}."
     )
+
     return redirect("jobs_list")
+

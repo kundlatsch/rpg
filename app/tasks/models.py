@@ -19,17 +19,58 @@ class TasksConfig(models.Model):
             f"Descanso {self.rest_stamina_per_minute}/{self.rest_hp_per_minute}/{self.rest_mana_per_minute}"
         )
 
+class ProfessionType(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=1000, default="")
+    emoji = models.CharField(max_length=10, blank=True)
+    level_growth_rate = models.FloatField(default=1.5)
+
+class Profession(models.Model):
+    character = models.ForeignKey("character.Character", on_delete=models.CASCADE)
+    profession_type = models.ForeignKey(
+        "tasks.ProfessionType",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    level = models.IntegerField(default=1)
+    exp = models.IntegerField(default=0)
+    max_exp = models.IntegerField(default=100)
+
+    def add_experience(self, amount):
+        """
+        Adiciona XP e aplica lógica de subir de nível.
+        growth_rate = fator de crescimento (ex: 1.5 = 50% mais difícil a cada nível)
+        """
+        self.exp += amount
+
+        leveled_up = False
+        # loop para tratar casos em que ganha XP suficiente para subir vários níveis
+        while self.exp >= self.max_exp:
+            self.exp -= self.max_exp
+            self.level += 1
+            # recalcula xp para próximo nível
+            self.max_exp = int(self.max_exp * self.profession_type.level_growth_rate)
+            leveled_up = True
+
+        self.save()
+        return leveled_up
 
 class Job(models.Model):
-    name = models.CharField(max_length=100)
-    emoji = models.CharField(max_length=10, blank=True, null=True)
-    gold_per_minute = models.IntegerField(default=0, blank=True, null=True)
-    xp_per_minute = models.IntegerField(default=0, blank=True, null=True)
-    drops = models.ManyToManyField(
-        "items.Item", blank=True, related_name="jobs_that_drop"
+    profession_type = models.ForeignKey(
+        "tasks.ProfessionType",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=1000, default="")
+    emoji = models.CharField(max_length=10, blank=True, null=True)
+    gold_per_minute = models.IntegerField(default=0)
+    xp_per_minute = models.IntegerField(default=0)
+    drops = models.ManyToManyField("items.Item", blank=True)
     required_level = models.IntegerField(default=1)
-    duration = models.IntegerField(default=5)  # duração fixa do job em minutos
+    duration = models.IntegerField(default=5)
 
     def __str__(self):
         return f"{self.emoji or ''} {self.name}"
@@ -47,26 +88,3 @@ class CharacterJob(models.Model):
         return max(self.job.duration - int(elapsed), 0)
 
 
-class JobRank(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="ranks")
-    name = models.CharField(max_length=50)  # nome do rank, não só número
-    multiplier = models.FloatField(default=1.0)
-    min_xp = models.IntegerField(default=0)  # XP necessário para atingir esse rank
-
-    def __str__(self):
-        return f"{self.job.name} - {self.name}"
-
-
-class CharacterJobProgress(models.Model):
-    character = models.ForeignKey("character.Character", on_delete=models.CASCADE)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    xp = models.IntegerField(default=0)
-
-    def current_rank(self):
-        # pega o rank correspondente ao XP atual
-        ranks = self.job.ranks.order_by("min_xp")
-        current = ranks.first()
-        for rank in ranks:
-            if self.xp >= rank.min_xp:
-                current = rank
-        return current

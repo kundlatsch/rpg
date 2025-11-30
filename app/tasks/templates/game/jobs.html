@@ -1,171 +1,536 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
 <div class="scroll-container p-4 p-md-5 mt-4">
-    <!-- Cabeçalho -->
-    <div class="text-center mb-5">
-        <h1 class="fantasy-title">💼 Trabalhos Disponíveis</h1>
-        <p class="text-dark mb-0">Ganhe recursos para sua aventura</p>
+    <!-- Cabeçalho dos trabalhos -->
+    <div class="text-center mb-4">
+        <h1 class="jobs-title">
+            ⚒️ Trabalhos Disponíveis
+        </h1>
+        <p class="text-dark mb-0">Escolha uma profissão e comece sua jornada</p>
     </div>
 
     <div class="divider"></div>
 
-    <!-- Lista de trabalhos -->
-    <div class="row">
-        {% for job in jobs %}
-            {% with progress=progress_dict.job.id %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="job-card p-4 h-100">
-                    <div class="job-header text-center mb-3">
-                        <div class="job-emoji" style="font-size: 3rem;">{{ job.emoji }}</div>
-                        <h3 class="fantasy-title mt-2">{{ job.name }}</h3>
+    <!-- Alertas -->
+    {% if request.session.alert %}
+        <div class="fantasy-alert">
+            <div class="alert-emoji">⚠️</div>
+            <div class="alert-message">{{ request.session.alert }}</div>
+        </div>
+    {% endif %}
+
+    <!-- Grid de Trabalhos -->
+    <div class="jobs-grid">
+        {% for entry in jobs_with_prof %}
+            {% with job=entry.job prof=entry.prof unlocked=entry.is_unlocked %}
+                <div class="job-card-compact">
+                    <!-- Cabeçalho do Card -->
+                    <div class="job-card-header">
+                        <div class="job-emoji">{{ job.emoji|default:"⚒️" }}</div>
+                        <div class="job-title-info">
+                            <h4 class="job-title">{{ job.name }}</h4>
+                            <div class="job-type">
+                                {{ job.profession_type.name }}
+                                {% if prof %}
+                                    <span class="profession-level">(Nv. {{ prof.level }})</span>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="job-details">
-                        {% if job.duration %}
-                            <div class="job-stat mb-2">
-                                <span class="stat-icon">🕒</span>
-                                <span class="stat-text">Duração: {{ job.duration }}</span>
-                            </div>
-                        {% endif %}
-
-                        {% if job.gold_per_minute %}
-                            <div class="job-stat mb-2">
-                                <span class="stat-icon">💰</span>
-                                <span class="stat-text">Ouro/min: {{ job.gold_per_minute }}</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% if job.xp_per_minute %}
-                            <div class="job-stat mb-2">
-                                <span class="stat-icon">✨</span>
-                                <span class="stat-text">XP/min: {{ job.xp_per_minute }}</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% if job.drops %}
-                            <div class="job-stat mb-2">
-                                <span class="stat-icon">🎁</span>
-                                <span class="stat-text">Drops: {{ job.drops }}</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% if job.required_level %}
-                            <div class="job-stat mb-3">
-                                <span class="stat-icon">🔒</span>
-                                <span class="stat-text">Nível requerido: {{ job.required_level }}</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% with rank=progress.current_rank %}
-                            <div class="job-rank p-3 text-center mb-3">
-                                <h4 class="fantasy-title mb-1">Rank Atual</h4>
-                                <p class="mb-0">{{ rank.name }} (Multiplicador: x{{ rank.multiplier }})</p>
-                            </div>
-                        {% endwith %}
+                    <!-- Informações Rápidas -->
+                    <div class="job-quick-info">
+                        <div class="requirement">
+                            <span class="req-emoji">⭐</span>
+                            Nv. {{ job.required_level }}+
+                        </div>
+                        <div class="duration">
+                            <span class="duration-emoji">⏱️</span>
+                            {{ job.duration }}min
+                        </div>
                     </div>
 
-                    <a href="{% url 'start_job' job.id %}" class="fantasy-btn w-100 text-center mt-3">
-                        💼 Iniciar Trabalho
-                    </a>
+                    <!-- Descrição do Job (sempre visível) -->
+                    {% if job.description %}
+                    <div class="job-description-section">
+                        <div class="description-icon">📝</div>
+                        <p class="job-description-text">{{ job.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recompensas (sempre visíveis) -->
+                    <div class="job-rewards-section">
+                        <div class="rewards-header">
+                            <span class="rewards-emoji">🎯</span>
+                            <span class="rewards-title">Recompensas</span>
+                        </div>
+                        <div class="rewards-grid">
+                            <div class="reward-item">
+                                <span class="reward-emoji">💰</span>
+                                <span class="reward-text">{{ job.gold_per_minute|default:0 }} <small>ouro/min</small></span>
+                            </div>
+                            <div class="reward-item">
+                                <span class="reward-emoji">⚡</span>
+                                <span class="reward-text">{{ job.xp_per_minute|default:0 }} <small>XP/min</small></span>
+                            </div>
+                            {% if prof %}
+                            <div class="reward-item">
+                                <span class="reward-emoji">📊</span>
+                                <span class="reward-text">{{ prof.exp|default:0 }} <small>XP profissão</small></span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Drops com _item_slot.html para TODOS os itens -->
+                    {% if job.drops.all %}
+                    <div class="drops-section">
+                        <div class="drops-header">
+                            <span class="drops-emoji">🎁</span>
+                            <span class="drops-title">Itens que podem cair</span>
+                        </div>
+                        <div class="drops-grid">
+                            {% for item in job.drops.all %}
+                                <div class="drop-item">
+                                    {% include "items/_item_slot.html" with item=item slot_name=item.name drop_chance=item.drop_chance %}
+                                    {% if item.drop_chance %}
+                                    <div class="drop-chance-badge">
+                                        {{ item.drop_chance }}%
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Status e Ação -->
+                    <div class="job-action-section">
+                        {% if unlocked %}
+                            <a href="{% url 'start_job' job.id %}" class="btn-start-compact">
+                                🚀 Iniciar Trabalho
+                            </a>
+                        {% else %}
+                            <div class="locked-info">
+                                <span class="locked-emoji">🔒</span>
+                                <span class="locked-text">
+                                    {% if prof %}
+                                        Nível insuficiente
+                                    {% else %}
+                                        Profissão não aprendida
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
             {% endwith %}
         {% endfor %}
-    </div>
-
-    <!-- Rodapé -->
-    <div class="text-center mt-5">
-        <p class="text-dark mb-0">
-            <small>💡 Escolha um trabalho adequado ao seu nível para melhores recompensas!</small>
-        </p>
     </div>
 </div>
 
 <style>
-    /* Estilos específicos para a página de trabalhos */
-    .job-card {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 12px;
+    /* Container principal em grid */
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin: 0 auto;
+    }
+
+    /* Cards compactos */
+    .job-card-compact {
+        background: rgba(245, 245, 220, 0.3);
         border: 2px solid #8B4513;
+        border-radius: 12px;
+        padding: 1.2rem;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
-    
-    .job-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        background: rgba(139, 69, 19, 0.2);
+
+    .job-card-compact:hover {
+        background: rgba(245, 245, 220, 0.5);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
     }
-    
-    .job-header {
-        border-bottom: 2px solid #D4AF37;
-        padding-bottom: 1rem;
+
+    /* Cabeçalho do card */
+    .job-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
     }
-    
-    .job-details {
+
+    .job-emoji {
+        font-size: 2.5rem;
+        flex-shrink: 0;
+    }
+
+    .job-title-info {
+        flex-grow: 1;
+    }
+
+    .job-title {
+        font-family: 'Cinzel', serif;
         color: #3E2723;
+        margin: 0 0 0.3rem 0;
+        font-size: 1.2rem;
+        line-height: 1.2;
     }
-    
-    .job-stat {
+
+    .job-type {
+        font-family: 'MedievalSharp', cursive;
+        color: #8B4513;
+        font-size: 0.85rem;
+    }
+
+    .profession-level {
+        color: #D4AF37;
+        font-weight: bold;
+    }
+
+    /* Informações rápidas */
+    .job-quick-info {
+        display: flex;
+        gap: 1rem;
+        padding: 0.5rem;
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 8px;
+    }
+
+    .requirement, .duration {
         display: flex;
         align-items: center;
-        padding: 0.5rem;
+        gap: 0.3rem;
+        font-family: 'MedievalSharp', cursive;
+        font-size: 0.8rem;
+        color: #3E2723;
+    }
+
+    .req-emoji, .duration-emoji {
+        font-size: 0.9rem;
+    }
+
+    /* Descrição do job */
+    .job-description-section {
+        display: flex;
+        gap: 0.8rem;
+        padding: 0.8rem;
+        background: rgba(245, 245, 220, 0.5);
+        border-radius: 8px;
+        border-left: 4px solid #8B4513;
+    }
+
+    .description-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+
+    .job-description-text {
+        margin: 0;
+        font-style: italic;
+        color: #3E2723;
+        font-family: 'MedievalSharp', cursive;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+
+    /* Seção de recompensas */
+    .job-rewards-section {
+        padding: 0.8rem;
+        background: rgba(139, 69, 19, 0.1);
+        border-radius: 8px;
+        border: 1px solid #8B4513;
+    }
+
+    .rewards-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.8rem;
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .rewards-emoji {
+        font-size: 1rem;
+    }
+
+    .rewards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .reward-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem;
         background: rgba(245, 245, 220, 0.3);
         border-radius: 6px;
+        border: 1px solid rgba(139, 69, 19, 0.3);
     }
-    
-    .stat-icon {
-        font-size: 1.5rem;
-        margin-right: 0.75rem;
-        width: 30px;
+
+    .reward-emoji {
+        font-size: 1rem;
+        width: 20px;
         text-align: center;
     }
-    
-    .stat-text {
-        flex: 1;
+
+    .reward-text {
+        font-family: 'MedievalSharp', cursive;
+        font-size: 0.8rem;
+        color: #3E2723;
+        font-weight: bold;
     }
-    
-    .job-rank {
-        background: rgba(212, 175, 55, 0.1);
+
+    .reward-text small {
+        font-weight: normal;
+        color: #8B4513;
+    }
+
+    /* Seção de drops */
+    .drops-section {
+        padding: 0.8rem;
+        background: rgba(139, 69, 19, 0.1);
         border-radius: 8px;
-        border: 1px solid #D4AF37;
+        border: 1px solid #8B4513;
     }
-    
-    .fantasy-btn {
-        background: linear-gradient(to bottom, #8B4513, #6B3100);
-        border: 1px solid var(--color-secondary);
-        color: var(--color-light) !important;
-        border-radius: 6px;
-        padding: 0.75rem;
+
+    .drops-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.8rem;
         font-family: 'Cinzel', serif;
-        transition: all 0.3s ease;
-        text-decoration: none;
+        color: #3E2723;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .drops-emoji {
+        font-size: 1rem;
+    }
+
+    .drops-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .drop-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .drop-item .item-slot {
+        width: 50px;
+        height: 50px;
+    }
+
+    .drop-item .slot-icon {
+        font-size: 1.5rem;
+    }
+
+    .drop-item .slot-label {
+        font-size: 0.55rem;
+    }
+
+    .drop-chance-badge {
+        background: rgba(212, 175, 55, 0.2);
+        padding: 0.1rem 0.3rem;
+        border-radius: 6px;
+        font-family: 'Cinzel', serif;
+        font-size: 0.6rem;
+        color: #D4AF37;
+        font-weight: bold;
+    }
+
+    /* Seção de ação */
+    .job-action-section {
+        margin-top: auto; /* Empurra para o final do card */
+    }
+
+    .btn-start-compact {
         display: block;
+        width: 100%;
+        background: linear-gradient(135deg, #D4AF37, #B8860B);
+        color: #3E2723;
+        padding: 0.8rem;
+        border: 2px solid #8B4513;
+        border-radius: 8px;
+        font-family: 'Cinzel', serif;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
     }
-    
-    .fantasy-btn:hover {
-        background: linear-gradient(to bottom, #6B3100, #8B4513);
-        box-shadow: 0 0 10px var(--color-secondary);
-        color: #FFF !important;
+
+    .btn-start-compact:hover {
+        background: linear-gradient(135deg, #B8860B, #D4AF37);
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        color: #3E2723;
     }
-    
-    /* Animação para os cards */
-    @keyframes jobCardAppear {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
+
+    .locked-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.8rem;
+        background: rgba(108, 117, 125, 0.2);
+        border: 1px solid #6c757d;
+        border-radius: 8px;
+        font-family: 'MedievalSharp', cursive;
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-align: center;
     }
-    
-    .job-card {
-        animation: jobCardAppear 0.5s ease-out forwards;
-        opacity: 0;
+
+    .locked-emoji {
+        font-size: 1rem;
     }
-    
-    /* Delay para cada card aparecer sequencialmente */
-    .job-card:nth-child(1) { animation-delay: 0.1s; }
-    .job-card:nth-child(2) { animation-delay: 0.2s; }
-    .job-card:nth-child(3) { animation-delay: 0.3s; }
-    .job-card:nth-child(4) { animation-delay: 0.4s; }
-    .job-card:nth-child(5) { animation-delay: 0.5s; }
-    .job-card:nth-child(6) { animation-delay: 0.6s; }
+
+    /* Alertas estilizados */
+    .fantasy-alert {
+        background: linear-gradient(135deg, #FFD700, #D4AF37);
+        border: 2px solid #B8860B;
+        border-radius: 10px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .alert-emoji {
+        font-size: 2rem;
+    }
+
+    .alert-message {
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        font-weight: bold;
+        flex-grow: 1;
+    }
+
+    /* Melhorias para textos */
+    .jobs-title {
+        font-family: 'Cinzel', serif;
+        color: #3E2723;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .divider {
+        height: 2px;
+        background: linear-gradient(to right, transparent, #8B4513, transparent);
+        margin: 2rem 0;
+    }
+
+    /* Responsividade */
+    @media (max-width: 1200px) {
+        .jobs-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .jobs-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .job-card-compact {
+            padding: 1rem;
+        }
+        
+        .job-card-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        
+        .job-emoji {
+            align-self: center;
+        }
+        
+        .job-quick-info {
+            justify-content: center;
+        }
+        
+        .rewards-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .drops-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .scroll-container {
+            padding: 1rem;
+        }
+        
+        .drops-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .job-quick-info {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação de entrada para os cards
+    const jobCards = document.querySelectorAll('.job-card-compact');
+    jobCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.4s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        }, index * 100);
+    });
+
+    // Efeito de brilho para cards com profissões desbloqueadas
+    const unlockedCards = document.querySelectorAll('.job-card-compact');
+    unlockedCards.forEach(card => {
+        const btn = card.querySelector('.btn-start-compact');
+        if (btn) {
+            setInterval(() => {
+                card.style.borderColor = card.style.borderColor === 'rgb(212, 175, 55)' ? 
+                    '#8B4513' : '#D4AF37';
+            }, 2000);
+        }
+    });
+
+    // Efeito de brilho para itens raros nos drops
+    const rareItems = document.querySelectorAll('.item-slot.rarity-rare, .item-slot.rarity-epic, .item-slot.rarity-legendary');
+    rareItems.forEach(item => {
+        setInterval(() => {
+            item.style.boxShadow = item.style.boxShadow ? 
+                '' : '0 0 10px rgba(212, 175, 55, 0.5)';
+        }, 2000);
+    });
+});
+</script>
 {% endblock %}
