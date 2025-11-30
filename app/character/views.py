@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .models import Character
+from tasks.models import Profession
 
 @login_required
 def character_detail(request):
@@ -28,15 +29,28 @@ def character_detail(request):
 
         return redirect("character_detail")
 
-    return render(request, "character/detail.html", {"character": character})
+    professions = (
+        Profession.objects
+        .filter(character=character)
+        .select_related("profession_type")
+    )
+
+    return render(request, "character/detail.html", {"character": character, "professions": professions})
 
 
 @login_required
 def public_character_view(request, character_id):
     character = get_object_or_404(Character, id=character_id)
 
+    professions = (
+        Profession.objects
+        .filter(character=character)
+        .select_related("profession_type")
+    )
+
     return render(request, "character/public_profile.html", {
-        "character": character
+        "character": character,
+        "professions": professions
     })
 
 
