@@ -11,7 +11,10 @@ from .models import (
     TasksConfig,
     Job,
     CharacterJob,
-    Profession
+    Profession,
+    Hunt,
+    CharacterHunt,
+    HuntMonster
 )
 
 from character.models import Character
@@ -31,7 +34,6 @@ def home(request):
 def create_character(request):
     if request.method == "POST":
         name = request.POST.get("name")
-        char_class = request.POST.get("char_class")
         Character.objects.create(user=request.user, name=name)
         return redirect("dashboard")
     return render(request, "game/create_character.html")
@@ -349,7 +351,13 @@ def end_job(request, job_id):
 
         if random.uniform(0, 100) <= chance:
             dropped_items.append(item)
-            InventoryItem.objects.create(character=character, item=item, quantity=1)
+            inv, created = InventoryItem.objects.get_or_create(
+                character=character,
+                item=item,
+                defaults={"quantity": 0},
+            )
+            inv.quantity += 1
+            inv.save()
 
     char_job.delete()
 
@@ -366,3 +374,86 @@ def end_job(request, job_id):
 
     return redirect("jobs_list")
 
+@login_required
+def hunts_list(request):
+    character = get_object_or_404(Character, user=request.user)
+    hunts = Hunt.objects.all()
+
+    return render(request, "game/hunts.html", {
+        "character": character,
+        "hunts": hunts,
+    })
+
+@login_required
+def hunt_in_progress(request):
+    character = Character.objects.get(user=request.user)
+    char_hunt = CharacterHunt.objects.filter(character=character).first()
+    if not char_hunt:
+        return redirect("hunts_list")
+
+    now = timezone.now()
+    end_time = char_hunt.start_time + timedelta(minutes=char_hunt.hunt.duration)
+    hunt_finished = now >= end_time
+
+    time_left = char_hunt.time_left()
+    return render(
+        request,
+        "game/hunt_in_progress.html",
+        {
+            "character": character,
+            "char_hunt": char_hunt,
+            "time_left": time_left,
+            "hunt_finished": hunt_finished,
+        },
+    )
+
+@login_required
+def start_hunt(request, hunt_id):
+    character = Character.objects.get(user=request.user)
+    hunt = get_object_or_404(Hunt, id=hunt_id)
+
+    if CharacterHunt.objects.filter(character=character).exists():
+        request.session["alert"] = "Você já está em uma caçada!"
+        return redirect("hunts_list")
+
+    hunt_monsters = HuntMonster.objects.filter(hunt=hunt)
+
+    if not hunt_monsters.exists():
+        request.session["alert"] = "Essa caçada não possui monstros cadastrados!"
+        return redirect("hunts_list")
+
+    pool = []
+    for hm in hunt_monsters:
+        pool += [hm] * int(hm.chance)
+
+    monster = random.choice(pool)
+
+    CharacterHunt.objects.create(
+        character=character,
+        hunt=hunt,
+        monster=monster
+    )
+
+    return redirect("hunt_in_progress")
+
+@login_required
+def end_hunt(request, hunt_id):
+    character = Character.objects.get(user=request.user)
+    char_hunt = CharacterHunt.objects.filter(
+        character=character,
+        hunt_id=hunt_id
+    ).first()
+
+    if not char_hunt:
+        request.session["alert"] = "Você não está nessa caçada."
+        return redirect("hunts_list")
+
+    if char_hunt.time_left() > 0:
+        return redirect("hunt_in_progress")
+
+    hunt = char_hunt.hunt
+    hunt_monster = char_hunt.monster
+
+    char_hunt.delete()
+
+    return redirect("combat:hunt", monster_id=hunt_monster.id)

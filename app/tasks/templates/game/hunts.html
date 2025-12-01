@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    {% if request.session.alert %}
+        <div class="alert alert-warning">{{ request.session.alert }}</div>
+    {% endif %}
+
+    <h2 class="mb-4">Caçadas Disponíveis</h2>
+
+    <ul class="list-group">
+
+        {% for hunt in hunts %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+
+            <!-- LEFT -->
+            <div>
+                <strong>{{ hunt.name }}</strong><br>
+                <small class="text-muted">
+                    Duração: {{ hunt.duration }} min<br>
+                    Monstros possíveis:
+                </small>
+                <ul class="mb-1">
+                    {% for m in hunt.possible_monsters.all %}
+                        <li>{{ m.name }} (nível {{ m.level }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="text-end">
+                {% if character.level >= hunt.required_level %}
+                    <a href="{% url 'start_hunt' hunt.id %}" class="btn btn-primary btn-sm">
+                        Iniciar Caçada
+                    </a>
+                {% else %}
+                    <span class="badge bg-secondary mb-2">Bloqueado</span><br>
+                    <button class="btn btn-outline-secondary btn-sm" disabled>Indisponível</button>
+                {% endif %}
+            </div>
+
+        </li>
+        {% endfor %}
+
+    </ul>
+
+</div>
+{% endblock %}

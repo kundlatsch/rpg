@@ -16,4 +16,8 @@ urlpatterns = [
     path("jobs/start/<int:job_id>/", views.start_job, name="start_job"),
     path("job/end/<int:job_id>/", views.end_job, name="end_job"),
     path("jobs/progress/", views.job_in_progress, name="job_in_progress"),
+    path("hunt/", views.hunts_list, name="hunts_list"),
+    path("hunt/start/<int:hunt_id>/", views.start_hunt, name="start_hunt"),
+    path("hunt/end/<int:hunt_id>/", views.end_hunt, name="end_hunt"),
+    path("hunt/progress/", views.hunt_in_progress, name="hunt_in_progress"),
 ]

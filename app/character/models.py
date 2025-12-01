@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 from .constants import SLOT_WEAKNESS_MULTIPLIER
 
@@ -15,7 +16,12 @@ class Character(models.Model):
         ("monster", "Monster"),
     ]
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     type = models.CharField(
         max_length=20,
         choices=CHARACTER_TYPES,
@@ -183,3 +189,11 @@ class Character(models.Model):
         final = self.final_attr
         return final["arcane"] * 10
     
+    def clean(self):
+
+        if self.type == "player" and self.user is None:
+            raise ValidationError("Player characters must have a user.")
+
+        if self.type != "player" and self.user is not None:
+            raise ValidationError("Only players can have a user.")
+

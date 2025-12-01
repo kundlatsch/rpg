@@ -88,3 +88,44 @@ class CharacterJob(models.Model):
         return max(self.job.duration - int(elapsed), 0)
 
 
+class Hunt(models.Model):
+    """Uma caçada disponível para o jogador escolher."""
+    name = models.CharField(max_length=100)
+    duration = models.IntegerField(default=5)  # minutos
+    required_level = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.name
+
+
+class HuntMonster(models.Model):
+    """Monstros possíveis dentro de uma caçada."""
+    hunt = models.ForeignKey(Hunt, related_name="monsters", on_delete=models.CASCADE)
+    monster = models.ForeignKey(
+        "character.Character",
+        on_delete=models.CASCADE,
+        limit_choices_to={"type": "monster"},
+    )
+    chance = models.FloatField(default=100)
+    xp_drop = models.IntegerField(default=0)
+    gold_drop = models.IntegerField(default=0)
+    item_drops = models.ManyToManyField("items.Item", blank=True)
+
+    def __str__(self):
+        return f"{self.monster.name} ({self.chance}%)"
+
+
+class CharacterHunt(models.Model):
+    """Guarda a caçada em andamento do jogador."""
+    character = models.OneToOneField("character.Character", on_delete=models.CASCADE)
+    hunt = models.ForeignKey(Hunt, on_delete=models.CASCADE)
+    monster = models.ForeignKey(
+        HuntMonster,
+        on_delete=models.CASCADE,
+        related_name="selected_monster"
+    )
+    start_time = models.DateTimeField(default=timezone.now)
+
+    def time_left(self):
+        elapsed = (timezone.now() - self.start_time).total_seconds() // 60
+        return max(self.hunt.duration - int(elapsed), 0)

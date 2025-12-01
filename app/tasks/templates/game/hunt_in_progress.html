@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Caçada em andamento...</h2>
+
+    <p>
+        Você está em uma caçada: <strong>{{ char_hunt.hunt.name }}</strong><br>
+        Tempo restante: <strong>{{ time_left }} minutos</strong>
+    </p>
+
+    {% if hunt_finished %}
+        <a href="{% url 'end_hunt' char_hunt.hunt.id %}" class="btn btn-success">
+            Batalhar com o monstro encontrado
+        </a>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            Aguarde o tempo terminar.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
