@@ -1,6 +1,5 @@
 # combat/engine.py
 from django.utils import timezone
-from combat.utils import create_mock_equipment
 from items.models import EquipmentSlot
 from .battle import (
     compute_hit_chance, compute_damage, apply_effects_from_passives,

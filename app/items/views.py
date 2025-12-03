@@ -1,13 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import InventoryItem, Equipment, MarketListing, StoreItem
+from .models import InventoryItem, Item, ItemType, MarketListing, StoreItem
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from character.models import Character
+from django.db import transaction
 from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import logging
+
+from .constants import RECIPE_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -85,16 +88,8 @@ def equip_item(request):
 
     if action == "unequip":
         slot = None
-        print("item id:", item_id)
         for s in slot_map.values():
-            print(s)
             equipped_item = getattr(character, s)
-            if equipped_item:
-                print(equipped_item.item.name)
-                print(equipped_item.item.id)
-                print(type(equipped_item.item.id), type(item_id))
-            else:
-                print("None")
             if equipped_item and equipped_item.item.id == int(item_id):
                 slot = s
                 break
@@ -351,7 +346,7 @@ def market_view(request):
     )
 
 #########################
-###       STORE        ###
+###       STORE       ###
 #########################
 
 @login_required
@@ -475,3 +470,113 @@ def store_sell(request):
         "message": f"Você vendeu {quantity}x {inv_item.item.name} por {total_gold} gold!",
         "gold_gained": total_gold
     })
+
+#########################
+###       CRAFT       ###
+#########################
+def get_character_inventory(character) -> dict:
+    inventory = InventoryItem.objects.filter(character=character)
+    inventory_dict = {}
+    for item in inventory:
+        inventory_dict[item.item.name] = item.quantity
+    return inventory_dict
+
+def can_craft(inventory: dict, item_to_craft: Item) -> bool:
+    if not item_to_craft.recipe:
+        return False
+    for ingredient, quantity in item_to_craft.recipe.items():
+        if int(inventory.get(RECIPE_LABELS[ingredient], 0)) < int(quantity):
+            return False
+    return True
+
+@login_required
+def craft_view(request):
+    character = request.user.character
+    inventory = get_character_inventory(character)
+    
+    all_craftable_items = Item.objects.filter(
+        recipe__isnull=False
+    ).select_related('equipment', 'consumable', 'material')
+    
+
+    if request.method == "POST":
+        item_id_to_craft = request.POST.get("item_id")
+        
+        if not item_id_to_craft:
+            messages.error(request, "Nenhum item especificado para criação.")
+            return redirect("craft") 
+
+        item_to_craft = get_object_or_404(Item, id=item_id_to_craft)
+        
+        if not can_craft(inventory, item_to_craft):
+            messages.error(request, f"Você não possui os materiais necessários para criar {item_to_craft.name}.")
+            return redirect("craft")
+            
+        try:
+            with transaction.atomic():
+                # 1. Consumir ingredientes
+                for material, req_quantity in item_to_craft.recipe.items():
+                    inv_item = InventoryItem.objects.filter(
+                        character=character,
+                        item__name=RECIPE_LABELS[material]
+                    ).first()
+                    new_qty = inv_item.quantity - int(req_quantity)
+                    if new_qty > 0:
+                        inv_item.quantity = new_qty
+                        inv_item.save()
+                    else:
+                        inv_item.delete()
+                
+                inv_created, created = InventoryItem.objects.get_or_create(
+                    character=character,
+                    item=item_to_craft,
+                    defaults={'quantity': 1}
+                )
+
+                if not created:
+                    inv_created.quantity += 1
+                    inv_created.save()
+
+            messages.success(request, f"🎉 Você criou com sucesso: {item_to_craft.name}!")
+
+        except Exception as e:
+            messages.error(request, f"Erro ao tentar criar o item. Tente novamente.")
+            
+        return redirect("craft")
+
+    # --- LÓGICA GET (LISTAR RECEITAS) ---
+    
+    craftable_by_type = {
+        ItemType.EQUIPMENT: [],
+        ItemType.CONSUMABLE: [],
+        ItemType.MATERIAL: [],
+    }
+
+    
+    for item in all_craftable_items:
+        # Prepara a receita com as informações do ingrediente (nome, qtde atual)
+        item.prepared_recipe = {}
+        item.can_craft = can_craft(inventory, item)
+        
+        if item.recipe:
+            for material, quantity in item.recipe.items():
+                prepared = {
+                    'item_name': RECIPE_LABELS[material],
+                    'required_qty': int(quantity),
+                    'current_qty': int(inventory.get(RECIPE_LABELS[material], 0)),
+                }
+                item.prepared_recipe[material] = prepared
+                
+        if item.item_type in craftable_by_type:
+            craftable_by_type[item.item_type].append(item)
+
+    # Prepara o contexto para o template
+    return render(
+        request,
+        "items/craft.html",
+        {
+            "character": character,
+            "crafts": craftable_by_type,
+            # Não precisamos mais do 'inventory' como um dicionário
+        },
+    )

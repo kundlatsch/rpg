@@ -27,6 +27,29 @@ class Item(models.Model):
         max_length=20, choices=ItemRarity.choices, default=ItemRarity.COMMON
     )
     item_type = models.CharField(max_length=20, choices=ItemType.choices)
+    recipe = models.JSONField(
+        blank=True, 
+        null=True,
+        help_text="""
+        Exemplo:
+        {
+            "wood": "2", 
+            "metal": "1"
+        }
+        """
+    )
+
+    @property
+    def recipe_strings(self):
+        if not self.recipe:
+            return {}
+
+        translated = {}
+        for key, value in self.recipe.items():
+            label = RECIPE_LABELS.get(key, key.replace("_", " ").title())
+            translated[label] = value
+
+        return translated
 
     class Meta:
         verbose_name = "Item"
@@ -60,8 +83,6 @@ class Equipment(models.Model):
     slot = models.CharField(
         max_length=20, choices=EquipmentSlot.choices, default=EquipmentSlot.HEAD
     )
-
-    recipe = models.JSONField(default=list, blank=True, null=True)
 
     attribute_bonuses = models.JSONField(default=dict, blank=True)
 
@@ -223,18 +244,6 @@ class Equipment(models.Model):
         return f"Equipamento: {self.item.name}"
     
     @property
-    def recipe_strings(self):
-        if not self.recipe:
-            return {}
-
-        translated = {}
-        for key, value in self.recipe.items():
-            label = RECIPE_LABELS.get(key, key.replace("_", " ").title())
-            translated[label] = value
-
-        return translated
-    
-    @property
     def trigger_string(self):
         if not self.passive_skill:
             return ""
@@ -261,9 +270,6 @@ class Consumable(models.Model):
     attribute_bonuses = models.JSONField(
         blank=True, null=True
     )  # {"strength": +5, "agility": +1}
-    crafting_recipe = models.JSONField(
-        blank=True, null=True
-    )  # [{"item_id":1, "qty":5}, ...]
 
     def __str__(self):
         return f"Consumível: {self.item.name}"
@@ -271,10 +277,6 @@ class Consumable(models.Model):
 
 class Material(models.Model):
     item = models.OneToOneField(Item, on_delete=models.CASCADE, related_name="material")
-
-    crafting_recipe = models.JSONField(
-        blank=True, null=True
-    )  # [{"item_id":1, "qty":5}, ...]
 
     def __str__(self):
         return f"Material: {self.item.name}"

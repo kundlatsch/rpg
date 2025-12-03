@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from character.models import Character
 from tasks.models import Profession, ProfessionType
+from combat.models import ArenaRanking
 
 @receiver(post_save, sender=Character)
 def create_professions_for_character(sender, instance, created, **kwargs):
@@ -14,3 +15,10 @@ def create_professions_for_character(sender, instance, created, **kwargs):
             character=instance,
             profession_type=ptype,
         )
+
+@receiver(post_save, sender=Character)
+def create_arenaranking_for_character(sender, instance, created, **kwargs):
+    if not created:
+        return
+
+    ArenaRanking.objects.create(character=instance)

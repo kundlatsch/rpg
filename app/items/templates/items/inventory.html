@@ -59,7 +59,7 @@
                               data-passive-skill="{{ inv.item.equipment.passive_skill|default:'{}'|escapejs }}"
                               data-formatted-effects="{{ inv.item.equipment.formatted_passive_skill_effects }}"
                               data-trigger="{{ inv.item.equipment.trigger_string }}"
-                              data-crafting-recipe="{{ inv.item.equipment.recipe_strings|default:'{}'|escapejs }}"
+                              data-crafting-recipe="{{ inv.item.recipe_strings|default:'{}'|escapejs }}"
                             >
                                 <div class="d-flex align-items-center">
                                     <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
@@ -90,7 +90,7 @@
                                 data-min-level="{{ inv.item.consumable.min_level }}"
                                 data-affected-attributes='{{ inv.item.consumable.affected_attributes|safe }}'
                                 data-attribute-bonuses='{{ inv.item.consumable.attribute_bonuses|safe }}'
-                                data-crafting-recipe='{{ inv.item.consumable.crafting_recipe|safe }}'
+                                data-crafting-recipe='{{ inv.item.recipe_strings|safe }}'
                               >
                                 <div class="d-flex align-items-center">
                                     <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
@@ -118,7 +118,7 @@
                                 data-description="{{ inv.item.description }}" 
                                 data-emoji="{{ inv.item.emoji }}" 
                                 data-rarity="{{ inv.item.rarity }}"
-                                data-crafting-recipe='{{ inv.item.material.crafting_recipe|safe }}'
+                                data-crafting-recipe='{{ inv.item.recipe_strings|safe }}'
                               >
                                 <div class="d-flex align-items-center">
                                     <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
@@ -192,7 +192,7 @@
                             data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
                             data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
                             data-trigger="{{ slot.equipment.trigger_string }}"
-                            data-crafting-recipe="{{ slot.equipment.recipe_strings|default:'{}'|escapejs }}"
+                            data-crafting-recipe="{{ slot.equipment.item.recipe_strings|default:'{}'|escapejs }}"
                         >
                             {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
                         </div>
@@ -226,7 +226,7 @@
                             data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
                             data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
                             data-trigger="{{ slot.equipment.trigger_string }}"
-                            data-crafting-recipe="{{ slot.equipment.recipe_strings|default:'{}'|escapejs }}"
+                            data-crafting-recipe="{{ slot.equipment.item.recipe_strings|default:'{}'|escapejs }}"
                         >
                             {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
                         </div>

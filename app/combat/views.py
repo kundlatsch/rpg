@@ -1,14 +1,15 @@
 # combat/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
 from django.db import transaction
 from combat.engine import run_battle
-from combat.utils import create_mock_equipment
 from items.models import EquipmentSlot
 from character.models import Character
 from tasks.models import HuntMonster
 from items.models import InventoryItem
+from .models import ArenaRanking
+from .utils import calculate_arena_points
 import random
 
 
@@ -63,5 +64,59 @@ def hunt(request, monster_id):
     )
 
     result["battle_log"].append(f"Você encontrou {drops_text}")
+
+    return render(request, "combat/hunt.html", result)
+
+
+@login_required
+def arena(request):
+    player = request.user.character
+    ranking, created = ArenaRanking.objects.get_or_create(character=player)
+
+    # Todos players com ranking
+    all_players = ArenaRanking.objects.exclude(character=player).order_by("points")
+
+    # pegar quem está logo acima / abaixo
+    above = list(all_players.filter(points__gt=ranking.points-1).order_by("points")[:4])
+    below = list(all_players.filter(points__lt=ranking.points+1).order_by("-points")[:4])
+    challanges = list(set(above + below))
+
+    # top 5 geral
+    top5 = ArenaRanking.objects.order_by("-points")[:5]
+
+    context = {
+        "player": player,
+        "ranking": ranking,
+        "challanges": challanges,
+        "top5": top5,
+    }
+
+    return render(request, "combat/arena.html", context)
+
+@login_required
+def arena_fight(request, target_id):
+    player = request.user.character
+    opponent = get_object_or_404(Character, id=target_id)
+
+    if opponent.type != "player":
+        raise HttpResponseBadRequest("Você só pode enfrentar jogadores.")
+    
+    result = run_battle(player, opponent)
+    winner = result["winner"]
+    
+    arena_player = ArenaRanking.objects.get(character=player)
+    arena_opponent = ArenaRanking.objects.get(character=opponent)
+
+    gained_player, gained_opponent = calculate_arena_points(
+        arena_player.points,
+        arena_opponent.points,
+        attacker_won=(winner == "character")
+    )
+
+    # atualiza pontos
+    arena_player.points += gained_player
+    arena_opponent.points += gained_opponent
+    arena_player.save()
+    arena_opponent.save()
 
     return render(request, "combat/hunt.html", result)

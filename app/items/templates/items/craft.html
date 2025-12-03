@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="mb-4">⚒️ Crafting — {{ character.name }}</h1>
+
+{% if messages %}
+<div class="my-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% for item_type, items in crafts.items %}
+    {% if items %}
+        <h2 class="mt-5">
+            {% if item_type == "equipment" %}
+                🛡️ Equipamentos
+            {% elif item_type == "consumable" %}
+                🧪 Consumíveis
+            {% else %}
+                🪵 Materiais
+            {% endif %}
+        </h2>
+
+        {% for item in items %}
+            <div class="card p-3 mb-4">
+
+                <h3>{{ item.emoji }} {{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+
+                <h4>🔧 Ingredientes:</h4>
+
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Ingrediente</th>
+                            <th>Necessário</th>
+                            <th>Você tem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material_key, data in item.prepared_recipe.items %}
+                            {% with needed=data.required_qty have=data.current_qty %}
+                                <tr class="{% if have >= needed %}table-success{% else %}table-danger{% endif %}">
+                                    <td>{{ data.item_name }}</td>
+                                    <td>{{ needed }}</td>
+                                    <td>{{ have }}</td>
+                                </tr>
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+
+                    {% if item.can_craft %}
+                        <button class="btn btn-success">Craftar</button>
+                    {% else %}
+                        <button class="btn btn-secondary" disabled>Materiais insuficientes</button>
+                    {% endif %}
+                </form>
+
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+
+{% endblock %}

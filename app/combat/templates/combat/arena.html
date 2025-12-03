@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Arena PvP</h1>
+
+<h2>Seus pontos: {{ ranking.points }}</h2>
+
+<h3>Desafie esses jogadores</h3>
+<ul>
+{% for r in challanges %}
+    <li>
+        {{ r.character.name }} — {{ r.points }} pts
+        <a href="{% url 'combat:arena_fight' r.character.id %}">Desafiar</a>
+    </li>
+{% empty %}
+    <li>Ninguém acima de você</li>
+{% endfor %}
+</ul>
+
+
+<h2>Top 5 Arena</h2>
+<ol>
+{% for r in top5 %}
+    <li>{{ r.character.name }} — {{ r.points }} pts</li>
+{% endfor %}
+</ol>
+
+{% endblock %}
