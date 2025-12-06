@@ -1,50 +1,54 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/inventory.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="scroll-container p-4 p-md-5 mt-4">
-    <!-- Cabeçalho do personagem -->
-    <div class="text-center mb-4">
-        <h1 class="fantasy-title">
+<div class="inventory-page">
+    <!-- Cabeçalho do inventário -->
+    <div class="inventory-header">
+        <h1 class="inventory-main-title">
             Inventário de {{ character.name }}
         </h1>
-        <p class="text-dark mb-0">Gerencie seus itens e equipamentos</p>
+        <p class="inventory-subtitle">Gerencie seus itens e equipamentos</p>
     </div>
 
-    <div class="divider"></div>
+    <div class="inventory-divider"></div>
 
-    <div class="row mt-4">
+    <div class="inventory-main-grid">
         <!-- Coluna da esquerda - Lista de itens com tabs -->
-        <div class="col-md-4 mb-4">
-            <div class="inventory-sidebar p-4">
+        <div class="inventory-column inventory-column-left">
+            <div class="inventory-sidebar">
                 <!-- Filtro de texto -->
-                <div class="mb-3">
-                    <input type="text" class="fantasy-form-control search-box" id="itemFilter" placeholder="🔍 Filtrar itens...">
+                <div class="inventory-search-container">
+                    <input type="text" class="inventory-search" id="itemFilter" placeholder="🔍 Filtrar itens...">
                 </div>
                 
                 <!-- Tabs para os tipos de itens -->
-                <div class="d-flex justify-content-between mb-3" id="itemTabs" role="tablist">
-                    <button class="tab-button active" data-bs-target="#equipment" type="button" role="tab" title="Equipamentos" data-toggle="tooltip" data-placement="top">
-                        <span class="tab-icon">🛡️</span>
-                        <span class="tab-text">Equip.</span>
+                <div class="inventory-tabs" id="itemTabs">
+                    <button class="inventory-tab inventory-tab-active" data-target="equipment" title="Equipamentos">
+                        <span class="inventory-tab-icon">🛡️</span>
+                        <span class="inventory-tab-text">Equip.</span>
                     </button>
-                    <button class="tab-button" data-bs-target="#consumable" type="button" role="tab" title="Consumíveis" data-toggle="tooltip" data-placement="top">
-                        <span class="tab-icon">🧪</span>
-                        <span class="tab-text">Consum.</span>
+                    <button class="inventory-tab" data-target="consumable" title="Consumíveis">
+                        <span class="inventory-tab-icon">🧪</span>
+                        <span class="inventory-tab-text">Consum.</span>
                     </button>
-                    <button class="tab-button" data-bs-target="#material" type="button" role="tab" title="Materiais" data-toggle="tooltip" data-placement="top">
-                        <span class="tab-icon">📦</span>
-                        <span class="tab-text">Mater.</span>
+                    <button class="inventory-tab" data-target="material" title="Materiais">
+                        <span class="inventory-tab-icon">📦</span>
+                        <span class="inventory-tab-text">Mater.</span>
                     </button>
                 </div>
                 
                 <!-- Conteúdo das tabs -->
-                <div class="tab-content">
+                <div class="inventory-tab-content">
                     <!-- Tab de Equipamentos -->
-                    <div class="tab-pane fade show active" id="equipment" role="tabpanel">
-                        <div class="item-list scrollable pt-2">
+                    <div class="inventory-tab-pane inventory-tab-pane-active" id="equipment" role="tabpanel">
+                        <div class="inventory-item-list">
                             {% for inv in equipment %}
-                            <div class="item-card rarity-{{ inv.item.rarity }}" 
+                            <div class="inventory-item-card inventory-rarity-{{ inv.item.rarity }}" 
                               data-id="{{ inv.id }}"
                               data-type="equipment" 
                               data-equipped="false"
@@ -54,33 +58,32 @@
                               data-rarity="{{ inv.item.rarity }}"
                               data-rarity-display="{{ inv.item.get_rarity_display }}"
                               data-min-level="{{ inv.item.equipment.min_level }}"
-                            data-stats="{{ inv.item.equipment.formatted_equipment_stats|default:'' }}"
+                              data-stats="{{ inv.item.equipment.formatted_equipment_stats|default:'' }}"
                               data-attribute-bonuses="{{ inv.item.equipment.attribute_bonuses_strings }}"
                               data-passive-skill="{{ inv.item.equipment.passive_skill|default:'{}'|escapejs }}"
                               data-formatted-effects="{{ inv.item.equipment.formatted_passive_skill_effects }}"
                               data-trigger="{{ inv.item.equipment.trigger_string }}"
                               data-crafting-recipe="{{ inv.item.recipe_strings|default:'{}'|escapejs }}"
                             >
-                                <div class="d-flex align-items-center">
-                                    <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-0">{{ inv.item.name }}</h6>
-                                        <small class="text-dark">x{{ inv.quantity }}</small>
+                                <div class="inventory-item-card-content">
+                                    <span class="inventory-item-emoji">{{ inv.item.emoji }}</span>
+                                    <div class="inventory-item-info">
+                                        <h6 class="inventory-item-name">{{ inv.item.name }}</h6>
+                                        <small class="inventory-item-quantity">x{{ inv.quantity }}</small>
                                     </div>
-                                    <span class="badge rarity-{{ inv.item.rarity }}">{{ inv.item.get_rarity_display }}</span>
                                 </div>
                             </div>
                             {% empty %}
-                            <p class="text-center text-dark mt-3">Nenhum equipamento.</p>
+                            <p class="inventory-empty-message">Nenhum equipamento.</p>
                             {% endfor %}
                         </div>
                     </div>
                     
                     <!-- Tab de Consumíveis -->
-                    <div class="tab-pane fade" id="consumable" role="tabpanel">
-                        <div class="item-list scrollable pt-2">
+                    <div class="inventory-tab-pane" id="consumable" role="tabpanel">
+                        <div class="inventory-item-list">
                             {% for inv in consumables %}
-                              <div class="item-card rarity-{{ inv.item.rarity }}" 
+                              <div class="inventory-item-card inventory-rarity-{{ inv.item.rarity }}" 
                                 data-id="{{ inv.id }}" 
                                 data-type="consumable"
                                 data-name="{{ inv.item.name }}" 
@@ -92,26 +95,25 @@
                                 data-attribute-bonuses='{{ inv.item.consumable.attribute_bonuses|safe }}'
                                 data-crafting-recipe='{{ inv.item.recipe_strings|safe }}'
                               >
-                                <div class="d-flex align-items-center">
-                                    <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-0">{{ inv.item.name }}</h6>
-                                        <small class="text-dark">x{{ inv.quantity }}</small>
+                                <div class="inventory-item-card-content">
+                                    <span class="inventory-item-emoji">{{ inv.item.emoji }}</span>
+                                    <div class="inventory-item-info">
+                                        <h6 class="inventory-item-name">{{ inv.item.name }}</h6>
+                                        <small class="inventory-item-quantity">x{{ inv.quantity }}</small>
                                     </div>
-                                    <span class="badge rarity-{{ inv.item.rarity }}">{{ inv.item.get_rarity_display }}</span>
                                 </div>
                             </div>
                             {% empty %}
-                            <p class="text-center text-dark mt-3">Nenhum consumível.</p>
+                            <p class="inventory-empty-message">Nenhum consumível.</p>
                             {% endfor %}
                         </div>
                     </div>
                     
                     <!-- Tab de Materiais -->
-                    <div class="tab-pane fade" id="material" role="tabpanel">
-                        <div class="item-list scrollable pt-2">
+                    <div class="inventory-tab-pane" id="material" role="tabpanel">
+                        <div class="inventory-item-list">
                             {% for inv in materials %}
-                              <div class="item-card rarity-{{ inv.item.rarity }}" 
+                              <div class="inventory-item-card inventory-rarity-{{ inv.item.rarity }}" 
                                 data-id="{{ inv.id }}" 
                                 data-type="material"
                                 data-name="{{ inv.item.name }}" 
@@ -120,17 +122,16 @@
                                 data-rarity="{{ inv.item.rarity }}"
                                 data-crafting-recipe='{{ inv.item.recipe_strings|safe }}'
                               >
-                                <div class="d-flex align-items-center">
-                                    <span class="item-emoji me-2">{{ inv.item.emoji }}</span>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-0">{{ inv.item.name }}</h6>
-                                        <small class="text-dark">x{{ inv.quantity }}</small>
+                                <div class="inventory-item-card-content">
+                                    <span class="inventory-item-emoji">{{ inv.item.emoji }}</span>
+                                    <div class="inventory-item-info">
+                                        <h6 class="inventory-item-name">{{ inv.item.name }}</h6>
+                                        <small class="inventory-item-quantity">x{{ inv.quantity }}</small>
                                     </div>
-                                    <span class="badge rarity-{{ inv.item.rarity }}">{{ inv.item.get_rarity_display }}</span>
                                 </div>
                             </div>
                             {% empty %}
-                            <p class="text-center text-dark mt-3">Nenhum material.</p>
+                            <p class="inventory-empty-message">Nenhum material.</p>
                             {% endfor %}
                         </div>
                     </div>
@@ -138,900 +139,108 @@
             </div>
         </div>
         
-        <!-- Coluna do meio - Detalhes do item -->
-        <div class="col-md-4 mb-4">
-            <div class="item-details p-4">
-                <div class="text-center" id="no-item-selected">
-                    <div class="mb-3">👆</div>
-                    <h4 class="fantasy-title">Selecione um item</h4>
-                    <p class="text-dark">Clique em um item à esquerda para ver seus detalhes</p>
+        <!-- Coluna da direita - Detalhes do item -->
+        <div class="inventory-column inventory-column-right">
+            <div class="inventory-details">
+                <div class="inventory-no-selection" id="no-item-selected">
+                    <div class="inventory-no-selection-icon">👆</div>
+                    <h4 class="inventory-no-selection-title">Selecione um item</h4>
+                    <p class="inventory-no-selection-text">Clique em um item à esquerda para ver seus detalhes</p>
                 </div>
                 
-                <div id="item-details-content" class="d-none">
-                    <div class="text-center mb-3">
-                        <span id="detail-emoji" class="detail-emoji"></span>
-                        <h3 id="detail-name" class="fantasy-title"></h3>
-                        <span id="detail-rarity" class="badge"></span>
+                <div id="item-details-content" class="inventory-details-content inventory-details-hidden">
+                    <div class="inventory-details-header">
+                        <div class="inventory-emoji-name">
+                            <span id="detail-emoji" class="inventory-details-emoji"></span>
+                            <h3 id="detail-name" class="inventory-details-name"></h3>
+                        </div>
+                        <span id="detail-rarity" class="inventory-details-rarity"></span>
                     </div>
                     
-                    <div class="text-center">
-                        <p id="detail-description" class="mb-3 text-dark" style="font-size: 0.8rem"></p>
+                    <div class="inventory-details-description">
+                        <p id="detail-description" class="inventory-details-description-text"></p>
                     </div>
                     
-                    <div class="stats-grid mb-3" id="detail-stats">
+                    <div class="inventory-details-stats" id="detail-stats">
                         <!-- As estatísticas serão preenchidas via JavaScript -->
                     </div>
                     
-                    <div id="item-actions" class="text-center">
+                    <div id="item-actions" class="inventory-details-actions">
                         <!-- Botões de ação serão adicionados aqui -->
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Coluna da direita - Visualização do personagem -->
-        <div class="col-md-4 mb-4">
-            <div class="character-equipment-section text-center p-4">
-                <h3 class="fantasy-title mb-4">Equipamentos</h3>
-                
-                <!-- Slots superiores -->
-                <div class="equipment-row mb-3">
-                    {% for slot in upper_slots %}
-                        <div class="meta-equipment-slot"
-                            data-type="equipment"
-                            data-equipped="true"
-                            data-id="{{ slot.equipment.item.id|default:'' }}"
-                            data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
-                            data-name="{{ slot.equipment.item.name|default:slot.name }}"
-                            data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
-                            data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
-                            data-rarity-display="{{ slot.equipment.item.get_rarity_display }}"
-                            data-min-level="{{ slot.equipment.min_level|default:1 }}"
-                            data-stats="{{ slot.equipment.formatted_equipment_stats|default:'' }}"
-                            data-attribute-bonuses="{{ slot.equipment.attribute_bonuses_strings|default:'{}'|escapejs }}"
-                            data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
-                            data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
-                            data-trigger="{{ slot.equipment.trigger_string }}"
-                            data-crafting-recipe="{{ slot.equipment.item.recipe_strings|default:'{}'|escapejs }}"
-                        >
-                            {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
-                        </div>
-                    {% endfor %}
-                </div>
+    </div>
 
-                <!-- Personagem central -->
-                <div class="character-center mb-3">
-                    <div class="character-emoji-bg">
-                        <div class="character-emoji">
-                            {{ character.emoji }}
-                        </div>
+    <!-- Seção de Equipamentos Atuais (embaixo) -->
+    <div class="character-section character-equipment-section">
+        <h3 class="inventory-equipment-title">Equipamentos Atuais</h3>
+        
+        <div class="inventory-equipment-grid">
+            <!-- Slots superiores -->
+            <div class="equipment-row">
+                {% for slot in upper_slots %}
+                    <div class="equipment-slot-container"
+                        data-type="equipment"
+                        data-equipped="true"
+                        data-id="{{ slot.equipment.item.id|default:'' }}"
+                        data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
+                        data-name="{{ slot.equipment.item.name|default:slot.name }}"
+                        data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
+                        data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
+                        data-rarity-display="{{ slot.equipment.item.get_rarity_display }}"
+                        data-min-level="{{ slot.equipment.min_level|default:1 }}"
+                        data-stats="{{ slot.equipment.formatted_equipment_stats|default:'' }}"
+                        data-attribute-bonuses="{{ slot.equipment.attribute_bonuses_strings|default:'{}'|escapejs }}"
+                        data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
+                        data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
+                        data-trigger="{{ slot.equipment.trigger_string }}"
+                        data-crafting-recipe="{{ slot.equipment.item.recipe_strings|default:'{}'|escapejs }}"
+                    >
+                        {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Personagem central -->
+            <div class="inventory-character-center">
+                <div class="inventory-character-emoji-bg">
+                    <div class="inventory-character-emoji">
+                        {{ character.emoji }}
                     </div>
                 </div>
+            </div>
 
-                <!-- Slots inferiores -->
-                <div class="equipment-row mb-3">
-                    {% for slot in lower_slots %}
-                        <div class="meta-equipment-slot"
-                            data-type="equipment"
-                            data-equipped="true"
-                            data-id="{{ slot.equipment.item.id|default:'' }}"
-                            data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
-                            data-name="{{ slot.equipment.item.name|default:slot.name }}"
-                            data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
-                            data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
-                            data-rarity-display="{{ slot.equipment.item.get_rarity_display }}"
-                            data-min-level="{{ slot.equipment.min_level|default:1 }}"
-                            data-stats="{{ slot.equipment.formatted_equipment_stats|default:'' }}"
-                            data-attribute-bonuses="{{ slot.equipment.attribute_bonuses_strings|default:'{}'|escapejs }}"
-                            data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
-                            data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
-                            data-trigger="{{ slot.equipment.trigger_string }}"
-                            data-crafting-recipe="{{ slot.equipment.item.recipe_strings|default:'{}'|escapejs }}"
-                        >
-                            {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
-                        </div>
-                    {% endfor %}
-                </div>
+            <!-- Slots inferiores -->
+            <div class="equipment-row">
+                {% for slot in lower_slots %}
+                    <div class="equipment-slot-container"
+                        data-type="equipment"
+                        data-equipped="true"
+                        data-id="{{ slot.equipment.item.id|default:'' }}"
+                        data-emoji="{{ slot.equipment.item.emoji|default:'❔' }}"
+                        data-name="{{ slot.equipment.item.name|default:slot.name }}"
+                        data-description="{{ slot.equipment.item.description|default:'Nenhum item equipado' }}"
+                        data-rarity="{{ slot.equipment.item.rarity|default:'common' }}"
+                        data-rarity-display="{{ slot.equipment.item.get_rarity_display }}"
+                        data-min-level="{{ slot.equipment.min_level|default:1 }}"
+                        data-stats="{{ slot.equipment.formatted_equipment_stats|default:'' }}"
+                        data-attribute-bonuses="{{ slot.equipment.attribute_bonuses_strings|default:'{}'|escapejs }}"
+                        data-passive-skill="{{ slot.equipment.passive_skill|default:'{}'|escapejs }}"
+                        data-formatted-effects="{{ slot.equipment.formatted_passive_skill_effects }}"
+                        data-trigger="{{ slot.equipment.trigger_string }}"
+                        data-crafting-recipe="{{ slot.equipment.item.recipe_strings|default:'{}'|escapejs }}"
+                    >
+                        {% include "items/_equipment_slot.html" with slot_name=slot.name slot_icon=slot.icon slot_equipment=slot.equipment %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<style>
-    /* Estilos específicos para a página de inventário */
-    .inventory-sidebar {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 12px;
-        border: 2px solid #8B4513;
-        height: 70vh;
-    }
-    
-    /* Novo estilo para as tabs */
-    #itemTabs {
-        display: flex;
-        gap: 5px;
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 8px;
-        padding: 5px;
-    }
-    
-    .tab-button {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 5px;
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        min-width: 0; /* Permite que os botões se ajustem ao espaço disponível */
-    }
-    
-    .tab-button.active {
-        background: rgba(139, 69, 19, 0.2);
-        border-color: #8B4513;
-    }
-    
-    .tab-button:hover {
-        background: rgba(139, 69, 19, 0.15);
-    }
-    
-    .tab-icon {
-        font-size: 1.2rem;
-        margin-bottom: 3px;
-    }
-    
-    .tab-text {
-        font-size: 0.75rem;
-        font-family: 'Cinzel', serif;
-        color: #3E2723;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-    }
-    
-    .search-box {
-        background: rgba(245, 245, 220, 0.9);
-        border: 1px solid #8B4513;
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-        color: #3E2723;
-        font-family: 'MedievalSharp', cursive;
-        width: 100%;
-    }
-    
-    .search-box:focus {
-        background: #F5F5DC;
-        border-color: #D4AF37;
-        box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
-    }
-    
-    .item-list.scrollable {
-        max-height: 50vh;
-        overflow-y: auto;
-        padding-right: 5px;
-    }
-    
-    /* Custom scrollbar */
-    .item-list.scrollable::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    .item-list.scrollable::-webkit-scrollbar-track {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 10px;
-    }
-    
-    .item-list.scrollable::-webkit-scrollbar-thumb {
-        background: #8B4513;
-        border-radius: 10px;
-    }
-    
-    .item-card {
-        background: rgba(245, 245, 220, 0.3);
-        border: 1px solid #8B4513;
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .item-card:hover {
-        background: rgba(245, 245, 220, 0.5);
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .item-card.selected {
-        background: rgba(212, 175, 55, 0.2);
-        border: 2px solid #D4AF37;
-    }
-    
-    /* Cores de raridade */
-    .item-card.rarity-common {
-        border-left: 4px solid #C0C0C0;
-    }
-    
-    .item-card.rarity-rare {
-        border-left: 4px solid #00FF00;
-    }
-    
-    .item-card.rarity-epic {
-        border-left: 4px solid #800080;
-    }
-    
-    .item-card.rarity-legendary {
-        border-left: 4px solid #FFD700;
-    }
-    
-    .item-emoji {
-        font-size: 1.8rem;
-    }
-    
-    .badge {
-        font-family: 'Cinzel', serif;
-        font-size: 0.7rem;
-        padding: 0.3rem 0.6rem;
-    }
-    
-    .badge.rarity-common {
-        background-color: #C0C0C0;
-        color: #000;
-    }
-    
-    .badge.rarity-rare {
-        background-color: #00FF00;
-        color: #000;
-    }
-    
-    .badge.rarity-epic {
-        background-color: #800080;
-        color: #FFF;
-    }
-    
-    .badge.rarity-legendary {
-        background-color: #FFD700;
-        color: #000;
-    }
-    
-    .item-details {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 12px;
-        border: 2px solid #8B4513;
-        height: 70vh;
-    }
-    
-    .detail-emoji {
-        font-size: 4rem;
-        display: block;
-        margin-bottom: 1rem;
-    }
-    
-    .stats-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 1.5rem;
-    }
-    
-    .stat-item {
-        background: rgba(245, 245, 220, 0.3);
-        padding: 8px;
-        border-radius: 5px;
-        text-align: center;
-        border: 1px solid #8B4513;
-    }
-    
-    .btn-unequip {
-        background: linear-gradient(to bottom, var(--color-primary), #6B3100);
-        border: 1px solid var(--color-secondary);
-        color: var(--color-light);
-        border-radius: 4px;
-        padding: 0.4rem 0.8rem;
-        font-family: 'Cinzel', serif;
-        font-weight: bold;
-        font-size: 0.8rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        width: 100%;
-        margin-top: 0.5rem;
-    }
-
-    .btn-unequip:hover {
-        background: linear-gradient(to bottom, #6B3100, var(--color-primary));
-        box-shadow: 0 0 8px var(--color-secondary);
-        color: #FFF;
-        transform: translateY(-1px);
-    }
-    
-    .btn-consume {
-        background: linear-gradient(to bottom, #28a745, #20c997);
-        border: 1px solid #2E8B57;
-        color: var(--color-light);
-        border-radius: 6px;
-        padding: 0.75rem 1.5rem;
-        font-family: 'Cinzel', serif;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        width: 100%;
-    }
-    
-    .btn-consume:hover {
-        background: linear-gradient(to bottom, #20c997, #28a745);
-        box-shadow: 0 0 10px #2E8B57;
-        color: #FFF;
-        transform: translateY(-2px);
-    }
-    
-    /* Seção de equipamentos */
-    .character-equipment-section {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 12px;
-        border: 2px solid #8B4513;
-    }
-    
-    .equipment-row {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-    }
-    
-    /* Personagem central */
-    .character-center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .character-emoji-bg {
-        width: 120px;
-        height: 120px;
-        background: linear-gradient(135deg, #8B4513, #D4AF37);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 15px rgba(139, 69, 19, 0.3);
-    }
-    
-    .character-emoji {
-        font-size: 4rem;
-        animation: float 3s infinite ease-in-out;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
-    }
-    
-    /* Responsividade para telas menores */
-    @media (max-width: 768px) {
-        .tab-text {
-            font-size: 0.65rem;
-        }
-        
-        .tab-icon {
-            font-size: 1rem;
-        }
-    }
-
-    .meta-equipment-slot {
-        display: contents; /* faz o navegador renderizar só os filhos, como se não houvesse a div */
-    }
-
-    
-    /* Estilo Tooltip MMO - Cores Consistente com o Tema */
-    .equipment-header {
-        text-align: center;
-        margin-bottom: 0.5rem;
-        padding-bottom: 0.3rem;
-        border-bottom: 1px solid var(--color-primary);
-    }
-
-    .equipment-level {
-        font-family: 'Cinzel', serif;
-        color: var(--color-secondary);
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-
-    /* Atributos em lista compacta */
-    .attributes-section {
-        margin-bottom: 0.5rem;
-    }
-
-    .attribute-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-    }
-
-    .attribute-line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.75rem;
-        padding: 0.1rem 0;
-        color: #3E2723;
-    }
-
-    .attribute-name {
-        font-family: 'MedievalSharp', cursive;
-        font-weight: bold;
-        color: #3E2723;
-    }
-
-    .attribute-value {
-        font-family: 'Cinzel', serif;
-        font-weight: bold;
-        color: var(--color-primary);
-    }
-
-    .attribute-value.positive {
-        color: #2E7D32;
-    }
-
-    .attribute-value.negative {
-        color: var(--color-accent);
-    }
-
-    /* Habilidade passiva compacta */
-    .passive-skill-section {
-        margin-bottom: 0.5rem;
-        padding: 0.3rem;
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 3px;
-        border-left: 2px solid var(--color-primary);
-    }
-
-    .skill-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.2rem;
-    }
-
-    .skill-name {
-        font-family: 'Cinzel', serif;
-        font-weight: bold;
-        color: var(--color-primary);
-        font-size: 0.9rem;
-    }
-
-    .skill-trigger {
-        background: var(--color-primary);
-        color: var(--color-light);
-        padding: 0.1rem 0.4rem;
-        border-radius: 8px;
-        font-size: 0.6rem;
-    }
-
-    .skill-description {
-        font-style: italic;
-        color: #3E2723;
-        font-size: 0.7rem;
-        line-height: 2;
-    }
-
-    .skill-effects {
-        color: #3E2723;
-        font-size: 0.8rem;
-        line-height: 1.2;
-    }
-
-    /* Receita compacta */
-    .recipe-section {
-        margin-bottom: 0.5rem;
-    }
-
-    .recipe-title {
-        font-family: 'Cinzel', serif;
-        color: var(--color-primary);
-        font-size: 0.8rem;
-        margin-bottom: 0.3rem;
-        text-align: center;
-    }
-
-    .recipe-items {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.3rem;
-        justify-content: center;
-    }
-
-    .recipe-item {
-        display: flex;
-        align-items: center;
-        gap: 0.2rem;
-        background: rgba(139, 69, 19, 0.1);
-        padding: 0.2rem 0.4rem;
-        border-radius: 3px;
-        font-size: 0.7rem;
-        border: 1px solid rgba(139, 69, 19, 0.3);
-    }
-
-    .material-emoji {
-        font-size: 0.7rem;
-    }
-
-    .material-name {
-        font-family: 'MedievalSharp', cursive;
-        color: #3E2723;
-    }
-
-    .material-quantity {
-        color: var(--color-primary);
-        font-weight: bold;
-    }
-
-    /* Botão consistente com o tema */
-    .btn-equip {
-        background: linear-gradient(to bottom, var(--color-primary), #6B3100);
-        border: 1px solid var(--color-secondary);
-        color: var(--color-light);
-        border-radius: 4px;
-        padding: 0.4rem 0.8rem;
-        font-family: 'Cinzel', serif;
-        font-weight: bold;
-        font-size: 0.8rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        width: 100%;
-        margin-top: 0.5rem;
-    }
-
-    .btn-equip:hover {
-        background: linear-gradient(to bottom, #6B3100, var(--color-primary));
-        box-shadow: 0 0 8px var(--color-secondary);
-        color: #FFF;
-        transform: translateY(-1px);
-    }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Elementos do DOM
-    const itemFilter = document.getElementById('itemFilter');
-    const itemCards = document.querySelectorAll('.item-card');
-    const equipmentSlots = document.querySelectorAll('.meta-equipment-slot');
-    const noItemSelected = document.getElementById('no-item-selected');
-    const itemDetailsContent = document.getElementById('item-details-content');
-    const tabButtons = document.querySelectorAll('.tab-button');
-    
-    // Filtro de itens
-    itemFilter.addEventListener('input', function() {
-        const filterText = this.value.toLowerCase();
-        
-        // Obter a tab ativa
-        const activeTab = document.querySelector('.tab-pane.active');
-        const cardsInTab = activeTab.querySelectorAll('.item-card');
-        
-        cardsInTab.forEach(card => {
-            const itemName = card.dataset.name.toLowerCase();
-            if (itemName.includes(filterText)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    });
-
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let cookie of cookies) {
-                cookie = cookie.trim();
-                if (cookie.startsWith(name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-    // helper no topo do script
-    function safeParse(str, fallback) {
-        if (str === undefined || str === null || str === '') {
-            return fallback;
-        }
-
-        // Se já for um objeto, retorne-o
-        if (typeof str === 'object') {
-            return str;
-        }
-
-        let parsed;
-        // Tentativa 1: Parse direto
-        try {
-            parsed = JSON.parse(str);
-            return parsed;
-        } catch (e) {
-            // Ignora e tenta outras abordagens
-        }
-
-        // Tentativa 2: Substituir aspas simples escapadas (\u0027) por aspas duplas
-        try {
-            const fixedStr = str.replace(/\\u0027/g, '"');
-            parsed = JSON.parse(fixedStr);
-            return parsed;
-        } catch (e) {
-            // Ignora e tenta outra abordagem
-        }
-
-        // Tentativa 3: Substituir todas as aspas simples por aspas duplas (para o caso de não estarem escapadas)
-        try {
-            const fixedStr = str.replace(/'/g, '"');
-            parsed = JSON.parse(fixedStr);
-            return parsed;
-        } catch (e) {
-            // Ignora e tenta outra abordagem
-        }
-
-        // Tentativa 4: Substituir outros caracteres Unicode escapados comuns
-        try {
-            const fixedStr = str
-            .replace(/\\u0022/g, '"')  // Aspas duplas escapadas
-            .replace(/\\u005C/g, '\\') // Barra invertida escapada
-            .replace(/\\u002F/g, '/')  // Barra escapada
-            .replace(/\\u000A/g, '\n') // Nova linha
-            .replace(/\\u000D/g, '\r') // Retorno de carro
-            .replace(/\\u0009/g, '\t') // Tabulação
-            .replace(/\\u0008/g, '\b') // Backspace
-            .replace(/\\u000C/g, '\f'); // Form feed
-            parsed = JSON.parse(fixedStr);
-            return parsed;
-        } catch (e) {
-            // Ignora e retorna o fallback
-        }
-
-        console.error('Failed to parse string:', str);
-        return fallback;
-    }
-
-    function safeIsEmpty(obj) {
-        if (obj === null || typeof obj !== 'object') {
-            return false; // Or handle as appropriate for non-objects
-        }
-        return Object.keys(obj).length === 0;
-    }
-    
-    [...itemCards, ...equipmentSlots].forEach(card => {
-      card.addEventListener('click', function() {
-        // Mostrar conteúdo de detalhes e esconder placeholder
-        noItemSelected.classList.add('d-none');
-        itemDetailsContent.classList.remove('d-none');
-        
-        // Preencher detalhes do item
-        document.getElementById('detail-emoji').textContent = this.dataset.emoji;
-        document.getElementById('detail-name').textContent = this.dataset.name;
-        document.getElementById('detail-description').textContent = this.dataset.description;
-        
-        // Atualizar badge de raridade
-        const rarityBadge = document.getElementById('detail-rarity');
-        rarityBadge.textContent = this.dataset.rarityDisplay.charAt(0).toUpperCase() + this.dataset.rarityDisplay.slice(1);
-        rarityBadge.className = 'badge rarity-' + this.dataset.rarity;
-        
-        // Limpar estatísticas e ações
-        const statsContainer = document.getElementById('detail-stats');
-        statsContainer.innerHTML = '';
-        const itemActions = document.getElementById('item-actions');
-        itemActions.innerHTML = '';
-
-        const emptySlot = this.dataset.description == "Nenhum item equipado"
-
-        switch (this.dataset.type) {
-          case 'equipment':
-            let equipmentHTML = '';
-            
-            if (!emptySlot) {
-                equipmentHTML += `
-                    <div class="equipment-header">
-                        <div class="equipment-level">📊 Nível ${this.dataset.minLevel}+</div>
-                    </div>
-                    
-                    <div class="attribute-line" style="font-size: 1.0rem">${this.dataset.stats}</div>
-                `;
-            }
-
-            // Atributos em lista vertical única
-            const bonusesEq = safeParse(this.dataset.attributeBonuses, {});
-            if (Object.keys(bonusesEq).length > 0) {
-                equipmentHTML += `
-                    <div class="attributes-section">
-                        ${Object.entries(bonusesEq).map(([attr, value]) => `
-                            <div class="attribute-line">
-                                <span class="attribute-name">${attr.replace(/_/g, ' ').toUpperCase()}</span>
-                                <span class="attribute-value ${value > 0 ? '' : 'negative'}">
-                                    ${value > 0 ? '+' : ''}${value}
-                                </span>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            // Habilidade Passiva compacta
-            const passiveSkill = safeParse(this.dataset.passiveSkill, {});
-            if (!safeIsEmpty(passiveSkill)) {
-                let effectsHTML = '';
-                
-                // Usar a string formatada do modelo
-                const formattedEffects = this.dataset.formattedEffects;
-                if (formattedEffects) {
-                    effectsHTML = `
-                        <div class="skill-effects">
-                            <strong>Efeitos:</strong> ${formattedEffects}
-                        </div>
-                    `;
-                }
-
-                equipmentHTML += `
-                    <div class="passive-skill-section">
-                        <div class="skill-header">
-                            <span class="skill-name">${passiveSkill.name}</span>
-                            <span class="skill-trigger">${this.dataset.trigger}</span>
-                        </div>
-                        <div class="skill-description">
-                            ${passiveSkill.description || ""}
-                        </div>
-                        ${effectsHTML}
-                    </div>
-                `;
-            }
-
-            // Receita de Crafting compacta
-            const eqRecipe = safeParse(this.dataset.craftingRecipe, {});
-            if (!safeIsEmpty(eqRecipe)) {
-                equipmentHTML += `
-                    <div class="recipe-section">
-                        <div class="recipe-title">⚒️ Receita</div>
-                        <div class="recipe-items">
-                            ${Object.entries(eqRecipe).map(([material, qty]) => `
-                                <div class="recipe-item">
-                                    <span class="material-emoji">📦</span>
-                                    <span class="material-name">${material}</span>
-                                    <span class="material-quantity">${qty}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            statsContainer.innerHTML = equipmentHTML;
-            
-            const isEquipped = this.dataset.equipped === "true";
-            if (!emptySlot) {
-                const csrftoken = getCookie('csrftoken');
-                if (isEquipped) {
-                    itemActions.innerHTML = '<button class="btn-unequip">❌ Remover Item</button>';
-                    const itemId = this.dataset.id;
-                    
-                    const unequipButton = itemActions.querySelector('.btn-unequip');
-
-                    unequipButton.addEventListener('click', async () => {
-                        const response = await fetch('/items/inventory/equip/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': csrftoken
-                            },
-                            body: JSON.stringify({
-                                item_id: itemId,
-                                action: "unequip"
-                            })
-                        });
-
-                        const result = await response.json();
-
-                        if (result.success) {
-                            alert("Item removido e devolvido ao inventário!");
-                            window.location.reload();
-                        } else {
-                            alert("Erro ao remover: " + result.error);
-                        }
-                    });
-                }
-                else {
-                    itemActions.innerHTML = '<button class="btn-equip">🎯 Equipar Item</button>';
-                    const itemId = this.dataset.id;
-                    
-                    const equipButton = itemActions.querySelector('.btn-equip');
-
-                    equipButton.addEventListener('click', async () => {
-                        const response = await fetch('/items/inventory/equip/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': csrftoken
-                            },
-                            body: JSON.stringify({
-                                item_id: itemId,
-                                action: "equip"
-                            })
-                        });
-
-                        const result = await response.json();
-
-                        if (result.success) {
-                            alert("Item equipado com sucesso!");
-                            window.location.reload(); // opcional
-                        } else {
-                            alert("Erro ao equipar: " + result.error);
-                        }
-                    });
-                }
-            }
-            break;
-
-          case 'consumable':
-            statsContainer.innerHTML += `<div class="stat-item">Nível mínimo: ${this.dataset.minLevel}</div>`;
-            const affected = safeParse(this.dataset.affectedAttributes, []);
-            if (affected.length) {
-              statsContainer.innerHTML += `<div class="stat-item">Afeta: ${affected.join(', ')}</div>`;
-            }
-            const bonusesCon = safeParse(this.dataset.attributeBonuses, {});
-            for (const [attr, value] of Object.entries(bonusesCon)) {
-              statsContainer.innerHTML += `<div class="stat-item">${attr}: ${value > 0 ? '+'+value : value}</div>`;
-            }
-            itemActions.innerHTML = '<button class="btn-consume">Consumir</button>';
-            break;
-
-          case 'material':
-            const recipe = safeParse(this.dataset.craftingRecipe, []);
-            if (recipe.length) {
-              statsContainer.innerHTML += `<div class="stat-item">Usado para craftar</div>`;
-            }
-            // sem botão
-            break;
-        }
-      });
-    });
-    
-    // Controle das tabs personalizadas
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remover classe active de todos os botões
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Adicionar classe active ao botão clicado
-            this.classList.add('active');
-            
-            // Ativar a tab correspondente
-            const target = this.dataset.bsTarget;
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            
-            tabPanes.forEach(pane => {
-                pane.classList.remove('show', 'active');
-                if (pane.id === target.substring(1)) {
-                    pane.classList.add('show', 'active');
-                }
-            });
-        });
-    });
-});
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar tooltips do Bootstrap (se estiver usando)
-    if (typeof bootstrap !== 'undefined') {
-      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
-      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-      })
-    }
-  });
-</script>
-
+{% block extra_js %}
+<script src="{% static 'game/js/inventory.js' %}"></script>
 {% endblock %}

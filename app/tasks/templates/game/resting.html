@@ -1,585 +1,157 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
 {% if alert %}
-<script>alert("{{ alert }}");</script>
+<div class="alert-overlay" id="alert-overlay">
+    <div class="alert-modal">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-message">{{ alert }}</div>
+        <button class="alert-close-btn" onclick="document.getElementById('alert-overlay').style.display='none'">OK</button>
+    </div>
+</div>
 {% endif %}
 
-<div class="scroll-container p-4 p-md-5 mt-4">
-  {% if character.resting_start %}
+<div class="resting-page">
+    
+    {% if character.resting_start %}
     <!-- Tela quando já está descansando -->
-    <div class="text-center mb-4">
-      <h2 class="fantasy-title">😴 Você está Descansando</h2>
-      <p class="text-dark">Recuperando energias para as próximas aventuras</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Animação de descanso -->
-    <div class="text-center my-5">
-      <div class="resting-scene">
-        <!-- Céu noturno -->
-        <div class="night-sky"></div>
-        
-        <!-- Lua -->
-        <div class="moon"></div>
-        
-        <!-- Nuvens -->
-        <div class="cloud cloud-1"></div>
-        <div class="cloud cloud-2"></div>
-        <div class="cloud cloud-3"></div>
-        
-        <!-- Estrelas -->
-        <div class="stars">
-          <div class="star"></div>
-          <div class="star"></div>
-          <div class="star"></div>
-          <div class="star"></div>
-          <div class="star"></div>
-          <div class="star"></div>
-          <div class="star"></div>
-          <div class="star"></div>
+    <div class="resting-active">
+        <div class="resting-header">
+            <h1 class="resting-title">Você está Descansando</h1>
+            <p class="resting-subtitle">Recuperando energias para as próximas aventuras</p>
         </div>
         
-        <!-- Fogueira -->
-        <div class="campfire">
-          <div class="fire">
-            <div class="flame"></div>
-            <div class="flame"></div>
-            <div class="flame"></div>
-            <div class="flame"></div>
-          </div>
-          <div class="logs"></div>
+        <!-- Cena de descanso minimalista -->
+        <div class="resting-scene-minimal">
+            <div class="scene-container">
+                <div class="night-background">
+                    <div class="moon-symbol">🌙</div>
+                    <div class="stars-symbol">✨</div>
+                </div>
+                <div class="campfire-symbol">🔥</div>
+                <div class="character-symbol">😴</div>
+                <div class="zzz-symbol">💤</div>
+            </div>
         </div>
         
-        <!-- Personagem -->
-        <div class="character-resting">😴</div>
+        <!-- Temporizador principal -->
+        <div class="resting-timer">
+            <div class="timer-icon">⏳</div>
+            <div class="timer-display" id="resting-timer">{{ time_elapsed.minutes }}m {{ time_elapsed.seconds }}s</div>
+            <div class="timer-label">Tempo decorrido</div>
+        </div>
         
-        <!-- Balões de "zzz" -->
-        <div class="zzz">z</div>
-        <div class="zzz">z</div>
-        <div class="zzz">z</div>
-      </div>
-    </div>
-
-    <!-- Informações do descanso -->
-    <div class="row text-dark">
-      <div class="col-md-4 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">⏳</div>
-          <h4 class="fantasy-title mb-2">Tempo Decorrido</h4>
-          <p class="stat-value" id="timer">{{ time_elapsed.minutes }}m {{ time_elapsed.seconds }}s</p>
+        <!-- Estatísticas de regeneração -->
+        <div class="regen-stats">
+            <div class="regen-stat">
+                <div class="stat-icon">❤️</div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ config.rest_hp_per_minute }}/min</div>
+                    <div class="stat-label">Vida</div>
+                </div>
+            </div>
+            
+            <div class="regen-stat">
+                <div class="stat-icon">🌀</div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ config.rest_mana_per_minute }}/min</div>
+                    <div class="stat-label">Mana</div>
+                </div>
+            </div>
+            
+            <div class="regen-stat">
+                <div class="stat-icon">💪</div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ config.rest_stamina_per_minute }}/min</div>
+                    <div class="stat-label">Stamina</div>
+                </div>
+            </div>
         </div>
-      </div>
-      
-      <div class="col-md-4 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">💖</div>
-          <h4 class="fantasy-title mb-2">Regeneração</h4>
-          <p class="stat-value">{{ config.rest_hp_per_minute }}/min</p>
-          <p class="stat-label">Vida</p>
+        
+        <!-- Botões de ação -->
+        <div class="resting-actions">
+            <a href="{% url 'end_resting' %}" class="resting-btn resting-btn-danger">
+                <span class="btn-icon">⛔</span>
+                Encerrar Descanso
+            </a>
         </div>
-      </div>
-      
-      <div class="col-md-4 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">🌀</div>
-          <h4 class="fantasy-title mb-2">Regeneração</h4>
-          <p class="stat-value">{{ config.rest_mana_per_minute }}/min</p>
-          <p class="stat-label">Mana</p>
+    </div>
+    
+    {% else %}
+    <!-- Tela antes de iniciar -->
+    <div class="resting-setup">
+        <div class="resting-header">
+            <h1 class="resting-title">📋 Descansar</h1>
+            <p class="resting-subtitle">Recupere suas energias para os desafios que virão</p>
         </div>
-      </div>
-    </div>
-
-    <div class="row text-dark">
-      <div class="col-md-6 offset-md-3 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">💪</div>
-          <h4 class="fantasy-title mb-2">Regeneração</h4>
-          <p class="stat-value">{{ config.rest_stamina_per_minute }}/min</p>
-          <p class="stat-label">Stamina</p>
+        
+        <!-- Benefícios do descanso -->
+        <div class="resting-benefits">
+            <div class="benefit-card">
+                <div class="benefit-icon">❤️</div>
+                <div class="benefit-content">
+                    <h3 class="benefit-title">Regeneração de Vida</h3>
+                    <div class="benefit-value">{{ config.rest_hp_per_minute }}/min</div>
+                    <div class="benefit-desc">Recupere pontos de vida para as próximas batalhas</div>
+                </div>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">🌀</div>
+                <div class="benefit-content">
+                    <h3 class="benefit-title">Regeneração de Mana</h3>
+                    <div class="benefit-value">{{ config.rest_mana_per_minute }}/min</div>
+                    <div class="benefit-desc">Recupere pontos de mana para conjurar mais habilidadews</div>
+                </div>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">💪</div>
+                <div class="benefit-content">
+                    <h3 class="benefit-title">Regeneração de Stamina</h3>
+                    <div class="benefit-value">{{ config.rest_stamina_per_minute }}/min</div>
+                    <div class="benefit-desc">Recupere energia para poder continuar suas aventuras</div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Botões de ação -->
-    <div class="text-center mt-4">
-      <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{% url 'end_resting' %}" class="fantasy-btn-danger">⛔ Encerrar Descanso</a>
-        <a href="{% url 'dashboard' %}" class="fantasy-btn-secondary">🏰 Voltar ao Dashboard</a>
-      </div>
-    </div>
-
-    <script>
-      // Atualizar o temporizador em tempo real
-      let totalSeconds = {{ time_elapsed.minutes }} * 60 + {{ time_elapsed.seconds }};
-      const timerEl = document.getElementById("timer");
-      
-      setInterval(() => {
-        totalSeconds++;
-        let minutes = Math.floor(totalSeconds / 60);
-        let seconds = totalSeconds % 60;
-        timerEl.textContent = `${minutes}m ${seconds}s`;
-      }, 1000);
-    </script>
-
-  {% else %}
-    <!-- Tela antes de iniciar o descanso -->
-    <div class="text-center mb-4">
-      <h2 class="fantasy-title">📋 Preparação para Descanso</h2>
-      <p class="text-dark">Recupere suas energias para os desafios que virão</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Informações do descanso -->
-    <div class="row text-dark">
-      <div class="col-md-4 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">💖</div>
-          <h4 class="fantasy-title mb-2">Regeneração</h4>
-          <p class="stat-value">{{ config.rest_hp_per_minute }}/min</p>
-          <p class="stat-label">Vida</p>
+        
+        <!-- Dicas -->
+        <div class="resting-tips">
+            <div class="tip-card">
+                <div class="tip-icon">💡</div>
+                <div class="tip-content">
+                    <h3 class="tip-title">Dica de Descanso</h3>
+                    <p class="tip-text">Descanse após combates intensos para recuperar totalmente suas energias. O descanso é essencial para aventuras longas.</p>
+                </div>
+            </div>
         </div>
-      </div>
-      
-      <div class="col-md-4 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">🌀</div>
-          <h4 class="fantasy-title mb-2">Regeneração</h4>
-          <p class="stat-value">{{ config.rest_mana_per_minute }}/min</p>
-          <p class="stat-label">Mana</p>
+        
+        <!-- Botões de ação -->
+        <div class="resting-actions">
+            <a href="{% url 'start_resting' %}" class="resting-btn resting-btn-primary">
+                <span class="btn-icon">😴</span>
+                Começar Descanso
+            </a>
         </div>
-      </div>
-      
-      <div class="col-md-4 mb-4">
-        <div class="resting-stat p-4 text-center">
-          <div class="stat-icon mb-2">💪</div>
-          <h4 class="fantasy-title mb-2">Regeneração</h4>
-          <p class="stat-value">{{ config.rest_stamina_per_minute }}/min</p>
-          <p class="stat-label">Stamina</p>
-        </div>
-      </div>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Botões de ação -->
-    <div class="text-center mt-4">
-      <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{% url 'start_resting' %}" class="fantasy-btn">😴 Começar Descanso</a>
-        <a href="{% url 'dashboard' %}" class="fantasy-btn-secondary">🏰 Voltar ao Dashboard</a>
-      </div>
-    </div>
-  {% endif %}
+    {% endif %}
 </div>
 
-<style>
-  /* Estilos específicos para a página de descanso */
-  .resting-stat {
-    background: rgba(101, 67, 33, 0.1);
-    border-radius: 12px;
-    border: 2px solid #654321;
-    transition: transform 0.3s ease;
-  }
-  
-  .resting-stat:hover {
-    transform: translateY(-5px);
-    background: rgba(101, 67, 33, 0.2);
-  }
-  
-  .stat-icon {
-    font-size: 2.5rem;
-  }
-  
-  .stat-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #654321;
-    margin: 0;
-    font-family: 'Cinzel', serif;
-  }
-  
-  .stat-label {
-    color: #3E2723;
-    margin: 0;
-    font-size: 1rem;
-  }
-  
-  /* Cena de descanso */
-  .resting-scene {
-    position: relative;
-    width: 350px;
-    height: 300px;
-    margin: 0 auto;
-    overflow: hidden;
-    border-radius: 15px;
-  }
-  
-  /* Céu noturno */
-  .night-sky {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, #0b1a33 0%, #1a3b5c 100%);
-    z-index: 1;
-  }
-  
-  /* Lua */
-  .moon {
-    position: absolute;
-    top: 30px;
-    right: 40px;
-    width: 70px;
-    height: 70px;
-    background: #F5F5DC;
-    border-radius: 50%;
-    box-shadow: 0 0 30px #F5F5DC;
-    z-index: 2;
-    animation: moonGlow 6s infinite ease-in-out;
-  }
-  
-  @keyframes moonGlow {
-    0%, 100% { box-shadow: 0 0 20px #F5F5DC; }
-    50% { box-shadow: 0 0 40px #F5F5DC, 0 0 60px #F5F5DC; }
-  }
-  
-  /* Nuvens */
-  .cloud {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    z-index: 3;
-  }
-  
-  .cloud-1 {
-    top: 40px;
-    left: -100px;
-    width: 80px;
-    height: 25px;
-    animation: moveCloud 25s infinite linear;
-  }
-  
-  .cloud-2 {
-    top: 70px;
-    left: -150px;
-    width: 100px;
-    height: 30px;
-    animation: moveCloud 35s infinite linear;
-    animation-delay: 5s;
-  }
-  
-  .cloud-3 {
-    top: 30px;
-    left: -200px;
-    width: 120px;
-    height: 35px;
-    animation: moveCloud 40s infinite linear;
-    animation-delay: 10s;
-  }
-  
-  @keyframes moveCloud {
-    0% { left: -200px; }
-    100% { left: 400px; }
-  }
-  
-  /* Estrelas */
-  .stars {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-  }
-  
-  .star {
-    position: absolute;
-    background-color: #FFFFFF;
-    border-radius: 50%;
-  }
-  
-  .star:nth-child(1) {
-    width: 3px;
-    height: 3px;
-    top: 50px;
-    left: 50px;
-    animation: twinkle 3s infinite ease-in-out;
-  }
-  
-  .star:nth-child(2) {
-    width: 2px;
-    height: 2px;
-    top: 80px;
-    left: 100px;
-    animation: twinkle 4s infinite ease-in-out 1s;
-  }
-  
-  .star:nth-child(3) {
-    width: 4px;
-    height: 4px;
-    top: 60px;
-    left: 200px;
-    animation: twinkle 5s infinite ease-in-out 2s;
-  }
-  
-  .star:nth-child(4) {
-    width: 3px;
-    height: 3px;
-    top: 120px;
-    left: 150px;
-    animation: twinkle 3.5s infinite ease-in-out 0.5s;
-  }
-  
-  .star:nth-child(5) {
-    width: 2px;
-    height: 2px;
-    top: 30px;
-    left: 180px;
-    animation: twinkle 4.5s infinite ease-in-out 1.5s;
-  }
-  
-  .star:nth-child(6) {
-    width: 3px;
-    height: 3px;
-    top: 90px;
-    left: 250px;
-    animation: twinkle 3s infinite ease-in-out 0.7s;
-  }
-  
-  .star:nth-child(7) {
-    width: 2px;
-    height: 2px;
-    top: 140px;
-    left: 70px;
-    animation: twinkle 4s infinite ease-in-out 2.2s;
-  }
-  
-  .star:nth-child(8) {
-    width: 4px;
-    height: 4px;
-    top: 160px;
-    left: 220px;
-    animation: twinkle 5s infinite ease-in-out 1.2s;
-  }
-  
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
-  }
-  
-  /* Fogueira */
-  .campfire {
-    position: absolute;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-  }
-  
-  .fire {
-    position: relative;
-    width: 50px;
-    height: 80px;
-    margin: 0 auto;
-  }
-  
-  .flame {
-    position: absolute;
-    bottom: 0;
-    border-radius: 50% 50% 20% 20%;
-    background: #ff6b00;
-    animation: flameAnimation 1.5s infinite alternate;
-  }
-  
-  .flame:nth-child(1) {
-    left: 5px;
-    width: 20px;
-    height: 40px;
-    animation-duration: 1.2s;
-  }
-  
-  .flame:nth-child(2) {
-    left: 20px;
-    width: 25px;
-    height: 60px;
-    animation-duration: 1.5s;
-    animation-delay: 0.2s;
-  }
-  
-  .flame:nth-child(3) {
-    left: 10px;
-    width: 15px;
-    height: 50px;
-    animation-duration: 1.3s;
-    animation-delay: 0.4s;
-  }
-  
-  .flame:nth-child(4) {
-    left: 25px;
-    width: 18px;
-    height: 35px;
-    animation-duration: 1.4s;
-    animation-delay: 0.6s;
-  }
-  
-  @keyframes flameAnimation {
-    0% { 
-      transform: translateY(0) scale(1);
-      background: #ff6b00;
-      box-shadow: 0 0 10px #ff6b00, 0 0 20px #ff6b00;
-    }
-    100% { 
-      transform: translateY(-10px) scale(1.2);
-      background: #ffcc00;
-      box-shadow: 0 0 20px #ffcc00, 0 0 40px #ffcc00;
-    }
-  }
-  
-  .logs {
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 12px;
-    background: #8B4513;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
-  }
-  
-  /* Personagem */
-  .character-resting {
-    position: absolute;
-    bottom: 60px;
-    left: 30%;
-    transform: translateX(-50%);
-    font-size: 3rem;
-    z-index: 3;
-    animation: breathe 3s infinite ease-in-out;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  }
-  
-  @keyframes breathe {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.05); }
-  }
-  
-  /* Balões "zzz" */
-  .zzz {
-    position: absolute;
-    font-family: 'MedievalSharp', cursive;
-    font-size: 1.5rem;
-    color: #FFFFFF;
-    opacity: 0;
-    z-index: 3;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-  }
-  
-  .zzz:nth-child(1) {
-    bottom: 100px;
-    left: 45%;
-    animation: floatZ 3s infinite ease-in-out;
-  }
-  
-  .zzz:nth-child(2) {
-    bottom: 120px;
-    left: 47%;
-    animation: floatZ 3s infinite ease-in-out 1s;
-  }
-  
-  .zzz:nth-child(3) {
-    bottom: 140px;
-    left: 49%;
-    animation: floatZ 3s infinite ease-in-out 2s;
-  }
-  
-  @keyframes floatZ {
-    0% { 
-      opacity: 0;
-      transform: translateY(0) translateX(0);
-    }
-    50% { 
-      opacity: 1;
-    }
-    100% { 
-      opacity: 0;
-      transform: translateY(-50px) translateX(20px);
-    }
-  }
-  
-  /* Botões */
-  .fantasy-btn-danger {
-    background: linear-gradient(to bottom, #8B0000, #660000);
-    border: 2px solid #FFD700;
-    color: #FFFFFF !important;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .fantasy-btn-danger:hover {
-    background: linear-gradient(to bottom, #660000, #8B0000);
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-    transform: translateY(-2px);
-    color: #FFFFFF !important;
-  }
-  
-  .fantasy-btn-secondary {
-    background: linear-gradient(to bottom, #654321, #4E342E);
-    border: 2px solid #8D6E63;
-    color: var(--color-light) !important;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .fantasy-btn-secondary:hover {
-    background: linear-gradient(to bottom, #4E342E, #654321);
-    box-shadow: 0 0 10px #8D6E63;
-    color: #FFF !important;
-    transform: translateY(-2px);
-  }
-  
-  .fantasy-btn {
-    background: linear-gradient(to bottom, #8B4513, #6B3100);
-    border: 2px solid var(--color-secondary);
-    color: var(--color-light) !important;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .fantasy-btn:hover {
-    background: linear-gradient(to bottom, #6B3100, #8B4513);
-    box-shadow: 0 0 10px var(--color-secondary);
-    color: #FFF !important;
-    transform: translateY(-2px);
-  }
-</style>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Efeito de entrada para a página
-    const container = document.querySelector('.scroll-container');
-    container.style.opacity = '0';
-    container.style.transition = 'opacity 1s ease-in-out';
+    {% if character.resting_start %}
+    // Timer para descanso ativo
+    let totalRestingSeconds = {{ time_elapsed.minutes }} * 60 + {{ time_elapsed.seconds }};
     
-    setTimeout(() => {
-      container.style.opacity = '1';
-    }, 100);
-  });
+    function updateRestingTimer() {
+        totalRestingSeconds++;
+        let minutes = Math.floor(totalRestingSeconds / 60);
+        let seconds = totalRestingSeconds % 60;
+        document.getElementById('resting-timer').textContent = `${minutes}m ${seconds}s`;
+    }
+    
+    setInterval(updateRestingTimer, 1000);
+    {% endif %}
 </script>
 
 {% endblock %}

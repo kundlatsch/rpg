@@ -1,102 +1,86 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}">
+{% endblock %}
 
 {% block content %}
-
 {% if alert %}
 <script>alert("{{ alert }}");</script>
 {% endif %}
 
-<div class="scroll-container p-4 p-md-5 mt-4">
+<div class="dashboard-page">
     <!-- Cabeçalho do personagem -->
-    <div class="text-center mb-4">
-        <h1 class="fantasy-title">
-            {{ character.name }}
-        </h1>
-        <p class="mb-0 text-dark">Nível <strong>{{ character.level }}</strong></p>
+    <div class="dashboard-header-wrapper">
+        <h1 class="dashboard-main-title">{{ character.name }}</h1>
+        <p class="dashboard-subtitle">Nível <strong>{{ character.level }}</strong></p>
     </div>
 
-    <!-- Barra de XP discreta -->
-    <div class="row text-dark mb-4">
-        <div class="col-12">
-                        <!-- Barras de HP, Mana e Stamina -->
-            <div class="row text-dark mb-4">
-                <div class="col-md-4 mb-3">
-                    <div class="resource-bar">
-                        <div class="resource-header">
-                            <span class="resource-icon">❤️</span>
-                            <span class="resource-name">Vida</span>
-                            <span class="resource-value">{{ character.hp }}/{{ character.max_hp }}</span>
-                        </div>
-                        <div class="progress resource-progress mb-1">
-                            <div class="progress-bar bg-hp" role="progressbar" 
-                                style="width: {% widthratio character.hp character.max_hp 100 %}%;" 
-                                aria-valuenow="{{ character.hp }}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="{{ character.max_hp }}">
-                            </div>
-                        </div>
-                    </div>
+    <!-- Barras de Recursos -->
+    <div class="dashboard-resources">
+        <!-- Barra de XP -->
+        <div class="resource-d-section">
+            <div class="resource-d-progress">
+                <div class="progress-bar xp-bar" 
+                     style="width: {% widthratio character.exp character.max_exp 100 %}%;">
                 </div>
-                
-                <div class="col-md-4 mb-3">
-                    <div class="resource-bar">
-                        <div class="resource-header">
-                            <span class="resource-icon">🔮</span>
-                            <span class="resource-name">Mana</span>
-                            <span class="resource-value">{{ character.mana }}/{{ character.max_mana }}</span>
-                        </div>
-                        <div class="progress resource-progress mb-1">
-                            <div class="progress-bar bg-mana" role="progressbar" 
-                                style="width: {% widthratio character.mana character.max_mana 100 %}%;" 
-                                aria-valuenow="{{ character.mana }}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="{{ character.max_mana }}">
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <p class="resource-d-text">{{ character.exp }}/{{ character.max_exp }} EXP</p>
+        </div>
+
+        <!-- Barras de HP, Mana e Stamina -->
+        <div class="resources-d-grid">
+            <div class="resource-d-item">
+                <div class="resource-d-header">
+                    <span class="resource-d-icon">❤️</span>
+                    <span class="resource-d-name">Vida</span>
+                    <span class="resource-d-value">{{ character.hp }}/{{ character.max_hp }}</span>
                 </div>
-                
-                <div class="col-md-4 mb-3">
-                    <div class="resource-bar">
-                        <div class="resource-header">
-                            <span class="resource-icon">⚡</span>
-                            <span class="resource-name">Energia</span>
-                            <span class="resource-value">{{ character.stamina }}/{{ character.max_stamina }}</span>
-                        </div>
-                        <div class="progress resource-progress mb-1">
-                            <div class="progress-bar bg-stamina" role="progressbar" 
-                                style="width: {% widthratio character.stamina character.max_stamina 100 %}%;" 
-                                aria-valuenow="{{ character.stamina }}" 
-                                aria-valuemin="0" 
-                                aria-valuemax="{{ character.max_stamina }}">
-                            </div>
-                        </div>
+                <div class="resource-d-progress">
+                    <div class="progress-bar hp-bar" 
+                         style="width: {% widthratio character.hp character.max_hp 100 %}%;">
                     </div>
                 </div>
             </div>
-            <div class="xp-container">
-                <div class="progress xp-bar mb-1">
-                    <div class="progress-bar bg-xp" role="progressbar" 
-                         style="width: {% widthratio character.exp character.max_exp 100 %}%;" 
-                         aria-valuenow="{{ character.exp }}" 
-                         aria-valuemin="0" 
-                         aria-valuemax="{{ character.max_exp }}">
+            
+            <div class="resource-d-item">
+                <div class="resource-d-header">
+                    <span class="resource-d-icon">🔮</span>
+                    <span class="resource-d-name">Mana</span>
+                    <span class="resource-d-value">{{ character.mana }}/{{ character.max_mana }}</span>
+                </div>
+                <div class="resource-d-progress">
+                    <div class="progress-bar mana-bar" 
+                         style="width: {% widthratio character.mana character.max_mana 100 %}%;">
                     </div>
                 </div>
-                <p class="xp-text text-center mb-0"><small>{{ character.exp }}/{{ character.max_exp }} EXP</small></p>
+            </div>
+            
+            <div class="resource-d-item">
+                <div class="resource-d-header">
+                    <span class="resource-d-icon">⚡</span>
+                    <span class="resource-d-name">Energia</span>
+                    <span class="resource-d-value">{{ character.stamina }}/{{ character.max_stamina }}</span>
+                </div>
+                <div class="resource-d-progress">
+                    <div class="progress-bar stamina-bar" 
+                         style="width: {% widthratio character.stamina character.max_stamina 100 %}%;">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="dashboard-divider"></div>
 
     <!-- Atributos e Emoji -->
-    <div class="row text-dark mb-4">
+    <div class="dashboard-grid">
         <!-- Atributos Primários -->
-        <div class="col-md-4 mb-4">
-            <div class="stat-box p-4">
-                <h3 class="fantasy-title text-center mb-3">Atributos Primários</h3>
-                <div class="attribute-list">
+        <div class="dashboard-column">
+            <div class="dashboard-section">
+                <h2 class="dashboard-section-title">Atributos Primários</h2>
+                <div class="attributes-list">
                     <div class="attribute-item">
                         <span class="attribute-icon">💪</span>
                         <span class="attribute-name">Força:</span>
@@ -132,49 +116,67 @@
         </div>
         
         <!-- Emoji do Personagem com Slots de Equipamento -->
-        <div class="col-md-4 mb-4">
-            <div class="character-equipment-section text-center">
-                <!-- Slots superiores -->
-                <div class="equipment-row mb-3">
-                    {% include "items/_equipment_slot.html" with slot_name="Cabeça" slot_icon="👑" slot_equipment=character.equipped_head %}
-                    {% include "items/_equipment_slot.html" with slot_name="Colar" slot_icon="📿" slot_equipment=character.equipped_necklace %}
-                    {% include "items/_equipment_slot.html" with slot_name="Ombro" slot_icon="🎗️" slot_equipment=character.equipped_shoulders %}
-                </div>
+        <div class="dashboard-column">
+            <div class="character-section character-equipment-section">
+                <h2 class="character-section-title">🛡️ Equipamentos</h2>
 
-                <!-- Personagem central -->
-                <div class="character-center mb-3">
-                    <div class="character-emoji-bg">
-                    <div class="character-emoji">
-                        {{ character.emoji }}
-                    </div>
-                    </div>
-                </div>
+                <div class="equipment-layout-compact">
 
-                <!-- Slots inferiores -->
-                <div class="equipment-row mt-3">
-                    {% include "items/_equipment_slot.html" with slot_name="Tronco" slot_icon="🦺" slot_equipment=character.equipped_chest %}
-                    {% include "items/_equipment_slot.html" with slot_name="Mãos" slot_icon="🧤" slot_equipment=character.equipped_hands %}
-                    {% include "items/_equipment_slot.html" with slot_name="Pés" slot_icon="👞" slot_equipment=character.equipped_feet %}
+                    <!-- Linha superior (3 slots) -->
+                    <div class="equipment-row">
+                        <div class="equipment-slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Cabeça" slot_icon="👑" slot_equipment=character.equipped_head %}
+                        </div>
+                        <div class="equipment-slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Colar" slot_icon="📿" slot_equipment=character.equipped_necklace %}
+                        </div>
+                        <div class="equipment-slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Ombro" slot_icon="🎗️" slot_equipment=character.equipped_shoulders %}
+                        </div>
+                    </div>
+
+                    <!-- Personagem central -->
+                    <div class="equipment-row character-center-row">
+                        <div class="character-emoji-bg">
+                            <div class="character-emoji">
+                                {{ character.emoji }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha inferior (3 slots) -->
+                    <div class="equipment-row">
+                        <div class="equipment-slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Tronco" slot_icon="🦺" slot_equipment=character.equipped_chest %}
+                        </div>
+                        <div class="equipment-slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Mãos" slot_icon="🧤" slot_equipment=character.equipped_hands %}
+                        </div>
+                        <div class="equipment-slot-container">
+                            {% include "items/_equipment_slot.html" with slot_name="Pés" slot_icon="👞" slot_equipment=character.equipped_feet %}
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Menu mock -->
-            <div class="character-menu mt-4">
-                <ul class="menu-list">
-                    <li><a href="{% url 'character_detail' %}" class="menu-btn">👤 Personagem</a></li>
-                    <li><a href="{% url 'inventory' %}" class="menu-btn">🎒 Inventário</a></li>
-                    <li><a href="{% url 'market' %}" class="menu-btn">🏪 Mercado</a></li>
-                    <li><a href="#" class="menu-btn">🏰 Guilda</a></li>
-                    <li><a href="{% url 'ranking' %}" class="menu-btn">🏆 Ranking</a></li>
+
+            <div class="dashboard-menu">
+                <ul class="dashboard-menu-list">
+                    <li><a href="{% url 'character_detail' %}" class="dashboard-menu-btn">👤 Personagem</a></li>
+                    <li><a href="{% url 'inventory' %}" class="dashboard-menu-btn">🎒 Inventário</a></li>
+                    <li><a href="{% url 'market' %}" class="dashboard-menu-btn">🏪 Mercado</a></li>
+                    <li><a href="#" class="dashboard-menu-btn">🏰 Guilda</a></li>
+                    <li><a href="{% url 'ranking' %}" class="dashboard-menu-btn">🏆 Ranking</a></li>
                 </ul>
             </div>
         </div>
         
         <!-- Atributos Secundários -->
-        <div class="col-md-4 mb-4">
-            <div class="stat-box p-4">
-                <h3 class="fantasy-title text-center mb-3">Atributos Secundários</h3>
-                <div class="attribute-list">
+        <div class="dashboard-column">
+            <div class="dashboard-section">
+                <h2 class="dashboard-section-title">Atributos Secundários</h2>
+                <div class="attributes-list">
                     <div class="attribute-item">
                         <span class="attribute-icon">⚔️</span>
                         <span class="attribute-name">Dano Físico:</span>
@@ -215,337 +217,148 @@
         </div>
     </div>
 
-    <div class="divider my-4"></div>
+    <div class="dashboard-divider"></div>
 
     <!-- Status atual -->
     {% if character.training_start %}
-        <div class="text-center p-4 status-container">
-            <h3 class="fantasy-title mb-3">⚔️ Em Treinamento ⚔️</h3>
-            <p class="text-dark">Seu personagem está se tornando mais forte!</p>
-            <a href="{% url 'training' %}" class="fantasy-btn mt-2">Ver Progresso do Treino</a>
+        <div class="dashboard-status">
+            <h3 class="dashboard-status-title">⚔️ Em Treinamento ⚔️</h3>
+            <p class="dashboard-status-text">Seu personagem está se tornando mais forte!</p>
+            <a href="{% url 'training' %}" class="dashboard-action-btn">Ver Progresso do Treino</a>
         </div>
     {% elif character.resting_start %}
-        <div class="text-center p-4 status-container">
-            <h3 class="fantasy-title mb-3">🛌 Descansando 🛌</h3>
-            <p class="text-dark">Seu personagem está recuperando energias!</p>
-            <a href="{% url 'resting' %}" class="fantasy-btn mt-2">Ver Status de Descanso</a>
+        <div class="dashboard-status">
+            <h3 class="dashboard-status-title">🛌 Descansando 🛌</h3>
+            <p class="dashboard-status-text">Seu personagem está recuperando energias!</p>
+            <a href="{% url 'resting' %}" class="dashboard-action-btn">Ver Status de Descanso</a>
         </div>
     {% else %}
         <!-- Ações disponíveis -->
-        <h2 class="fantasy-title text-center mb-4">Ações Disponíveis</h2>
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <a href="{% url 'training' %}" class="action-btn training text-center p-4">
-                            <div class="action-icon mb-2">⚔️</div>
-                            <h4 class="fantasy-title">Treinar</h4>
-                            <p class="mb-0">Aumente suas habilidades</p>
-                        </a>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <a href="{% url 'resting' %}" class="action-btn resting text-center p-4">
-                            <div class="action-icon mb-2">🛌</div>
-                            <h4 class="fantasy-title">Descansar</h4>
-                            <p class="mb-0">Recupere HP e Mana</p>
-                        </a>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <a href="{% url 'jobs_list' %}" class="action-btn working text-center p-4">
-                            <div class="action-icon mb-2">⚒️</div>
-                            <h4 class="fantasy-title">Trabalhar</h4>
-                            <p class="mb-0">Ganhe recursos</p>
-                        </a>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <a href="{% url 'hunts_list' %}" class="action-btn quest text-center p-4">
-                            <div class="action-icon mb-2">🗺️</div>
-                            <h4 class="fantasy-title">Missões</h4>
-                            <p class="mb-0">Embarca em aventuras</p>
-                        </a>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <a href="{% url 'combat:arena' %}" class="action-btn arena text-center p-4">
-                            <div class="action-icon mb-2">🏟️</div>
-                            <h4 class="fantasy-title">Arena</h4>
-                            <p class="mb-0">Desafie outros jogadores</p>
-                        </a>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <a href="{% url 'craft' %}" class="action-btn arena text-center p-4">
-                            <div class="action-icon mb-2">🔧</div>
-                            <h4 class="fantasy-title">Oficina</h4>
-                            <p class="mb-0">Crie seus itens aqui</p>
-                        </a>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <a href="{% url 'market' %}" class="action-btn arena text-center p-4">
-                            <div class="action-icon mb-2">🏪</div>
-                            <h4 class="fantasy-title">Entreposto Comercial</h4>
-                            <p class="mb-0">Compra e venda itens de outros jogadores</p>
-                        </a>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <a href="{% url 'store' %}" class="action-btn arena text-center p-4">
-                            <div class="action-icon mb-2">🛒</div>
-                            <h4 class="fantasy-title">Empório</h4>
-                            <p class="mb-0">Abasteça seus suprimentos</p>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <h2 class="dashboard-actions-title">Ações Disponíveis</h2>
+        <div class="dashboard-actions-grid">
+            <a href="{% url 'training' %}" class="dashboard-action-card training">
+                <div class="action-icon">⚔️</div>
+                <h4 class="action-title">Treinar</h4>
+                <p class="action-description">Aumente suas habilidades</p>
+            </a>
+            
+            <a href="{% url 'resting' %}" class="dashboard-action-card resting">
+                <div class="action-icon">🛌</div>
+                <h4 class="action-title">Descansar</h4>
+                <p class="action-description">Recupere HP e Mana</p>
+            </a>
+            
+            <a href="{% url 'jobs_list' %}" class="dashboard-action-card working">
+                <div class="action-icon">⚒️</div>
+                <h4 class="action-title">Trabalhar</h4>
+                <p class="action-description">Ganhe recursos</p>
+            </a>
+            
+            <a href="{% url 'hunts_list' %}" class="dashboard-action-card quest">
+                <div class="action-icon">🗺️</div>
+                <h4 class="action-title">Missões</h4>
+                <p class="action-description">Embarca em aventuras</p>
+            </a>
+            
+            <a href="{% url 'combat:arena' %}" class="dashboard-action-card arena">
+                <div class="action-icon">🏟️</div>
+                <h4 class="action-title">Arena</h4>
+                <p class="action-description">Desafie outros jogadores</p>
+            </a>
+            
+            <a href="{% url 'craft' %}" class="dashboard-action-card craft">
+                <div class="action-icon">🔧</div>
+                <h4 class="action-title">Oficina</h4>
+                <p class="action-description">Crie seus itens aqui</p>
+            </a>
+            
+            <a href="{% url 'market' %}" class="dashboard-action-card market">
+                <div class="action-icon">🏪</div>
+                <h4 class="action-title">Entreposto Comercial</h4>
+                <p class="action-description">Compra e venda itens de outros jogadores</p>
+            </a>
+            
+            <a href="{% url 'store' %}" class="dashboard-action-card store">
+                <div class="action-icon">🛒</div>
+                <h4 class="action-title">Empório</h4>
+                <p class="action-description">Abasteça seus suprimentos</p>
+            </a>
         </div>
     {% endif %}
 </div>
+{% endblock %}
 
-<style>
-    /* Estilos específicos para o dashboard */
-    .stat-box {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 12px;
-        border: 2px solid #8B4513;
-        height: 100%;
-        transition: transform 0.3s ease;
-    }
-    
-    .stat-box:hover {
-        transform: translateY(-5px);
-        background: rgba(139, 69, 19, 0.2);
-    }
-    
-    .progress {
-        background-color: #D4AF37;
-        border: 1px solid #8B4513;
-    }
-    
-    .progress-bar {
-        background-color: #8B4513 !important;
-    }
-    
-    .status-container {
-        background: rgba(139, 69, 19, 0.15);
-        border-radius: 8px;
-        border: 2px solid #8B4513;
-    }
-    
-    .action-btn {
-        display: block;
-        background: rgba(139, 69, 19, 0.1);
-        border: 2px solid #8B4513;
-        border-radius: 8px;
-        text-decoration: none;
-        color: #3E2723;
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-    
-    .action-btn:hover {
-        background: rgba(139, 69, 19, 0.2);
-        border-color: #D4AF37;
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        color: #3E2723;
-    }
-    
-    .action-icon {
-        font-size: 2.5rem;
-    }
-    
-    /* Estilos para os atributos */
-    .attribute-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.8rem;
-    }
-    
-    .attribute-item {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem;
-        background: rgba(245, 245, 220, 0.2);
-        border-radius: 6px;
-    }
-    
-    .attribute-icon {
-        font-size: 1.5rem;
-        margin-right: 0.75rem;
-        width: 30px;
-        text-align: center;
-    }
-    
-    .attribute-name {
-        flex: 1;
-        font-weight: 600;
-        color: #3E2723;
-    }
-    
-    .attribute-value {
-        font-weight: bold;
-        color: #8B4513;
-        font-family: 'Cinzel', serif;
-    }
-    
-    /* Barra de XP discreta */
-    .xp-container {
-        max-width: 400px;
-        margin: 0 auto;
-    }
-    
-    .xp-bar {
-        height: 8px !important;
-        background-color: rgba(212, 175, 55, 0.3) !important;
-        border: 1px solid rgba(139, 69, 19, 0.3);
-    }
-    
-    .bg-xp {
-        background: linear-gradient(to right, #8B4513, #D4AF37) !important;
-    }
-    
-    .xp-text {
-        color: #8B4513;
-        font-size: 0.85rem;
-    }
-    
-    /* Seção de equipamentos */
-    .character-equipment-section {
-        padding: 1rem;
-        {% comment %} margin: 0 auto;           /* horizontal */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;  /* vertical */
-        height: 100%;             /* precisa altura no pai */ {% endcomment %}
-    }
-    
-    .equipment-row {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-    }
-    
-    /* Personagem central */
-    .character-center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .character-emoji-bg {
-        width: 120px;
-        height: 120px;
-        background: linear-gradient(135deg, #1ce647ff, #5937d4ff);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 15px rgba(139, 69, 19, 0.3);
-    }
-    
-    .character-emoji {
-        font-size: 4rem;
-        animation: float 3s infinite ease-in-out;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
-    }
-
-    .character-menu {
-        max-width: 200px; /* ou outra largura que quiser */
-        margin: 0 auto;   /* centraliza */
-    }
-
-    .character-menu .menu-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .character-menu .menu-list li {
-        margin-bottom: 0.5rem;
-    }
-
-    .character-menu .menu-btn {
-        display: block;
-        width: 100%;
-        padding: 0.5rem 1rem;
-        background: rgba(139, 69, 19, 0.1);
-        border: 2px solid #8B4513;
-        border-radius: 8px;
-        text-decoration: none;
-        color: #3E2723;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-
-    .character-menu .menu-btn:hover {
-        background: rgba(139, 69, 19, 0.2);
-        border-color: #D4AF37;
-        transform: translateY(-3px);
-    }
-
-    /* Barras de recursos */
-    .resource-bar {
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 8px;
-        border: 1px solid #8B4513;
-        padding: 0.75rem;
-    }
-    
-    .resource-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-    
-    .resource-icon {
-        font-size: 1.2rem;
-    }
-    
-    .resource-name {
-        font-weight: 600;
-        color: #3E2723;
-        font-family: 'Cinzel', serif;
-    }
-    
-    .resource-value {
-        font-size: 0.85rem;
-        color: #8B4513;
-        font-weight: bold;
-    }
-    
-    .resource-progress {
-        height: 10px !important;
-        background-color: rgba(212, 175, 55, 0.2) !important;
-        border: 1px solid rgba(139, 69, 19, 0.3);
-    }
-    
-    .bg-hp {
-        background: linear-gradient(to right, #DC143C, #FF6B6B) !important;
-    }
-    
-    .bg-mana {
-        background: linear-gradient(to right, #4B0082, #9370DB) !important;
-    }
-    
-    .bg-stamina {
-        background: linear-gradient(to right, #32CD32, #90EE90) !important;
-    }
-
-</style>
-
-{% comment %} <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Efeito de entrada para a página
-        const container = document.querySelector('.scroll-container');
-        container.style.opacity = '0';
-        container.style.transition = 'opacity 1s ease-in-out';
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação para os atributos
+    const attributeItems = document.querySelectorAll('.attribute-item');
+    attributeItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(10px)';
         
         setTimeout(() => {
-            container.style.opacity = '1';
-        }, 100);
+            item.style.transition = 'all 0.4s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, index * 50);
     });
-</script> {% endcomment %}
 
+    // Animação para as barras de recursos
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach((bar, index) => {
+        const width = bar.style.width;
+        bar.style.width = '0';
+        
+        setTimeout(() => {
+            bar.style.transition = 'width 1.5s ease-out';
+            bar.style.width = width;
+        }, 300 + (index * 100));
+    });
+
+    // Animação para os cards de ação
+    const actionCards = document.querySelectorAll('.dashboard-action-card');
+    actionCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        }, 500 + (index * 100));
+    });
+
+    // Efeito de hover para os cards de ação
+    actionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Efeito pulsante para o emoji do personagem
+    const characterEmoji = document.querySelector('.character-emoji');
+    if (characterEmoji) {
+        setInterval(() => {
+            characterEmoji.style.filter = characterEmoji.style.filter ? 
+                '' : '0 0 20px rgba(231, 201, 143, 0.5)';
+        }, 2000);
+    }
+
+    // Efeito para itens equipados raros
+    const equipmentSlots = document.querySelectorAll('.equipment-slot');
+    equipmentSlots.forEach(slot => {
+        if (slot.classList.contains('rare') || slot.classList.contains('epic') || slot.classList.contains('legendary')) {
+            setInterval(() => {
+                slot.style.boxShadow = slot.style.boxShadow ? 
+                    '' : '0 0 15px rgba(255, 215, 0, 0.5)';
+            }, 1500);
+        }
+    });
+});
+</script>
 {% endblock %}

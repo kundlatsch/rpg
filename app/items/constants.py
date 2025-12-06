@@ -34,6 +34,16 @@ RECIPE_LABELS = {
     "essence": "Essência",
 }
 
+RECIPE_EMOJIS = {
+    "wood": "🌲",
+    "metal": "⛓️",
+    "cloth": "🧵",
+    "leather": "👜",
+    "crystal": "🔮",
+    "bone": "🦴",
+    "essence": "✨",
+}
+
 STAT_LABELS = {
     "attack": "Ataque",
     "defense": "Defesa",

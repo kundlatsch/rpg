@@ -2,137 +2,137 @@
 {% load static %}
 
 {% block content %}
-<div class="scroll-container p-4 p-md-5 mt-4">
+<div class="attributes-page">
     <!-- Cabeçalho -->
-    <div class="text-center mb-4">
-        <h1 class="fantasy-title">{{ character.name }}</h1>
-        <p class="text-dark mb-0">Nível: {{ character.level }} - XP: {{ character.exp }}/{{ character.max_exp }}</p>
+    <div class="attributes-header-wrapper">
+        <h1 class="attributes-main-title">{{ character.name }}</h1>
+        <p class="attributes-subtitle">Nível: {{ character.level }} - XP: {{ character.exp }}/{{ character.max_exp }}</p>
     </div>
 
-    <div class="divider"></div>
+    <div class="attributes-divider"></div>
 
     <!-- Pontos de Atributo -->
     {% if character.attribute_points != 0 %}
-        <div class="inventory-sidebar p-4 text-center mb-4">
-            <h3 class="fantasy-title mb-3">Pontos de Atributo Disponíveis</h3>
-            <div class="points-display">
-                <span class="points-value">{{ character.attribute_points }}</span>
+        <div class="attribute-points-section">
+            <h2 class="attribute-points-title">Pontos de Atributo Disponíveis</h2>
+            <div class="attribute-points-display">
+                <span class="attribute-points-value">{{ character.attribute_points }}</span>
             </div>
-            <p class="text-dark mt-2">Use os pontos ganhos ao subir de nível para melhorar seus atributos</p>
+            <p class="attribute-points-text">Use os pontos ganhos ao subir de nível para melhorar seus atributos</p>
         </div>
     {% endif %}
 
-    <div class="row">
+    <div class="attributes-grid">
         <!-- Coluna da Esquerda - Atributos Primários -->
-        <div class="col-md-6 mb-4">
-            <div class="inventory-sidebar p-4">
-                <h3 class="fantasy-title text-center mb-4">Atributos Primários</h3>
+        <div class="attributes-column">
+            <div class="attributes-section">
+                <h2 class="attributes-section-title">Atributos Primários</h2>
                 
-                <div class="attributes-list">
+                <div class="primary-attributes-list">
                     <!-- Força -->
-                    <div class="attribute-item">
-                        <div class="attribute-info">
-                            <span class="attribute-emoji">💪</span>
-                            <div class="attribute-details">
-                                <span class="attribute-name">Força</span>
-                                <span class="attribute-value">{{ character.strength }}</span>
+                    <div class="primary-attribute-item">
+                        <div class="primary-attribute-info">
+                            <span class="primary-attribute-emoji">💪</span>
+                            <div class="primary-attribute-details">
+                                <span class="primary-attribute-name">Força</span>
+                                <span class="primary-attribute-value">{{ character.strength }}</span>
                             </div>
                         </div>
                         {% if character.attribute_points > 0 %}
-                        <form method="POST" class="attribute-form">
+                        <form method="POST" class="attribute-upgrade-form">
                             {% csrf_token %}
                             <input type="hidden" name="attribute" value="strength">
-                            <button type="submit" class="btn-upgrade">+</button>
+                            <button type="submit" class="attribute-upgrade-btn">+</button>
                         </form>
                         {% endif %}
                     </div>
 
                     <!-- Destreza -->
-                    <div class="attribute-item">
-                        <div class="attribute-info">
-                            <span class="attribute-emoji">🎯</span>
-                            <div class="attribute-details">
-                                <span class="attribute-name">Destreza</span>
-                                <span class="attribute-value">{{ character.dexterity }}</span>
+                    <div class="primary-attribute-item">
+                        <div class="primary-attribute-info">
+                            <span class="primary-attribute-emoji">🎯</span>
+                            <div class="primary-attribute-details">
+                                <span class="primary-attribute-name">Destreza</span>
+                                <span class="primary-attribute-value">{{ character.dexterity }}</span>
                             </div>
                         </div>
                         {% if character.attribute_points > 0 %}
-                        <form method="POST" class="attribute-form">
+                        <form method="POST" class="attribute-upgrade-form">
                             {% csrf_token %}
                             <input type="hidden" name="attribute" value="dexterity">
-                            <button type="submit" class="btn-upgrade">+</button>
+                            <button type="submit" class="attribute-upgrade-btn">+</button>
                         </form>
                         {% endif %}
                     </div>
 
                     <!-- Arcano -->
-                    <div class="attribute-item">
-                        <div class="attribute-info">
-                            <span class="attribute-emoji">🔮</span>
-                            <div class="attribute-details">
-                                <span class="attribute-name">Arcano</span>
-                                <span class="attribute-value">{{ character.arcane }}</span>
+                    <div class="primary-attribute-item">
+                        <div class="primary-attribute-info">
+                            <span class="primary-attribute-emoji">🔮</span>
+                            <div class="primary-attribute-details">
+                                <span class="primary-attribute-name">Arcano</span>
+                                <span class="primary-attribute-value">{{ character.arcane }}</span>
                             </div>
                         </div>
                         {% if character.attribute_points > 0 %}
-                        <form method="POST" class="attribute-form">
+                        <form method="POST" class="attribute-upgrade-form">
                             {% csrf_token %}
                             <input type="hidden" name="attribute" value="arcane">
-                            <button type="submit" class="btn-upgrade">+</button>
+                            <button type="submit" class="attribute-upgrade-btn">+</button>
                         </form>
                         {% endif %}
                     </div>
 
                     <!-- Constituição -->
-                    <div class="attribute-item">
-                        <div class="attribute-info">
-                            <span class="attribute-emoji">🛡️</span>
-                            <div class="attribute-details">
-                                <span class="attribute-name">Constituição</span>
-                                <span class="attribute-value">{{ character.constitution }}</span>
+                    <div class="primary-attribute-item">
+                        <div class="primary-attribute-info">
+                            <span class="primary-attribute-emoji">🛡️</span>
+                            <div class="primary-attribute-details">
+                                <span class="primary-attribute-name">Constituição</span>
+                                <span class="primary-attribute-value">{{ character.constitution }}</span>
                             </div>
                         </div>
                         {% if character.attribute_points > 0 %}
-                        <form method="POST" class="attribute-form">
+                        <form method="POST" class="attribute-upgrade-form">
                             {% csrf_token %}
                             <input type="hidden" name="attribute" value="constitution">
-                            <button type="submit" class="btn-upgrade">+</button>
+                            <button type="submit" class="attribute-upgrade-btn">+</button>
                         </form>
                         {% endif %}
                     </div>
 
                     <!-- Coragem -->
-                    <div class="attribute-item">
-                        <div class="attribute-info">
-                            <span class="attribute-emoji">⚡</span>
-                            <div class="attribute-details">
-                                <span class="attribute-name">Coragem</span>
-                                <span class="attribute-value">{{ character.courage }}</span>
+                    <div class="primary-attribute-item">
+                        <div class="primary-attribute-info">
+                            <span class="primary-attribute-emoji">⚡</span>
+                            <div class="primary-attribute-details">
+                                <span class="primary-attribute-name">Coragem</span>
+                                <span class="primary-attribute-value">{{ character.courage }}</span>
                             </div>
                         </div>
                         {% if character.attribute_points > 0 %}
-                        <form method="POST" class="attribute-form">
+                        <form method="POST" class="attribute-upgrade-form">
                             {% csrf_token %}
                             <input type="hidden" name="attribute" value="courage">
-                            <button type="submit" class="btn-upgrade">+</button>
+                            <button type="submit" class="attribute-upgrade-btn">+</button>
                         </form>
                         {% endif %}
                     </div>
 
                     <!-- Sorte -->
-                    <div class="attribute-item">
-                        <div class="attribute-info">
-                            <span class="attribute-emoji">🍀</span>
-                            <div class="attribute-details">
-                                <span class="attribute-name">Sorte</span>
-                                <span class="attribute-value">{{ character.luck }}</span>
+                    <div class="primary-attribute-item">
+                        <div class="primary-attribute-info">
+                            <span class="primary-attribute-emoji">🍀</span>
+                            <div class="primary-attribute-details">
+                                <span class="primary-attribute-name">Sorte</span>
+                                <span class="primary-attribute-value">{{ character.luck }}</span>
                             </div>
                         </div>
                         {% if character.attribute_points > 0 %}
-                        <form method="POST" class="attribute-form">
+                        <form method="POST" class="attribute-upgrade-form">
                             {% csrf_token %}
                             <input type="hidden" name="attribute" value="luck">
-                            <button type="submit" class="btn-upgrade">+</button>
+                            <button type="submit" class="attribute-upgrade-btn">+</button>
                         </form>
                         {% endif %}
                     </div>
@@ -141,58 +141,58 @@
         </div>
 
         <!-- Coluna da Direita - Atributos Secundários -->
-        <div class="col-md-6 mb-4">
-            <div class="inventory-sidebar p-4">
-                <h3 class="fantasy-title text-center mb-4">Atributos Secundários</h3>
+        <div class="attributes-column">
+            <div class="attributes-section">
+                <h2 class="attributes-section-title">Atributos Secundários</h2>
                 
                 <div class="secondary-attributes-grid">
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">⚔️</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Dano Físico</span>
-                            <span class="secondary-value">{{ character.physical_damage }}</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">⚔️</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Dano Físico</span>
+                            <span class="secondary-attribute-value">{{ character.physical_damage }}</span>
                         </div>
                     </div>
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">✨</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Dano Mágico</span>
-                            <span class="secondary-value">{{ character.magical_damage }}</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">✨</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Dano Mágico</span>
+                            <span class="secondary-attribute-value">{{ character.magical_damage }}</span>
                         </div>
                     </div>
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">🎯</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Precisão</span>
-                            <span class="secondary-value">{{ character.accuracy }}</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">🎯</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Precisão</span>
+                            <span class="secondary-attribute-value">{{ character.accuracy }}</span>
                         </div>
                     </div>
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">💥</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Chance de Crítico</span>
-                            <span class="secondary-value">{{ character.crit_chance }}%</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">💥</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Chance de Crítico</span>
+                            <span class="secondary-attribute-value">{{ character.crit_chance }}%</span>
                         </div>
                     </div>
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">🔥</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Dano Crítico</span>
-                            <span class="secondary-value">{{ character.crit_damage }}</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">🔥</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Dano Crítico</span>
+                            <span class="secondary-attribute-value">{{ character.crit_damage }}</span>
                         </div>
                     </div>
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">❤️</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Vida Total</span>
-                            <span class="secondary-value">{{ character.total_hp }}</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">❤️</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Vida Total</span>
+                            <span class="secondary-attribute-value">{{ character.total_hp }}</span>
                         </div>
                     </div>
-                    <div class="secondary-attribute">
-                        <span class="secondary-emoji">🔷</span>
-                        <div class="secondary-details">
-                            <span class="secondary-name">Mana Total</span>
-                            <span class="secondary-value">{{ character.total_mana }}</span>
+                    <div class="secondary-attribute-item">
+                        <span class="secondary-attribute-emoji">🔷</span>
+                        <div class="secondary-attribute-details">
+                            <span class="secondary-attribute-name">Mana Total</span>
+                            <span class="secondary-attribute-value">{{ character.total_mana }}</span>
                         </div>
                     </div>
                 </div>
@@ -200,37 +200,40 @@
         </div>
     </div>
 
-    <div class="text-center">
-        <h2 class="fantasy-title mb-3">Perícias</h2>
+    <!-- Perícias -->
+    <div class="professions-section">
+        <h2 class="professions-section-title">Perícias</h2>
 
         {% if professions %}
             <div class="professions-grid">
                 {% for p in professions %}
-                    <div class="profession-card">
+                    <div class="profession-card" data-level="{{ p.level }}">
                         <div class="profession-header">
                             <span class="profession-emoji">{{ p.profession_type.emoji|default:"⚒️" }}</span>
                             <div class="profession-info">
                                 <h4 class="profession-name">{{ p.profession_type.name }}</h4>
                             </div>
-                            <div class="profession-level">
-                                <span class="level-badge">Nível {{ p.level }}</span>
-                            </div>
                         </div>
-                        
                         {% if p.profession_type.description %}
                         <div class="profession-description">
                             {{ p.profession_type.description }}
                         </div>
                         {% endif %}
                         
-                        <div class="profession-progress">
-                            <div class="progress-info">
-                                <span class="xp-current">{{ p.exp }}</span>
-                                <span class="xp-separator">/</span>
-                                <span class="xp-max">{{ p.max_exp }} XP</span>
+                        <div class="profession-level-container">
+                            <div class="profession-level">
+                                <span class="profession-level-badge">Nível {{ p.level }}</span>
                             </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: {% widthratio p.exp p.max_exp 100 %}%"></div>
+                        </div>
+
+                        <div class="profession-progress">
+                            <div class="profession-progress-info">
+                                <span class="profession-xp-current">{{ p.exp }}</span>
+                                <span class="profession-xp-separator">/</span>
+                                <span class="profession-xp-max">{{ p.max_exp }} XP</span>
+                            </div>
+                            <div class="profession-progress-bar">
+                                <div class="profession-progress-fill" style="width: {% widthratio p.exp p.max_exp 100 %}%"></div>
                             </div>
                         </div>
                     </div>
@@ -243,509 +246,39 @@
             </div>
         {% endif %}
     </div>
-    
-
-    <!-- Botão de Voltar -->
-    <div class="text-center mt-4">
-        <a href="{% url 'dashboard' %}" class="btn-equip">🏰 Voltar ao Dashboard</a>
-    </div>
 </div>
 
-<style>
-/* Estilos específicos para a página de atributos - Mantendo cores existentes */
-.points-display {
-    background: rgba(212, 175, 55, 0.2);
-    border: 2px solid #D4AF37;
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-}
-
-.points-value {
-    font-family: 'Cinzel', serif;
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #8B4513;
-}
-
-.attributes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-}
-
-.attribute-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(245, 245, 220, 0.3);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #8B4513;
-    transition: all 0.3s ease;
-}
-
-.attribute-item:hover {
-    background: rgba(245, 245, 220, 0.5);
-    transform: translateX(5px);
-}
-
-.attribute-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1;
-}
-
-.attribute-emoji {
-    font-size: 1.8rem;
-    width: 40px;
-    text-align: center;
-}
-
-.attribute-details {
-    display: flex;
-    flex-direction: column;
-}
-
-.attribute-name {
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    color: #8B4513;
-    font-size: 1rem;
-}
-
-.attribute-value {
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    color: #3E2723;
-    font-size: 1.2rem;
-}
-
-.attribute-form {
-    margin: 0;
-}
-
-.btn-upgrade {
-    background: linear-gradient(to bottom, #8B4513, #6B3100);
-    border: 1px solid #D4AF37;
-    color: #F5F5DC;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-upgrade:hover {
-    background: linear-gradient(to bottom, #6B3100, #8B4513);
-    box-shadow: 0 0 10px #D4AF37;
-    transform: scale(1.1);
-}
-
-.secondary-attributes-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-}
-
-.secondary-attribute {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: rgba(245, 245, 220, 0.3);
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #8B4513;
-    transition: all 0.3s ease;
-}
-
-.secondary-attribute:hover {
-    background: rgba(245, 245, 220, 0.5);
-    transform: translateX(5px);
-}
-
-.secondary-emoji {
-    font-size: 1.5rem;
-    width: 30px;
-    text-align: center;
-}
-
-.secondary-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex: 1;
-}
-
-.secondary-name {
-    font-family: 'MedievalSharp', cursive;
-    color: #3E2723;
-    font-weight: bold;
-}
-
-.secondary-value {
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    color: #8B4513;
-    background: rgba(212, 175, 55, 0.2);
-    padding: 0.3rem 0.6rem;
-    border-radius: 15px;
-    min-width: 60px;
-    text-align: center;
-}
-
-.btn-equip {
-    background: linear-gradient(to bottom, #8B4513, #6B3100);
-    border: 1px solid #D4AF37;
-    color: #F5F5DC;
-    border-radius: 6px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-equip:hover {
-    background: linear-gradient(to bottom, #6B3100, #8B4513);
-    box-shadow: 0 0 10px #D4AF37;
-    color: #FFF;
-    transform: translateY(-2px);
-    text-decoration: none;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .attribute-info {
-        gap: 0.5rem;
-    }
-    
-    .attribute-emoji {
-        font-size: 1.5rem;
-        width: 30px;
-    }
-    
-    .attribute-name {
-        font-size: 0.9rem;
-    }
-    
-    .attribute-value {
-        font-size: 1rem;
-    }
-    
-    .btn-upgrade {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-}
-</style>
-
-<style>
-.professions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-.profession-card {
-    background: rgba(245, 245, 220, 0.3);
-    border: 2px solid #8B4513;
-    border-radius: 10px;
-    padding: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    min-height: 180px;
-}
-
-.profession-card:hover {
-    background: rgba(245, 245, 220, 0.5);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-}
-
-.profession-header {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 0.8rem;
-}
-
-.profession-emoji {
-    font-size: 2rem;
-    flex-shrink: 0;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profession-info {
-    flex-grow: 1;
-    min-width: 0; /* Permite que o texto quebre corretamente */
-}
-
-.profession-name {
-    font-family: 'Cinzel', serif;
-    color: #3E2723;
-    margin: 0 0 0.3rem 0;
-    font-size: 1rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.level-badge {
-    background: linear-gradient(135deg, #D4AF37, #B8860B);
-    color: #3E2723;
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    font-size: 0.8rem;
-    border: 1px solid #8B4513;
-    display: inline-block;
-}
-
-.profession-description {
-    background: rgba(139, 69, 19, 0.1);
-    padding: 0.6rem;
-    border-radius: 6px;
-    margin-bottom: 0.8rem;
-    border-left: 3px solid #8B4513;
-    font-family: 'MedievalSharp', cursive;
-    color: #3E2723;
-    font-size: 0.75rem;
-    line-height: 1.3;
-    font-style: italic;
-    max-height: 40px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-.profession-progress {
-    background: rgba(139, 69, 19, 0.1);
-    padding: 0.6rem;
-    border-radius: 6px;
-    border: 1px solid #8B4513;
-}
-
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    font-size: 0.8rem;
-}
-
-.xp-current {
-    color: #D4AF37;
-}
-
-.xp-separator {
-    color: #8B4513;
-    margin: 0 0.2rem;
-}
-
-.xp-max {
-    color: #3E2723;
-    font-size: 0.7rem;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    background: rgba(139, 69, 19, 0.2);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 0.5rem;
-    border: 1px solid #8B4513;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #D4AF37, #B8860B);
-    border-radius: 4px;
-    transition: width 0.5s ease;
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
-}
-
-.growth-rate {
-    text-align: center;
-    font-family: 'MedievalSharp', cursive;
-    color: #8B4513;
-    font-size: 0.7rem;
-    background: rgba(245, 245, 220, 0.5);
-    padding: 0.2rem;
-    border-radius: 4px;
-    border: 1px solid rgba(139, 69, 19, 0.3);
-}
-
-.no-professions {
-    text-align: center;
-    padding: 2rem 1rem;
-    background: rgba(139, 69, 19, 0.1);
-    border: 2px dashed #8B4513;
-    border-radius: 10px;
-    margin: 1.5rem 0;
-    grid-column: 1 / -1;
-}
-
-.no-professions-emoji {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 0.5rem;
-    opacity: 0.7;
-}
-
-.no-professions-text {
-    font-family: 'Cinzel', serif;
-    color: #3E2723;
-    font-size: 1rem;
-    margin: 0;
-    font-style: italic;
-}
-
-/* Efeitos de animação */
-@keyframes pulse-glow {
-    0%, 100% { 
-        box-shadow: 0 0 3px rgba(212, 175, 55, 0.3);
-    }
-    50% { 
-        box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
-    }
-}
-
-.profession-card:hover .level-badge {
-    animation: pulse-glow 2s infinite;
-}
-
-/* Layout mais compacto para telas maiores */
-@media (min-width: 1200px) {
-    .professions-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.8rem;
-    }
-    
-    .profession-card {
-        padding: 0.8rem;
-        min-height: 170px;
-    }
-}
-
-/* Responsividade para tablets */
-@media (max-width: 768px) {
-    .professions-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 0.8rem;
-    }
-    
-    .profession-card {
-        padding: 0.8rem;
-        min-height: 160px;
-    }
-    
-    .profession-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 0.5rem;
-        margin-bottom: 0.6rem;
-    }
-    
-    .profession-emoji {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
-    }
-    
-    .profession-name {
-        font-size: 0.9rem;
-    }
-    
-    .profession-description {
-        font-size: 0.7rem;
-        padding: 0.4rem;
-        max-height: 35px;
-        -webkit-line-clamp: 2;
-    }
-    
-    .progress-info {
-        flex-direction: column;
-        gap: 0.3rem;
-        text-align: center;
-        font-size: 0.75rem;
-    }
-}
-
-/* Responsividade para mobile */
-@media (max-width: 480px) {
-    .professions-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.6rem;
-    }
-    
-    .profession-card {
-        padding: 0.6rem;
-        min-height: 150px;
-    }
-    
-    .profession-name {
-        font-size: 0.8rem;
-    }
-    
-    .level-badge {
-        font-size: 0.7rem;
-        padding: 0.15rem 0.4rem;
-    }
-    
-    .profession-description {
-        display: none; /* Esconde descrição em mobile para economizar espaço */
-    }
-    
-    .profession-progress {
-        padding: 0.4rem;
-    }
-    
-    .progress-info {
-        font-size: 0.7rem;
-    }
-    
-    .growth-rate {
-        font-size: 0.65rem;
-    }
-}
-
-/* Para telas muito pequenas */
-@media (max-width: 360px) {
-    .professions-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
 <script>
+// Character Attributes Page Animations
 document.addEventListener('DOMContentLoaded', function() {
-    // Animação de entrada para os cards de profissão
+
+    // Animação para os atributos primários
+    const primaryAttributes = document.querySelectorAll('.primary-attribute-item');
+    primaryAttributes.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+            item.style.transition = 'all 0.5s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, index * 80);
+    });
+
+    // Animação para os atributos secundários
+    const secondaryAttributes = document.querySelectorAll('.secondary-attribute-item');
+    secondaryAttributes.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(20px)';
+        
+        setTimeout(() => {
+            item.style.transition = 'all 0.5s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, 300 + (index * 60));
+    });
+
+    // Animação para os cards de profissão
     const professionCards = document.querySelectorAll('.profession-card');
     professionCards.forEach((card, index) => {
         card.style.opacity = '0';
@@ -755,23 +288,53 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.transition = 'all 0.4s ease';
             card.style.opacity = '1';
             card.style.transform = 'scale(1)';
-        }, index * 100);
+        }, 600 + (index * 100));
     });
 
     // Efeito de brilho para profissões de nível alto
     professionCards.forEach(card => {
-        const levelBadge = card.querySelector('.level-badge');
-        if (levelBadge) {
-            const level = parseInt(levelBadge.textContent.match(/\d+/)[0]);
-            if (level >= 5) {
-                setInterval(() => {
-                    card.style.borderColor = card.style.borderColor === 'rgb(212, 175, 55)' ? 
-                        '#8B4513' : '#D4AF37';
-                }, 2000);
-            }
+        const level = parseInt(card.getAttribute('data-level'));
+        if (level >= 50) {
+            setInterval(() => {
+                card.style.borderColor = card.style.borderColor === 'rgba(255, 107, 107, 0.5)' ? 
+                    'rgba(78, 205, 196, 0.5)' : 'rgba(255, 107, 107, 0.5)';
+            }, 2000);
         }
     });
+
+    // Efeito de hover para botões de upgrade
+    const upgradeButtons = document.querySelectorAll('.attribute-upgrade-btn');
+    upgradeButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            const attributeItem = this.closest('.primary-attribute-item');
+            if (attributeItem) {
+                attributeItem.style.transform = 'translateX(10px) scale(1.02)';
+                attributeItem.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.4)';
+            }
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            const attributeItem = this.closest('.primary-attribute-item');
+            if (attributeItem) {
+                attributeItem.style.transform = 'translateX(5px) scale(1)';
+                attributeItem.style.boxShadow = 'none';
+            }
+        });
+    });
+
+    // Efeito de progresso nas barras de XP das profissões
+    const progressBars = document.querySelectorAll('.profession-progress-fill');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0';
+        
+        setTimeout(() => {
+            bar.style.transition = 'width 1.5s ease-out';
+            bar.style.width = width;
+        }, 800);
+    });
+
+
 });
 </script>
-
 {% endblock %}

@@ -1,0 +1,108 @@
+{# recebe item (objeto de item) e slot_name (opcional) no context #}
+<div class="item-slot {% if item.rarity %}rarity-{{ item.rarity }}{% endif %} {{ slot_name|default:'' }}-slot"
+     data-toggle="tooltip" 
+     data-placement="top"
+     title="{% if not item %}Slot vazio{% endif %}"
+     data-item-type="{% if item.equipment %}equipment{% elif item.consumable %}consumable{% elif item.material %}material{% else %}unknown{% endif %}">
+  
+  <div class="slot-icon">
+    {% if item %}
+      {{ item.emoji|default:"❔" }}
+    {% else %}
+      {{ slot_icon|default:"⬜" }}
+    {% endif %}
+  </div>
+  
+  <div class="slot-label">
+    {{ slot_name|capfirst|default:"" }}
+  </div>
+  
+  {% if item %}
+  <div class="item-tooltip">
+    <div class="tooltip-header {% if item.rarity %}{{ item.rarity }}{% else %}common{% endif %}">
+      <span class="item-emoji">{{ item.emoji|default:"❔" }}</span>
+      <span class="item-name">{{ item.name }}</span>
+    </div>
+    
+    <div class="tooltip-body">
+      {% if item.rarity %}
+      <div class="item-rarity {{ item.rarity }}">{{ item.get_rarity_display }}</div>
+      {% endif %}
+      
+      <div class="item-description">{{ item.description|default:"Sem descrição disponível." }}</div>
+      
+      {% if item.equipment %}
+        <!-- Informações de equipamento -->
+        <div class="item-equipment-info">
+          {% if item.equipment.formatted_equipment_stats %}
+          <div class="item-stats">
+            <strong>Atributos:</strong>
+            <div class="stats-list">{{ item.equipment.formatted_equipment_stats }}</div>
+          </div>
+          {% endif %}
+          
+          {% if item.equipment.attribute_bonuses_strings %}
+          <div class="attribute-bonuses">
+            <div class="bonus-title">Bônus de Atributos:</div>
+            {% for attr, value in item.equipment.attribute_bonuses_strings.items %}
+            <div class="bonus-item">
+              <span class="bonus-attr">{{ attr|capfirst }}</span>
+              <span class="bonus-value">+{{ value }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          {% if item.equipment.passive_skill %}
+          <div class="item-skill">
+            <div class="skill-title">{{ item.equipment.passive_skill.name }}</div>
+            
+            {% if item.equipment.passive_skill.description %}
+            <div class="skill-description">
+              <em>{{ item.equipment.passive_skill.description }}</em>
+            </div>
+            {% endif %}
+            
+            {% if item.equipment.passive_skill.trigger %}
+            <div class="skill-trigger">
+              <strong>Ativação:</strong> {{ item.equipment.trigger_string }}
+            </div>
+            {% endif %}
+            
+            {% if item.equipment.formatted_passive_skill_effects %}
+            <div class="skill-effects">
+              <strong>Efeitos:</strong> {{ item.equipment.formatted_passive_skill_effects }}
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+          
+          <div class="item-level">Requer nível {{ item.equipment.min_level|default:1 }}</div>
+        </div>
+      
+      {% elif item.consumable %}
+        <!-- Informações de consumível -->
+        <div class="item-consumable-info">
+          <div class="item-type">🧪 Consumível</div>
+          {% if item.consumable.min_level %}
+          <div class="item-level">Requer nível {{ item.consumable.min_level }}</div>
+          {% endif %}
+          {% if item.consumable.affected_attributes %}
+          <div class="affected-attributes">
+            <strong>Atributos Afetados:</strong>
+            {{ item.consumable.affected_attributes|join:", " }}
+          </div>
+          {% endif %}
+        </div>
+      
+      {% elif item.material %}
+        <!-- Informações de material -->
+        <div class="item-material-info">
+          <div class="item-type">📦 Material</div>
+          <div class="material-usage">Usado em crafting</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>

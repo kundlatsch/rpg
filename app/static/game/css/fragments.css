@@ -1,0 +1,364 @@
+/* ======================
+   ITEM SLOT FRAGMENT STYLES
+   Para exibição unificada de itens
+   ====================== */
+
+/* Slot base */
+.item-slot {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 107, 107, 0.3);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin: 0;
+    z-index: 100;
+}
+
+.item-slot:hover {
+    border-color: #FF6B6B;
+    background: rgba(255, 107, 107, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+}
+
+/* Cores de raridade */
+.item-slot.rarity-common {
+    background: rgba(192, 192, 192, 0.1);
+    border-color: rgba(192, 192, 192, 0.5);
+}
+
+.item-slot.rarity-rare {
+    background: rgba(0, 255, 157, 0.1);
+    border-color: rgba(0, 255, 157, 0.5);
+}
+
+.item-slot.rarity-epic {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.5);
+}
+
+.item-slot.rarity-legendary {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+/* Slot vazio */
+.item-slot:not(.rarity-common):not(.rarity-rare):not(.rarity-epic):not(.rarity-legendary) {
+    background: rgba(100, 100, 100, 0.1);
+    border-color: rgba(150, 150, 150, 0.3);
+}
+
+/* Ícone do slot */
+.slot-icon {
+    font-size: 1.8rem;
+    margin-bottom: 4px;
+}
+
+/* Label do slot */
+.slot-label {
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    font-size: 0.7rem;
+    color: #FFFFFF;
+    text-align: center;
+    opacity: 0.9;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 0;
+    border-radius: 0 0 10px 10px;
+}
+
+/* Tooltip */
+.item-tooltip {
+    position: fixed; /* Usar fixed para escapar de containers com overflow */
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    background: rgba(40, 40, 40, 0.98);
+    border: 2px solid #FF6B6B;
+    border-radius: 10px;
+    padding: 0;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.item-slot:hover .item-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+/* Cabeçalho do tooltip */
+.tooltip-header {
+    padding: 12px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+}
+
+.tooltip-header.common {
+    background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+    color: #000000;
+}
+
+.tooltip-header.rare {
+    background: linear-gradient(45deg, #00FF9D, #00CC7A);
+    color: #000000;
+}
+
+.tooltip-header.epic {
+    background: linear-gradient(45deg, #A855F7, #7C3AED);
+    color: #FFFFFF;
+}
+
+.tooltip-header.legendary {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000000;
+}
+
+.item-emoji {
+    font-size: 1.2rem;
+}
+
+.item-name {
+    font-size: 1.1rem;
+}
+
+/* Corpo do tooltip */
+.tooltip-body {
+    padding: 12px;
+    color: #E0E0E0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Raridade */
+.item-rarity {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.item-rarity.common {
+    background: #C0C0C0;
+    color: #000000;
+}
+
+.item-rarity.rare {
+    background: #00FF9D;
+    color: #000000;
+}
+
+.item-rarity.epic {
+    background: #A855F7;
+    color: #FFFFFF;
+}
+
+.item-rarity.legendary {
+    background: #FFD700;
+    color: #000000;
+}
+
+/* Descrição */
+.item-description {
+    margin-bottom: 15px;
+    color: #4ECDC4;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Informações específicas por tipo */
+.item-equipment-info,
+.item-consumable-info,
+.item-material-info {
+    margin-top: 10px;
+}
+
+/* Estatísticas de equipamento */
+.item-stats {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.stats-list {
+    font-size: 0.8rem;
+    color: #FF6B6B;
+}
+
+/* Bônus de atributos */
+.attribute-bonuses {
+    margin-bottom: 10px;
+}
+
+.bonus-title {
+    font-weight: bold;
+    color: #4ECDC4;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.bonus-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+    font-size: 0.8rem;
+}
+
+.bonus-attr {
+    color: #FFFFFF;
+}
+
+.bonus-value {
+    color: #00FF9D;
+    font-weight: bold;
+}
+
+/* Habilidades */
+.item-skill {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(78, 205, 196, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #4ECDC4;
+}
+
+.skill-title {
+    font-weight: bold;
+    color: #4ECDC4;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.skill-name {
+    margin-bottom: 5px;
+    color: #FFFFFF;
+}
+
+.skill-description {
+    font-style: italic;
+    font-size: 0.75rem;
+    margin-bottom: 5px;
+    color: #E0E0E0;
+}
+
+.skill-trigger,
+.skill-effects {
+    font-size: 0.75rem;
+    margin-bottom: 3px;
+}
+
+/* Tipo de item e nível */
+.item-type {
+    font-weight: bold;
+    color: #4ECDC4;
+    margin-bottom: 5px;
+}
+
+.affected-attributes {
+    font-size: 0.8rem;
+    color: #FF6B6B;
+}
+
+.material-usage {
+    font-style: italic;
+    color: #E0E0E0;
+}
+
+.item-level {
+    text-align: center;
+    color: #FFFFFF;
+    font-weight: bold;
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ajustes específicos para crafting */
+.crafting-page .item-slot {
+    width: 80px;
+    height: 80px;
+}
+
+.crafting-page .slot-icon {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+}
+
+.crafting-page .slot-label {
+    font-size: 0.8rem;
+    padding: 3px 0;
+}
+
+/* Ajustes específicos para inventário */
+.inventory-page .item-slot {
+    width: 70px;
+    height: 70px;
+}
+
+.inventory-page .slot-icon {
+    font-size: 1.5rem;
+}
+
+/* Ajustes específicos para personagem */
+.character-page .item-slot {
+    width: 60px;
+    height: 60px;
+}
+
+.character-page .slot-icon {
+    font-size: 1.3rem;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .item-slot {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .slot-icon {
+        font-size: 1.3rem;
+    }
+    
+    .slot-label {
+        font-size: 0.6rem;
+    }
+    
+    .item-tooltip {
+        width: 240px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Para garantir que o tooltip não seja cortado */
+.craft-card,
+.inventory-slot,
+.character-slot {
+    overflow: visible !important;
+    position: relative;
+    z-index: 1;
+}

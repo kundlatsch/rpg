@@ -2,16 +2,14 @@
 {% load static %}
 
 {% block content %}
-<div class="scroll-container p-4 p-md-5 mt-4">
+<div class="scroll-container jobs-container p-4 p-md-5 mt-4">
     <!-- Cabeçalho dos trabalhos -->
-    <div class="text-center mb-4">
+    <div class="jobs-header">
         <h1 class="jobs-title">
             ⚒️ Trabalhos Disponíveis
         </h1>
-        <p class="text-dark mb-0">Escolha uma profissão e comece sua jornada</p>
+        <p class="jobs-subtitle">Escolha uma profissão e comece sua jornada</p>
     </div>
-
-    <div class="divider"></div>
 
     <!-- Alertas -->
     {% if request.session.alert %}
@@ -62,23 +60,23 @@
 
                     <!-- Recompensas (sempre visíveis) -->
                     <div class="job-rewards-section">
-                        <div class="rewards-header">
-                            <span class="rewards-emoji">🎯</span>
-                            <span class="rewards-title">Recompensas</span>
+                        <div class="job-rewards-header">
+                            <span class="job-rewards-emoji">🎯</span>
+                            <span class="job-rewards-title">Recompensas</span>
                         </div>
-                        <div class="rewards-grid">
-                            <div class="reward-item">
-                                <span class="reward-emoji">💰</span>
-                                <span class="reward-text">{{ job.gold_per_minute|default:0 }} <small>ouro/min</small></span>
+                        <div class="job-rewards-grid">
+                            <div class="job-reward-item">
+                                <span class="job-reward-emoji">💰</span>
+                                <span class="job-reward-text">{{ job.gold_per_minute|default:0 }} <small>ouro/min</small></span>
                             </div>
-                            <div class="reward-item">
-                                <span class="reward-emoji">⚡</span>
-                                <span class="reward-text">{{ job.xp_per_minute|default:0 }} <small>XP/min</small></span>
+                            <div class="job-reward-item">
+                                <span class="job-reward-emoji">⚡</span>
+                                <span class="job-reward-text">{{ job.xp_per_minute|default:0 }} <small>XP/min</small></span>
                             </div>
                             {% if prof %}
-                            <div class="reward-item">
-                                <span class="reward-emoji">📊</span>
-                                <span class="reward-text">{{ prof.exp|default:0 }} <small>XP profissão</small></span>
+                            <div class="job-reward-item">
+                                <span class="job-reward-emoji">📊</span>
+                                <span class="job-reward-text">{{ prof.exp|default:0 }} <small>XP profissão</small></span>
                             </div>
                             {% endif %}
                         </div>
@@ -89,7 +87,7 @@
                     <div class="drops-section">
                         <div class="drops-header">
                             <span class="drops-emoji">🎁</span>
-                            <span class="drops-title">Itens que podem cair</span>
+                            <span class="drops-title">Recompensas</span>
                         </div>
                         <div class="drops-grid">
                             {% for item in job.drops.all %}
@@ -131,371 +129,6 @@
     </div>
 </div>
 
-<style>
-    /* Container principal em grid */
-    .jobs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 1.5rem;
-        margin: 0 auto;
-    }
-
-    /* Cards compactos */
-    .job-card-compact {
-        background: rgba(245, 245, 220, 0.3);
-        border: 2px solid #8B4513;
-        border-radius: 12px;
-        padding: 1.2rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .job-card-compact:hover {
-        background: rgba(245, 245, 220, 0.5);
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Cabeçalho do card */
-    .job-card-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.8rem;
-    }
-
-    .job-emoji {
-        font-size: 2.5rem;
-        flex-shrink: 0;
-    }
-
-    .job-title-info {
-        flex-grow: 1;
-    }
-
-    .job-title {
-        font-family: 'Cinzel', serif;
-        color: #3E2723;
-        margin: 0 0 0.3rem 0;
-        font-size: 1.2rem;
-        line-height: 1.2;
-    }
-
-    .job-type {
-        font-family: 'MedievalSharp', cursive;
-        color: #8B4513;
-        font-size: 0.85rem;
-    }
-
-    .profession-level {
-        color: #D4AF37;
-        font-weight: bold;
-    }
-
-    /* Informações rápidas */
-    .job-quick-info {
-        display: flex;
-        gap: 1rem;
-        padding: 0.5rem;
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 8px;
-    }
-
-    .requirement, .duration {
-        display: flex;
-        align-items: center;
-        gap: 0.3rem;
-        font-family: 'MedievalSharp', cursive;
-        font-size: 0.8rem;
-        color: #3E2723;
-    }
-
-    .req-emoji, .duration-emoji {
-        font-size: 0.9rem;
-    }
-
-    /* Descrição do job */
-    .job-description-section {
-        display: flex;
-        gap: 0.8rem;
-        padding: 0.8rem;
-        background: rgba(245, 245, 220, 0.5);
-        border-radius: 8px;
-        border-left: 4px solid #8B4513;
-    }
-
-    .description-icon {
-        font-size: 1.2rem;
-        flex-shrink: 0;
-        margin-top: 0.1rem;
-    }
-
-    .job-description-text {
-        margin: 0;
-        font-style: italic;
-        color: #3E2723;
-        font-family: 'MedievalSharp', cursive;
-        font-size: 0.85rem;
-        line-height: 1.4;
-    }
-
-    /* Seção de recompensas */
-    .job-rewards-section {
-        padding: 0.8rem;
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 8px;
-        border: 1px solid #8B4513;
-    }
-
-    .rewards-header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.8rem;
-        font-family: 'Cinzel', serif;
-        color: #3E2723;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-
-    .rewards-emoji {
-        font-size: 1rem;
-    }
-
-    .rewards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 0.5rem;
-    }
-
-    .reward-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem;
-        background: rgba(245, 245, 220, 0.3);
-        border-radius: 6px;
-        border: 1px solid rgba(139, 69, 19, 0.3);
-    }
-
-    .reward-emoji {
-        font-size: 1rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    .reward-text {
-        font-family: 'MedievalSharp', cursive;
-        font-size: 0.8rem;
-        color: #3E2723;
-        font-weight: bold;
-    }
-
-    .reward-text small {
-        font-weight: normal;
-        color: #8B4513;
-    }
-
-    /* Seção de drops */
-    .drops-section {
-        padding: 0.8rem;
-        background: rgba(139, 69, 19, 0.1);
-        border-radius: 8px;
-        border: 1px solid #8B4513;
-    }
-
-    .drops-header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.8rem;
-        font-family: 'Cinzel', serif;
-        color: #3E2723;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-
-    .drops-emoji {
-        font-size: 1rem;
-    }
-
-    .drops-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-        gap: 0.8rem;
-    }
-
-    .drop-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .drop-item .item-slot {
-        width: 50px;
-        height: 50px;
-    }
-
-    .drop-item .slot-icon {
-        font-size: 1.5rem;
-    }
-
-    .drop-item .slot-label {
-        font-size: 0.55rem;
-    }
-
-    .drop-chance-badge {
-        background: rgba(212, 175, 55, 0.2);
-        padding: 0.1rem 0.3rem;
-        border-radius: 6px;
-        font-family: 'Cinzel', serif;
-        font-size: 0.6rem;
-        color: #D4AF37;
-        font-weight: bold;
-    }
-
-    /* Seção de ação */
-    .job-action-section {
-        margin-top: auto; /* Empurra para o final do card */
-    }
-
-    .btn-start-compact {
-        display: block;
-        width: 100%;
-        background: linear-gradient(135deg, #D4AF37, #B8860B);
-        color: #3E2723;
-        padding: 0.8rem;
-        border: 2px solid #8B4513;
-        border-radius: 8px;
-        font-family: 'Cinzel', serif;
-        font-weight: bold;
-        text-decoration: none;
-        text-align: center;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-    }
-
-    .btn-start-compact:hover {
-        background: linear-gradient(135deg, #B8860B, #D4AF37);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        color: #3E2723;
-    }
-
-    .locked-info {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.8rem;
-        background: rgba(108, 117, 125, 0.2);
-        border: 1px solid #6c757d;
-        border-radius: 8px;
-        font-family: 'MedievalSharp', cursive;
-        font-size: 0.8rem;
-        color: #6c757d;
-        text-align: center;
-    }
-
-    .locked-emoji {
-        font-size: 1rem;
-    }
-
-    /* Alertas estilizados */
-    .fantasy-alert {
-        background: linear-gradient(135deg, #FFD700, #D4AF37);
-        border: 2px solid #B8860B;
-        border-radius: 10px;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-    }
-
-    .alert-emoji {
-        font-size: 2rem;
-    }
-
-    .alert-message {
-        font-family: 'Cinzel', serif;
-        color: #3E2723;
-        font-weight: bold;
-        flex-grow: 1;
-    }
-
-    /* Melhorias para textos */
-    .jobs-title {
-        font-family: 'Cinzel', serif;
-        color: #3E2723;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-
-    .divider {
-        height: 2px;
-        background: linear-gradient(to right, transparent, #8B4513, transparent);
-        margin: 2rem 0;
-    }
-
-    /* Responsividade */
-    @media (max-width: 1200px) {
-        .jobs-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .jobs-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .job-card-compact {
-            padding: 1rem;
-        }
-        
-        .job-card-header {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.5rem;
-        }
-        
-        .job-emoji {
-            align-self: center;
-        }
-        
-        .job-quick-info {
-            justify-content: center;
-        }
-        
-        .rewards-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .drops-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-
-    @media (max-width: 480px) {
-        .scroll-container {
-            padding: 1rem;
-        }
-        
-        .drops-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        
-        .job-quick-info {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-    }
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Animação de entrada para os cards
@@ -517,8 +150,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const btn = card.querySelector('.btn-start-compact');
         if (btn) {
             setInterval(() => {
-                card.style.borderColor = card.style.borderColor === 'rgb(212, 175, 55)' ? 
-                    '#8B4513' : '#D4AF37';
+                card.style.borderColor = card.style.borderColor === 'rgb(220, 20, 60)' ? 
+                    'var(--color-border)' : 'var(--color-accent)';
             }, 2000);
         }
     });
@@ -528,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
     rareItems.forEach(item => {
         setInterval(() => {
             item.style.boxShadow = item.style.boxShadow ? 
-                '' : '0 0 10px rgba(212, 175, 55, 0.5)';
+                '' : '0 0 10px rgba(255, 215, 0, 0.5)';
         }, 2000);
     });
 });

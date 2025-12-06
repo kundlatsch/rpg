@@ -1,24 +1,139 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="hunt-in-progress-container">
+    <!-- Cabeçalho -->
+    <div class="hunt-in-progress-header">
+        <h1 class="hunt-in-progress-title">🎯 Caçada em Andamento</h1>
+    </div>
 
-    <h2>Caçada em andamento...</h2>
-
-    <p>
-        Você está em uma caçada: <strong>{{ char_hunt.hunt.name }}</strong><br>
-        Tempo restante: <strong>{{ time_left }} minutos</strong>
-    </p>
-
-    {% if hunt_finished %}
-        <a href="{% url 'end_hunt' char_hunt.hunt.id %}" class="btn btn-success">
-            Batalhar com o monstro encontrado
-        </a>
-    {% else %}
-        <div class="alert alert-info mt-3">
-            Aguarde o tempo terminar.
+    <!-- Informações em linha -->
+    <div class="hunt-in-progress-info-line">
+        <!-- Nome da Caçada -->
+        <div class="hunt-in-progress-info-item">
+            <div class="hunt-in-progress-info-icon">🎯</div>
+            <div class="hunt-in-progress-info-label">Caçada Atual</div>
+            <div class="hunt-in-progress-info-value">{{ char_hunt.hunt.name }}</div>
         </div>
-    {% endif %}
+        
+        <!-- Tempo Restante -->
+        <div class="hunt-in-progress-info-item hunt-in-progress-timer-item">
+            <div class="hunt-in-progress-info-icon">⏱️</div>
+            <div class="hunt-in-progress-info-label">Tempo Restante</div>
+            <div class="hunt-in-progress-info-value" id="hunt-timer">{{ time_left }}</div>
+        </div>
+    </div>
 
+    <!-- Status e ações -->
+    <div class="hunt-in-progress-status">
+        {% if hunt_finished %}
+            <a href="{% url 'end_hunt' char_hunt.hunt.id %}" class="hunt-in-progress-battle-btn">
+                ⚔️ Batalhar com o Monstro
+            </a>
+        {% else %}
+            <div class="hunt-in-progress-indicator">
+                <div class="hunt-in-progress-spinner"></div>
+                <span>Explorando território...</span>
+            </div>
+            <div class="hunt-in-progress-alert">
+                <span class="hunt-in-progress-alert-icon">⏳</span>
+                <span>Aguarde o tempo terminar para enfrentar o monstro.</span>
+            </div>
+        {% endif %}
+    </div>
 </div>
+
+<script>
+{% if not hunt_finished %}
+    // Timer para caçada em andamento
+    let huntTimeLeft = {{ time_left }};
+    const huntTimerEl = document.getElementById('hunt-timer');
+    
+    // Função para formatar o tempo
+    function formatHuntTime(minutes) {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        
+        if (hours > 0) {
+            return `${hours}h ${mins}m`;
+        }
+        return `${mins}m`;
+    }
+    
+    // Atualizar timer
+    function updateHuntTimer() {
+        const formattedTime = formatHuntTime(huntTimeLeft);
+        if (huntTimerEl) huntTimerEl.textContent = formattedTime;
+        
+        // Efeito de pulso suave
+        huntTimerEl.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            huntTimerEl.style.transform = 'scale(1)';
+        }, 300);
+    }
+    
+    // Inicializar
+    updateHuntTimer();
+    
+    // Atualizar a cada minuto
+    const huntInterval = setInterval(() => {
+        if (huntTimeLeft > 0) {
+            huntTimeLeft--;
+            updateHuntTimer();
+            
+            // Avisar quando faltar pouco tempo
+            if (huntTimeLeft === 5) {
+                console.log("Atenção: 5 minutos restantes na caçada!");
+            }
+        } else {
+            clearInterval(huntInterval);
+            // Recarregar a página para mostrar o botão de batalha
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+    }, 60000); // 1 minuto
+    
+{% else %}
+    // Efeito para quando a caçada está concluída
+    document.addEventListener('DOMContentLoaded', function() {
+        const battleBtn = document.querySelector('.hunt-in-progress-battle-btn');
+        if (battleBtn) {
+            // Animação de pulsação no botão
+            setInterval(() => {
+                battleBtn.style.transform = battleBtn.style.transform === 'scale(1.05)' ? 
+                    'scale(1)' : 'scale(1.05)';
+            }, 1500);
+            
+            // Efeito de brilho
+            setInterval(() => {
+                battleBtn.style.boxShadow = battleBtn.style.boxShadow ? 
+                    '' : '0 0 15px rgba(255, 107, 107, 0.6)';
+            }, 2000);
+        }
+    });
+{% endif %}
+    
+    // Efeito de entrada para a página
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.hunt-in-progress-container');
+        container.style.opacity = '0';
+        container.style.transform = 'translateY(20px)';
+        container.style.transition = 'opacity 0.5s, transform 0.5s';
+        
+        setTimeout(() => {
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+        }, 100);
+        
+        // Efeito de pulso no timer
+        if (huntTimerEl) {
+            setInterval(() => {
+                huntTimerEl.style.color = huntTimerEl.style.color === '#FF6B6B' ? 
+                    '#FF8E8E' : '#FF6B6B';
+            }, 2000);
+        }
+    });
+</script>
 {% endblock %}

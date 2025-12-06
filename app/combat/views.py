@@ -79,7 +79,7 @@ def arena(request):
     # pegar quem está logo acima / abaixo
     above = list(all_players.filter(points__gt=ranking.points-1).order_by("points")[:4])
     below = list(all_players.filter(points__lt=ranking.points+1).order_by("-points")[:4])
-    challanges = list(set(above + below))
+    challenges = list(set(above + below))
 
     # top 5 geral
     top5 = ArenaRanking.objects.order_by("-points")[:5]
@@ -87,7 +87,7 @@ def arena(request):
     context = {
         "player": player,
         "ranking": ranking,
-        "challanges": challanges,
+        "challenges": challenges,
         "top5": top5,
     }
 

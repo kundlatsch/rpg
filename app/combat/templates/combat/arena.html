@@ -1,28 +1,185 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
-<h1>Arena PvP</h1>
 
-<h2>Seus pontos: {{ ranking.points }}</h2>
+<div class="arena-page">
+    <div class="arena-header">
+        <h1 class="arena-title">⚔️ Arena PvP</h1>
+        <p class="arena-subtitle">Prove seu valor em combates épicos contra outros aventureiros</p>
+    </div>
 
-<h3>Desafie esses jogadores</h3>
-<ul>
-{% for r in challanges %}
-    <li>
-        {{ r.character.name }} — {{ r.points }} pts
-        <a href="{% url 'combat:arena_fight' r.character.id %}">Desafiar</a>
-    </li>
-{% empty %}
-    <li>Ninguém acima de você</li>
-{% endfor %}
-</ul>
+    <!-- Pontuação do jogador -->
+    <div class="player-stats">
+        <div class="stats-card">
+            <div class="stats-icon">🏆</div>
+            <div class="stats-content">
+                <div class="stats-label">Sua Pontuação</div>
+                <div class="stats-value">{{ ranking.points|default:0 }} pontos</div>
+                <div class="stats-rank">Rank: #{{ ranking.position|default:"-" }}</div>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <div class="stats-icon">⚔️</div>
+            <div class="stats-content">
+                <div class="stats-label">Vitórias</div>
+                <div class="stats-value">{{ ranking.wins|default:0 }}</div>
+                <div class="stats-desc">Combates vencidos</div>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <div class="stats-icon">💀</div>
+            <div class="stats-content">
+                <div class="stats-label">Derrotas</div>
+                <div class="stats-value">{{ ranking.losses|default:0 }}</div>
+                <div class="stats-desc">Combates perdidos</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="arena-content">
+        <!-- Seção de desafios -->
+        <div class="arena-section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 Desafie Outros Jogadores</h2>
+                <p class="section-subtitle">Enfrente oponentes para subir no ranking</p>
+            </div>
+            
+            {% if challenges %}
+            <div class="challenges-grid">
+                {% for challenge in challenges %}
+                <div class="challenge-card-compact">
+                    <div class="compact-header">
+                        <div class="compact-avatar">
+                            <div class="compact-avatar-emoji">{{challenge.character.emoji|default:"👤"}}</div>
+                            <div class="compact-avatar-level">Lv. {{ challenge.character.level|default:1 }}</div>
+                        </div>
+                        <div class="compact-info">
+                            <h4 class="compact-name">{{ challenge.character.name }}</h4>
+                            <div class="compact-points">
+                                <span class="points-label">Pontos:</span>
+                                <span class="points-value">{{ challenge.points|default:0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="compact-footer">
+                        <a href="{% url 'combat:arena_fight' challenge.character.id %}" class="compact-btn">
+                            <span class="btn-icon">⚔️</span>
+                            Desafiar
+                        </a>
+                        <div class="compact-rewards">
+                            <div class="reward-item" title="Pontos de vitória">
+                                <span class="reward-icon">🏆</span>
+                                <span class="reward-value">+{{ challenge.reward_points|default:10 }}</span>
+                            </div>
+                            <div class="reward-item" title="Ouro">
+                                <span class="reward-icon">💰</span>
+                                <span class="reward-value">+{{ challenge.reward_gold|default:50 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-challenges">
+                <div class="no-challenges-icon">🏆</div>
+                <div class="no-challenges-message">
+                    <h3>Nenhum Desafio Disponível</h3>
+                    <p>Parabéns! Você está no topo do ranking. Aguarde novos desafiantes.</p>
+                    <a href="{% url 'dashboard' %}" class="back-btn">Voltar ao Dashboard</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
 
-<h2>Top 5 Arena</h2>
-<ol>
-{% for r in top5 %}
-    <li>{{ r.character.name }} — {{ r.points }} pts</li>
-{% endfor %}
-</ol>
+        <!-- RANKING MINIMALISTA/BRUTALISTA -->
+        <div class="arena-section">
+            <div class="section-header">
+                <h2 class="section-title">👑 Top da Arena</h2>
+                <p class="section-subtitle">Os maiores guerreiros do reino</p>
+            </div>
+            
+            {% if top5 %}
+            <div class="minimal-ranking">
+                <!-- TOP 3 DESTACADO -->
+                <div class="top-three">
+                    <!-- 2º LUGAR -->
+                    {% if top5.1 %}
+                    <div class="podium-place second-place">
+                        <div class="podium-rank">🥈</div>
+                        <a href="{% url 'public_character' top5.1.character.id %}" class="podium-character">
+                            <div class="podium-character-emoji">{{ top5.1.character.emoji|default:"👤" }}</div>
+                            <div class="character-name">{{ top5.1.character.name }}</div>
+                        </a>
+                        <div class="podium-points">{{ top5.1.points|default:0 }} pts</div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- 1º LUGAR -->
+                    {% if top5.0 %}
+                    <div class="podium-place first-place">
+                        <div class="podium-rank">🥇</div>
+                        <a href="{% url 'public_character' top5.0.character.id %}" class="podium-character">
+                            <div class="podium-character-emoji">{{ top5.0.character.emoji|default:"👤" }}</div>
+                            <div class="character-name">{{ top5.0.character.name }}</div>
+                        </a>
+                        <div class="podium-points">{{ top5.0.points|default:0 }} pts</div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- 3º LUGAR -->
+                    {% if top5.2 %}
+                    <div class="podium-place third-place">
+                        <div class="podium-rank">🥉</div>
+                        <a href="{% url 'public_character' top5.2.character.id %}" class="podium-character">
+                            <div class="podium-character-emoji">{{ top5.2.character.emoji|default:"👤" }}</div>
+                            <div class="character-name">{{ top5.2.character.name }}</div>
+                        </a>
+                        <div class="podium-points">{{ top5.2.points|default:0 }} pts</div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- RESTANTE DO RANKING -->
+                <div class="ranking-list">
+                    {% for r in top5 %}
+                    {% if forloop.counter > 3 %}
+                    <div class="ranking-item">
+                        <div class="item-rank">#{{ forloop.counter }}</div>
+                        <a href="{% url 'public_character' r.character.id %}" class="item-character">
+                            <div class="character-name">{{ r.character.name }}</div>
+                        </a>
+                        <div class="item-points">{{ r.points|default:0 }}</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    <!-- LINHA DO JOGADOR ATUAL -->
+                    {% if ranking and ranking.position > 5 %}
+                    <div class="ranking-item player-row">
+                        <div class="item-rank">#{{ ranking.position }}</div>
+                        <div class="item-character">
+                            <div class="podium-character-emoji">{{ ranking.character.emoji|default:"👤" }}</div>
+                            <div class="character-name">{{ ranking.character.name }} <span class="you-badge">(Você)</span></div>
+                        </div>
+                        <div class="item-points">{{ ranking.points|default:0 }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="no-ranking">
+                <div class="no-data-icon">📊</div>
+                <div class="no-data-message">
+                    <h3>Ranking em Construção</h3>
+                    <p>Seja o primeiro a entrar na arena e criar o ranking!</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 {% endblock %}

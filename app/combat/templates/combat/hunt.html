@@ -1,541 +1,218 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/battle.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="scroll-container p-4 p-md-5 mt-4">
+<div class="scroll-container battle-container">
     <!-- Cabeçalho do Combate -->
-    <div class="text-center mb-4">
-        <h1 class="fantasy-title">
+    <div class="battle-header">
+        <h1 class="battle-title">
             ⚔️ Combate: {{ character.name }} vs {{ monster.name }}
         </h1>
-        <p class="text-dark mb-0">Batalha Épica em Andamento</p>
+        <p class="battle-subtitle">Batalha Épica em Andamento</p>
     </div>
 
-    <div class="divider"></div>
-
     <!-- Status dos Combatentes -->
-    <div class="row mb-4">
+    <div class="battle-combatants-row">
         <!-- Personagem -->
-        <div class="col-md-6 mb-4">
-            <div class="inventory-sidebar p-4 text-center">
-                <div class="combatant-header mb-3">
-                    <span class="combatant-emoji">{{ character.emoji }}</span>
-                    <h3 class="fantasy-title mb-1">{{ character.name }}</h3>
-                    <div class="level-badge">Nível {{ character.level }}</div>
+        <div class="battle-combatant-card">
+            <div class="battle-combatant-header">
+                <span class="battle-combatant-emoji">{{ character.emoji }}</span>
+                <h3 class="battle-combatant-name">{{ character.name }}</h3>
+                <div class="battle-level-badge">Nível {{ character.level }}</div>
+            </div>
+            
+            <div class="battle-hp-section">
+                <div class="battle-status-label">
+                    <span>❤️ Vida</span>
+                    <span>{{ character.hp }} / {{ character.max_hp }}</span>
                 </div>
-                
-                <div class="hp-bar-section">
-                    <div class="health-label">
-                        <span>❤️ Vida</span>
-                        <span>{{ character.hp }} / {{ character.max_hp }}</span>
-                    </div>
-                    <div class="health-bar">
-                        <div class="health-fill" style="width: {% widthratio character.hp character.max_hp 100 %}%"></div>
-                    </div>
+                <div class="battle-status-bar">
+                    <div class="battle-status-fill battle-health-fill" 
+                         style="width: {% widthratio character.hp character.max_hp 100 %}%"></div>
                 </div>
+            </div>
 
-                <div class="mp-bar-section">
-                    <div class="mana-label">
-                        <span>🔮 Mana</span>
-                        <span>{{ character.mana }} / {{ character.max_mana }}</span>
-                    </div>
-                    <div class="mana-bar">
-                        <div class="mana-fill" style="width: {% widthratio character.mana character.max_mana 100 %}%"></div>
-                    </div>
+            <div class="battle-mp-section">
+                <div class="battle-status-label">
+                    <span>🔮 Mana</span>
+                    <span>{{ character.mana }} / {{ character.max_mana }}</span>
                 </div>
+                <div class="battle-status-bar">
+                    <div class="battle-status-fill battle-mana-fill" 
+                         style="width: {% widthratio character.mana character.max_mana 100 %}%"></div>
+                </div>
+            </div>
 
-                <!-- Atributos Rápidos -->
-                <div class="attributes-grid mt-3">
-                    <div class="attribute-item">
-                        <span class="attribute-icon">💪</span>
-                        <span class="attribute-value">{{ character.strength }}</span>
-                    </div>
-                    <div class="attribute-item">
-                        <span class="attribute-icon">🎯</span>
-                        <span class="attribute-value">{{ character.dexterity }}</span>
-                    </div>
-                    <div class="attribute-item">
-                        <span class="attribute-icon">🔮</span>
-                        <span class="attribute-value">{{ character.arcane }}</span>
-                    </div>
-                    <div class="attribute-item">
-                        <span class="attribute-icon">🛡️</span>
-                        <span class="attribute-value">{{ character.constitution }}</span>
-                    </div>
+            <!-- Atributos Rápidos -->
+            <div class="battle-attributes-grid">
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">💪</span>
+                    <span class="battle-attribute-value">{{ character.strength }}</span>
+                </div>
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">🎯</span>
+                    <span class="battle-attribute-value">{{ character.dexterity }}</span>
+                </div>
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">🔮</span>
+                    <span class="battle-attribute-value">{{ character.arcane }}</span>
+                </div>
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">🛡️</span>
+                    <span class="battle-attribute-value">{{ character.constitution }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Monstro -->
-        <div class="col-md-6 mb-4">
-            <div class="inventory-sidebar p-4 text-center">
-                <div class="combatant-header mb-3">
-                    <span class="combatant-emoji">{{ monster.emoji }}</span>
-                    <h3 class="fantasy-title mb-1">{{ monster.name }}</h3>
-                    <div class="level-badge">Nível {{ monster.level }}</div>
+        <div class="battle-combatant-card">
+            <div class="battle-combatant-header">
+                <span class="battle-combatant-emoji">{{ monster.emoji }}</span>
+                <h3 class="battle-combatant-name">{{ monster.name }}</h3>
+                <div class="battle-level-badge">Nível {{ monster.level }}</div>
+            </div>
+            
+            <div class="battle-hp-section">
+                <div class="battle-status-label">
+                    <span>❤️ Vida</span>
+                    <span>{{ monster.hp }} / {{ monster.max_hp }}</span>
                 </div>
-                
-                <div class="hp-bar-section">
-                    <div class="health-label">
-                        <span>❤️ Vida</span>
-                        <span>{{ monster.hp }} / {{ monster.max_hp }}</span>
-                    </div>
-                    <div class="health-bar">
-                        <div class="health-fill enemy-health" style="width: {% widthratio monster.hp monster.max_hp 100 %}%"></div>
-                    </div>
+                <div class="battle-status-bar">
+                    <div class="battle-status-fill battle-health-fill" 
+                         style="width: {% widthratio monster.hp monster.max_hp 100 %}%"></div>
                 </div>
+            </div>
 
-                <div class="mp-bar-section">
-                    <div class="mana-label">
-                        <span>🔮 Mana</span>
-                        <span>{{ monster.mana }} / {{ monster.max_mana }}</span>
-                    </div>
-                    <div class="mana-bar">
-                        <div class="mana-fill enemy-mana" style="width: {% widthratio monster.mana monster.max_mana 100 %}%"></div>
-                    </div>
+            <div class="battle-mp-section">
+                <div class="battle-status-label">
+                    <span>🔮 Mana</span>
+                    <span>{{ monster.mana }} / {{ monster.max_mana }}</span>
                 </div>
+                <div class="battle-status-bar">
+                    <div class="battle-status-fill battle-mana-fill" 
+                         style="width: {% widthratio monster.mana monster.max_mana 100 %}%"></div>
+                </div>
+            </div>
 
-                <!-- Atributos Rápidos -->
-                <div class="attributes-grid mt-3">
-                    <div class="attribute-item">
-                        <span class="attribute-icon">💪</span>
-                        <span class="attribute-value">{{ monster.strength }}</span>
-                    </div>
-                    <div class="attribute-item">
-                        <span class="attribute-icon">🎯</span>
-                        <span class="attribute-value">{{ monster.dexterity }}</span>
-                    </div>
-                    <div class="attribute-item">
-                        <span class="attribute-icon">🔮</span>
-                        <span class="attribute-value">{{ monster.arcane }}</span>
-                    </div>
-                    <div class="attribute-item">
-                        <span class="attribute-icon">🛡️</span>
-                        <span class="attribute-value">{{ monster.constitution }}</span>
-                    </div>
+            <!-- Atributos Rápidos -->
+            <div class="battle-attributes-grid">
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">💪</span>
+                    <span class="battle-attribute-value">{{ monster.strength }}</span>
+                </div>
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">🎯</span>
+                    <span class="battle-attribute-value">{{ monster.dexterity }}</span>
+                </div>
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">🔮</span>
+                    <span class="battle-attribute-value">{{ monster.arcane }}</span>
+                </div>
+                <div class="battle-attribute-item">
+                    <span class="battle-attribute-icon">🛡️</span>
+                    <span class="battle-attribute-value">{{ monster.constitution }}</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Registro do Combate -->
-    <div class="row">
-        <div class="col-12">
-            <div class="item-details p-4">
-                <h3 class="fantasy-title text-center mb-4">📜 Registro da Batalha</h3>
-                
-                <div class="battle-log-container" style="max-height: 400px; overflow-y: auto;">
-                    {% for line in battle_log %}
-                        {% if "--- Turno" in line %}
-                            <div class="turn-divider">
-                                <span class="turn-number">{{ line }}</span>
-                            </div>
-                        {% elif "acerta" in line or "cura" in line or "aplica" in line %}
-                            <div class="log-entry action-success">
-                                <span class="log-icon">✅</span>
-                                <span class="log-text">{{ line }}</span>
-                            </div>
-                        {% elif "errou" in line or "falhou" in line %}
-                            <div class="log-entry action-miss">
-                                <span class="log-icon">❌</span>
-                                <span class="log-text">{{ line }}</span>
-                            </div>
-                        {% elif "CRÍTICO" in line %}
-                            <div class="log-entry action-crit">
-                                <span class="log-icon">💥</span>
-                                <span class="log-text">{{ line }}</span>
-                            </div>
-                        {% elif "morreu" in line or "derrotado" in line %}
-                            <div class="log-entry action-death">
-                                <span class="log-icon">💀</span>
-                                <span class="log-text">{{ line }}</span>
-                            </div>
-                        {% else %}
-                            <div class="log-entry">
-                                <span class="log-icon">📝</span>
-                                <span class="log-text">{{ line }}</span>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Resultado e Ações -->
-    <div class="row mt-4">
-        <div class="col-md-8">
-            <div class="inventory-sidebar p-4 text-center">
-                {% if winner == "character" %}
-                    <div class="victory-banner">
-                        <div class="victory-emoji">🎉</div>
-                        <h3 class="victory-title">Vitória Gloriosa!</h3>
-                        <p class="victory-text">Você emerge vitorioso da batalha!</p>
+    <div class="battle-log-section">
+        <h3 class="battle-log-title">📜 Registro da Batalha</h3>
+        
+        <div class="battle-log-container">
+            {% for line in battle_log %}
+                {% if "--- Turno" in line %}
+                    <div class="battle-turn-divider">
+                        <span class="battle-turn-number">{{ line }}</span>
                     </div>
-                {% elif winner == "monster" %}
-                    <div class="defeat-banner">
-                        <div class="defeat-emoji">💀</div>
-                        <h3 class="defeat-title">Derrota</h3>
-                        <p class="defeat-text">Você foi derrotado em combate.</p>
+                {% elif "acerta" in line or "cura" in line or "aplica" in line %}
+                    <div class="battle-log-entry action-success">
+                        <span class="battle-log-icon">✅</span>
+                        <span class="battle-log-text">{{ line }}</span>
+                    </div>
+                {% elif "errou" in line or "falhou" in line %}
+                    <div class="battle-log-entry action-miss">
+                        <span class="battle-log-icon">❌</span>
+                        <span class="battle-log-text">{{ line }}</span>
+                    </div>
+                {% elif "CRÍTICO" in line %}
+                    <div class="battle-log-entry action-crit">
+                        <span class="battle-log-icon">💥</span>
+                        <span class="battle-log-text">{{ line }}</span>
+                    </div>
+                {% elif "morreu" in line or "derrotado" in line %}
+                    <div class="battle-log-entry action-death">
+                        <span class="battle-log-icon">💀</span>
+                        <span class="battle-log-text">{{ line }}</span>
                     </div>
                 {% else %}
-                    <div class="draw-banner">
-                        <div class="draw-emoji">⚖️</div>
-                        <h3 class="draw-title">Empate</h3>
-                        <p class="draw-text">O combate terminou sem vencedor.</p>
+                    <div class="battle-log-entry">
+                        <span class="battle-log-icon">📝</span>
+                        <span class="battle-log-text">{{ line }}</span>
                     </div>
                 {% endif %}
-            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Resultado e Estatísticas -->
+    <div class="battle-result-row">
+        <!-- Resultado -->
+        <div class="battle-result-banner 
+            {% if winner == 'character' %}battle-victory-banner
+            {% elif winner == 'monster' %}battle-defeat-banner
+            {% else %}battle-draw-banner{% endif %}">
+            {% if winner == "character" %}
+                <div class="battle-result-emoji">🎉</div>
+                <h3 class="battle-result-title battle-victory-title">Vitória Gloriosa!</h3>
+                <p class="battle-result-text">Você emerge vitorioso da batalha!</p>
+            {% elif winner == "monster" %}
+                <div class="battle-result-emoji">💀</div>
+                <h3 class="battle-result-title battle-defeat-title">Derrota</h3>
+                <p class="battle-result-text">Você foi derrotado em combate.</p>
+            {% else %}
+                <div class="battle-result-emoji">⚖️</div>
+                <h3 class="battle-result-title battle-draw-title">Empate</h3>
+                <p class="battle-result-text">O combate terminou sem vencedor.</p>
+            {% endif %}
         </div>
         
-        <div class="col-md-4">
-            <div class="inventory-sidebar p-4">
-                <h4 class="fantasy-title text-center mb-3">📊 Estatísticas</h4>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">Turnos</span>
-                        <span class="stat-value">{{ battle_stats.turns_taken }}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Acertos</span>
-                        <span class="stat-value">{{ battle_stats.hits }}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Críticos</span>
-                        <span class="stat-value">{{ battle_stats.crits }}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Erros</span>
-                        <span class="stat-value">{{ battle_stats.misses }}</span>
-                    </div>
+        <!-- Estatísticas -->
+        <div class="battle-stats-section">
+            <h4 class="battle-stats-title">📊 Estatísticas</h4>
+            <div class="battle-stats-grid">
+                <div class="battle-stat-item">
+                    <span class="battle-stat-label">Turnos</span>
+                    <span class="battle-stat-value">{{ battle_stats.turns_taken }}</span>
+                </div>
+                <div class="battle-stat-item">
+                    <span class="battle-stat-label">Acertos</span>
+                    <span class="battle-stat-value">{{ battle_stats.hits }}</span>
+                </div>
+                <div class="battle-stat-item">
+                    <span class="battle-stat-label">Críticos</span>
+                    <span class="battle-stat-value">{{ battle_stats.crits }}</span>
+                </div>
+                <div class="battle-stat-item">
+                    <span class="battle-stat-label">Erros</span>
+                    <span class="battle-stat-value">{{ battle_stats.misses }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Botões de Ação -->
-    <div class="text-center mt-4">
-        <a href="{% url 'dashboard' %}" class="btn-equip">🏰 Retornar ao Dashboard</a>
+    <!-- Botão de Ação -->
+    <div class="battle-action-container">
+        <a href="{% url 'dashboard' %}" class="battle-return-btn">
+            🏰 Retornar ao Dashboard
+        </a>
     </div>
 </div>
-
-<style>
-/* Estilos específicos para a página de combate */
-.combatant-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.combatant-emoji {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
-    animation: float 3s infinite ease-in-out;
-}
-
-.level-badge {
-    background: rgba(212, 175, 55, 0.2);
-    color: #8B4513;
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    border: 1px solid #D4AF37;
-    font-family: 'Cinzel', serif;
-}
-
-.hp-bar-section {
-    margin: 1rem 0;
-}
-
-.health-label {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    color: #3E2723;
-    margin-bottom: 0.5rem;
-}
-
-.health-bar {
-    width: 100%;
-    height: 20px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #8B4513;
-}
-
-.health-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #8BC34A);
-    transition: width 0.5s ease;
-}
-
-.mp-bar-section {
-    margin: 1rem 0;
-}
-
-.mana-label {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-    color: #3E2723;
-    margin-bottom: 0.5rem;
-}
-
-.mana-bar {
-    width: 100%;
-    height: 20px;
-    background: rgba(9, 2, 49, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid #0c0044ff;
-}
-
-.mana-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #67cee7ff, #0084ffff);
-    transition: width 0.5s ease;
-}
-
-.enemy-health {
-    background: linear-gradient(90deg, #F44336, #FF9800);
-}
-
-.enemy-mana {
-    background: linear-gradient(90deg, #9097eeff, #6000dfff);
-}
-
-.attributes-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.attribute-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: rgba(245, 245, 220, 0.3);
-    padding: 0.5rem;
-    border-radius: 8px;
-    border: 1px solid #8B4513;
-}
-
-.attribute-icon {
-    font-size: 1.2rem;
-    margin-bottom: 0.2rem;
-}
-
-.attribute-value {
-    font-weight: bold;
-    color: #3E2723;
-    font-family: 'Cinzel', serif;
-}
-
-/* Log de Batalha */
-.battle-log-container {
-    padding: 1rem;
-    background: rgba(245, 245, 220, 0.5);
-    border-radius: 8px;
-    border: 1px solid #8B4513;
-}
-
-.turn-divider {
-    text-align: center;
-}
-
-.turn-number {
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    color: #8B4513;
-    font-size: 0.9rem;
-}
-
-.log-entry {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.8rem;
-    padding: 0.5rem;
-    margin: 0.3rem 0;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.7);
-}
-
-.log-entry.action-success {
-    background: rgba(76, 175, 80, 0.1);
-    border-left: 4px solid #4CAF50;
-}
-
-.log-entry.action-miss {
-    background: rgba(244, 67, 54, 0.1);
-    border-left: 4px solid #F44336;
-}
-
-.log-entry.action-crit {
-    background: rgba(255, 193, 7, 0.2);
-    border-left: 4px solid #FFC107;
-    animation: pulse 2s infinite;
-}
-
-.log-entry.action-death {
-    background: rgba(0, 0, 0, 0.1);
-    border-left: 4px solid #000;
-}
-
-.log-icon {
-    font-size: 1rem;
-    margin-top: 0.1rem;
-}
-
-.log-text {
-    flex: 1;
-    color: #3E2723;
-    font-family: 'MedievalSharp', cursive;
-    font-size: 0.9rem;
-}
-
-/* Banner de Resultado */
-.victory-banner, .defeat-banner, .draw-banner {
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.victory-banner {
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.1));
-    border: 2px solid #4CAF50;
-}
-
-.defeat-banner {
-    background: linear-gradient(135deg, rgba(244, 67, 54, 0.2), rgba(229, 57, 53, 0.1));
-    border: 2px solid #F44336;
-}
-
-.draw-banner {
-    background: linear-gradient(135deg, rgba(158, 158, 158, 0.2), rgba(189, 189, 189, 0.1));
-    border: 2px solid #9E9E9E;
-}
-
-.victory-emoji, .defeat-emoji, .draw-emoji {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.victory-title, .defeat-title, .draw-title {
-    font-family: 'Cinzel', serif;
-    color: #3E2723;
-    margin-bottom: 0.5rem;
-}
-
-.victory-text, .defeat-text, .draw-text {
-    color: #3E2723;
-}
-
-/* Estatísticas */
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.8rem;
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(245, 245, 220, 0.3);
-    padding: 0.8rem;
-    border-radius: 8px;
-    border: 1px solid #8B4513;
-}
-
-.stat-label {
-    font-family: 'MedievalSharp', cursive;
-    color: #3E2723;
-    font-weight: bold;
-}
-
-.stat-value {
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    color: #8B4513;
-    background: rgba(212, 175, 55, 0.2);
-    padding: 0.3rem 0.6rem;
-    border-radius: 15px;
-    min-width: 40px;
-    text-align: center;
-}
-
-/* Botões */
-.btn-equip, .btn-consume {
-    background: linear-gradient(to bottom, #8B4513, #6B3100);
-    border: 1px solid var(--color-secondary);
-    color: var(--color-light);
-    border-radius: 6px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    margin: 0 0.5rem;
-}
-
-.btn-consume {
-    background: linear-gradient(to bottom, #2E8B57, #228B22);
-    border: 1px solid #32CD32;
-}
-
-.btn-equip:hover, .btn-consume:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    color: #FFF;
-}
-
-/* Animações */
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-/* Scrollbar personalizada */
-.battle-log-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.battle-log-container::-webkit-scrollbar-track {
-    background: rgba(139, 69, 19, 0.1);
-    border-radius: 10px;
-}
-
-.battle-log-container::-webkit-scrollbar-thumb {
-    background: #8B4513;
-    border-radius: 10px;
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-    .combatant-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .attributes-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .btn-equip, .btn-consume {
-        display: block;
-        margin: 0.5rem 0;
-        width: 100%;
-    }
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -543,6 +220,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const logContainer = document.querySelector('.battle-log-container');
     if (logContainer) {
         logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
+    // Efeito de entrada para a página
+    const container = document.querySelector('.battle-container');
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(20px)';
+    container.style.transition = 'opacity 0.5s, transform 0.5s';
+    
+    setTimeout(() => {
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+    }, 100);
+    
+    // Efeito de pulsação nas barras de vida se estiverem baixas
+    const healthBars = document.querySelectorAll('.battle-health-fill');
+    healthBars.forEach(bar => {
+        const width = parseFloat(bar.style.width || '100');
+        if (width < 30) {
+            setInterval(() => {
+                bar.style.opacity = bar.style.opacity === '0.7' ? '1' : '0.7';
+            }, 800);
+        }
+    });
+    
+    // Efeito de brilho no botão de retorno
+    const returnBtn = document.querySelector('.battle-return-btn');
+    if (returnBtn) {
+        setInterval(() => {
+            returnBtn.style.boxShadow = returnBtn.style.boxShadow ? 
+                '' : '0 0 20px rgba(255, 107, 107, 0.5)';
+        }, 2000);
     }
 });
 </script>

@@ -1,73 +1,99 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
-<h1 class="mb-4">⚒️ Crafting — {{ character.name }}</h1>
+<link rel="stylesheet" href="{% static 'game/css/fragments.css' %}">
 
-{% if messages %}
-<div class="my-3">
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
+<div class="crafting-page">
+    <h1 class="crafting-main-title">⚒️ Oficina</h1>
+    
+    {% for item_type, items in crafts.items %}
+        {% if items %}
+        <div class="crafting-section">
+            <h2 class="crafting-section-header">
+                {% if item_type == "equipment" %}
+                    🛡️ Equipamentos
+                {% elif item_type == "consumable" %}
+                    🧪 Consumíveis
+                {% else %}
+                    🪵 Materiais
+                {% endif %}
+                <span class="section-count">({{ items|length }})</span>
+            </h2>
+            
+            <div class="crafting-grid">
+                {% for item in items %}
+                <div class="craft-card">
+                    <!-- Cabeçalho do card com item -->
+                    <div class="craft-header">
+                        {% include "items/_item_display.html" with item=item slot_name="" %}
+                        <div class="craft-title">
+                            <h3>{{ item.name }}</h3>
+                            {% if item.rarity %}
+                            <span class="craft-rarity rarity-{{ item.rarity }}">
+                                {{ item.get_rarity_display|default:"" }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Descrição do item -->
+                    <div class="craft-description">
+                        <p>{{ item.description }}</p>
+                    </div>
+                    
+                    <!-- Grade de ingredientes -->
+                    <div class="craft-ingredients">
+                        <h4>🔧 Ingredientes:</h4>
+                        
+                        <div class="ingredients-grid">
+                            {% for material_key, data in item.prepared_recipe.items %}
+                            {% with needed=data.required_qty have=data.current_qty %}
+                            <div class="ingredient-item {% if have >= needed %}ingredient-sufficient{% else %}ingredient-insufficient{% endif %}"
+                                 title="{{ data.item_name }} - {{ have }}/{{ needed }}">
+                                <div class="ingredient-icon">{{ data.item_emoji|default:"❓" }}</div>
+                                <div class="ingredient-info">
+                                    <span class="ingredient-name">{{ data.item_name }}</span>
+                                    <span class="ingredient-quantity">{{ have }}/{{ needed }}</span>
+                                </div>
+                            </div>
+                            {% endwith %}
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Status de craft -->
+                        <div class="craft-status {% if item.can_craft %}craft-possible{% else %}craft-impossible{% endif %}">
+                            {% if item.can_craft %}
+                                ✅ Todos os materiais disponíveis
+                            {% else %}
+                                ❌ Materiais insuficientes
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Botão de craft -->
+                    <form method="POST" class="craft-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        
+                        {% if item.can_craft %}
+                        <button type="submit" class="craft-btn craft-btn-enabled">
+                            <span class="craft-btn-icon">⚒️</span>
+                            Craftar
+                        </button>
+                        {% else %}
+                        <button type="button" class="craft-btn craft-btn-disabled" disabled>
+                            <span class="craft-btn-icon">🔒</span>
+                            Materiais insuficientes
+                        </button>
+                        {% endif %}
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
         </div>
+        {% endif %}
     {% endfor %}
 </div>
-{% endif %}
-
-{% for item_type, items in crafts.items %}
-    {% if items %}
-        <h2 class="mt-5">
-            {% if item_type == "equipment" %}
-                🛡️ Equipamentos
-            {% elif item_type == "consumable" %}
-                🧪 Consumíveis
-            {% else %}
-                🪵 Materiais
-            {% endif %}
-        </h2>
-
-        {% for item in items %}
-            <div class="card p-3 mb-4">
-
-                <h3>{{ item.emoji }} {{ item.name }}</h3>
-                <p>{{ item.description }}</p>
-
-                <h4>🔧 Ingredientes:</h4>
-
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Ingrediente</th>
-                            <th>Necessário</th>
-                            <th>Você tem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for material_key, data in item.prepared_recipe.items %}
-                            {% with needed=data.required_qty have=data.current_qty %}
-                                <tr class="{% if have >= needed %}table-success{% else %}table-danger{% endif %}">
-                                    <td>{{ data.item_name }}</td>
-                                    <td>{{ needed }}</td>
-                                    <td>{{ have }}</td>
-                                </tr>
-                            {% endwith %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="item_id" value="{{ item.id }}">
-
-                    {% if item.can_craft %}
-                        <button class="btn btn-success">Craftar</button>
-                    {% else %}
-                        <button class="btn btn-secondary" disabled>Materiais insuficientes</button>
-                    {% endif %}
-                </form>
-
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endfor %}
 
 {% endblock %}

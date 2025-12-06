@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -6,238 +7,244 @@
     <title>Reino de Eldoria - RPG Online</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Fontes temáticas -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --color-primary: #8B4513;
-            --color-secondary: #D4AF37;
-            --color-dark: #1A1A1A;
-            --color-light: #F5F5DC;
-            --color-accent: #800020;
-        }
-        
-        body {
-            font-family: 'MedievalSharp', cursive;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23221C0F" opacity="0.9"/><path d="M0 0L100 100M100 0L0 100" stroke="%23392C1A" stroke-width="1"/></svg>') fixed;
-            color: var(--color-light);
-            background-color: #221C0F;
-            position: relative;
-            min-height: 100vh;
-        }
-        
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, transparent 40%, #0F0A06 90%);
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        .fantasy-title {
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7), 0 0 10px var(--color-secondary);
-            letter-spacing: 1px;
-        }
-
-        .fantasy-title a {
-            all: unset;           /* remove todo estilo padrão do a */
-            cursor: pointer;      /* deixa clicável novamente */
-        }
-
-        .fantasy-title a:hover {
-            text-decoration: underline; /* opcional, se quiser feedback visual */
-        }
-        
-        .fantasy-header {
-            background: linear-gradient(to bottom, #2A1F14, #1A130B);
-            border-bottom: 3px solid var(--color-secondary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-            position: relative;
-            padding: 0.8rem 0;
-        }
-        
-        .fantasy-header::after {
-            content: "";
-            position: absolute;
-            bottom: -6px;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="6" viewBox="0 0 20 6"><path d="M0,0 Q5,6 10,0 Q15,6 20,0" fill="%23D4AF37" /></svg>') repeat-x;
-        }
-        
-        .fantasy-nav a {
-            font-family: 'Cinzel', serif;
-            font-weight: 400;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            margin: 0 0.2rem;
-            border: 1px solid transparent;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .fantasy-nav a:hover {
-            color: var(--color-secondary) !important;
-            border: 1px solid var(--color-secondary);
-            text-shadow: 0 0 8px var(--color-secondary);
-        }
-        
-        .header-fantasy-btn {
-            background: linear-gradient(to bottom, #8B4513, #6B3100);
-            border: 1px solid var(--color-secondary);
-            color: var(--color-light) !important;
-            border-radius: 4px;
-            padding: 0.5rem 1.5rem;
-            font-family: 'Cinzel', serif;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .header-fantasy-btn:hover {
-            background: linear-gradient(to bottom, #6B3100, #8B4513);
-            box-shadow: 0 0 8px var(--color-secondary);
-            color: #FFF !important;
-            transform: translateY(-2px);
-        }
-        
-        .fantasy-main {
-            background: rgba(26, 19, 11, 0.85);
-            border: 2px solid var(--color-primary);
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            padding: 2rem;
-            margin: 2rem auto;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .fantasy-main::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="transparent"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23392C1A" stroke-width="0.5"/></svg>');
-            opacity: 0.2;
-            pointer-events: none;
-        }
-        
-        .fantasy-footer {
-            background: linear-gradient(to top, #2A1F14, #1A130B);
-            border-top: 3px solid var(--color-secondary);
-            padding: 1.5rem;
-            margin-top: 2rem;
-            position: relative;
-        }
-        
-        .fantasy-footer::before {
-            content: "";
-            position: absolute;
-            top: -6px;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="6" viewBox="0 0 20 6"><path d="M0,6 Q5,0 10,6 Q15,0 20,6" fill="%23D4AF37" /></svg>') repeat-x;
-        }
-        
-        .divider {
-            height: 2px;
-            background: linear-gradient(to right, transparent, var(--color-secondary), transparent);
-            margin: 1.5rem 0;
-        }
-        
-        /* Efeito de pergaminho para áreas de texto */
-        .scroll-container {
-            background: #F5F5DC;
-            color: #3E2723;
-            padding: 2rem;
-            border-radius: 5px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.5);
-            border: 1px solid #A1887F;
-            position: relative;
-        }
-        
-        /* .scroll-container::before, .scroll-container::after {
-            content: "";
-            position: absolute;
-            height: 25px;
-            left: 10px;
-            right: 10px;
-            background: #8B4513;
-            border-radius: 5px;
-        }
-        
-        .scroll-container::before {
-            top: -10px;
-            background: linear-gradient(to bottom, #8B4513, #6B3100);
-        }
-        
-        .scroll-container::after {
-            bottom: -10px;
-            background: linear-gradient(to top, #8B4513, #6B3100);
-        } */
-        
-        /* Efeitos para formulários */
-        .fantasy-form-control {
-            background-color: rgba(245, 245, 220, 0.9);
-            border: 1px solid #8B4513;
-            border-radius: 4px;
-            color: #3E2723;
-            padding: 0.5rem 1rem;
-        }
-        
-        .fantasy-form-control:focus {
-            background-color: #F5F5DC;
-            border-color: var(--color-secondary);
-            box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
-        }
-    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'game/css/style.css' %}">
 </head>
 <body>
 
-    <header class="fantasy-header">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1 class="fantasy-title mb-0"><a href="/dashboard/">Reino de Eldoria</a></h1>
-            <nav class="fantasy-nav">
-                <a class="text-white" href="/">Início</a>
+    <!-- Header integrado com status -->
+    <header class="game-header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Título -->
+                <h1 class="game-title"><a href="/dashboard/">Reino de Eldoria</a></h1>
                 
-                {% if user.is_authenticated %}
-                    <a class="text-white" href="/dashboard/">Dashboard</a>
-                    <form method="post" action="/accounts/logout/" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn header-fantasy-btn p-2 m-0 align-baseline">
-                            Sair do Reino
-                        </button>
-                    </form>
-                {% else %}
-                    <a class="text-white" href="/accounts/login/">Entrar</a>
-                    <a class="header-fantasy-btn" href="/accounts/signup/">Juntar-se à Jornada</a>
+                <!-- Botões de autenticação -->
+                {% if not user.is_authenticated %}
+                    <div class="auth-buttons">
+                        <a class="auth-btn" href="/accounts/login/">
+                            <i class="fas fa-door-open me-1"></i>Entrar
+                        </a>
+                        <a class="auth-btn" href="/accounts/signup/">
+                            <i class="fas fa-user-plus me-1"></i>Cadastrar
+                        </a>
+                    </div>
                 {% endif %}
-            </nav>
+                
+                <!-- Status do personagem -->
+                <div class="header-status">
+                    {% if user.is_authenticated %}
+                    <div class="character-name">
+                        <a href="{% url 'public_character' user.character.id %}">{{ user.character.name }}</a>
+                    </div>
+                    <div class="status-bars">
+                        <div class="status-bar">
+                            <div class="status-label">HP</div>
+                            <div class="status-progress-container">
+                                <div class="status-progress hp-bar" style="width: {% widthratio user.character.hp user.character.max_hp 100 %}%"></div>
+                            </div>
+                            <div class="status-value">{{user.character.hp}}/{{user.character.max_hp}}</div>
+                        </div>
+                        <div class="status-bar">
+                            <div class="status-label">MP</div>
+                            <div class="status-progress-container">
+                                <div class="status-progress mp-bar" style="width: {% widthratio user.character.mana user.character.max_mana 100 %}%"></div>
+                            </div>
+                            <div class="status-value">{{user.character.mana}}/{{user.character.max_mana}}</div>
+                        </div>
+                        <div class="status-bar">
+                            <div class="status-label">ENERGIA</div>
+                            <div class="status-progress-container">
+                                <div class="status-progress energy-bar" style="width: {% widthratio user.character.stamina user.character.max_stamina 100 %}%"></div>
+                            </div>
+                            <div class="status-value">{{user.character.stamina}}/{{user.character.max_stamina}}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Recursos e nível -->
+                <div class="header-resources">
+                    {% if user.is_authenticated %}
+                    <div class="resource-item">
+                        <span class="resource-icon">Ouro: </span>
+                        <span class="resource-value">{{user.character.gold}} 💰</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">Fama: </span>
+                        <span class="resource-value">{{user.character.arenaranking.points}} ⭐</span>
+                    </div>
+                    <div class="level-xp">
+                        <div class="level-xp-item">Nível: <span class="level-xp-value">{{user.character.level}}</span></div>
+                        <div class="level-xp-item">XP: <span class="level-xp-value">{% widthratio user.character.exp user.character.max_exp 100 %}%</span></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </header>
+    
+    
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %} 
 
-    <main class="container fantasy-main">
-        {% block content %}
-        <!-- O conteúdo específico de cada página será inserido aqui -->
-        {% endblock %}
-    </main>
+    <!-- Container principal com coluna lateral esquerda -->
+    <div class="container main-container">
+        
+        <!-- Coluna esquerda - Menu -->
+        <div class="left-column">
+            <div class="menu-section">
+                <h3 class="menu-title">Visão Geral</h3>
+                <ul class="menu-list">
+                    <li>
+                        <a href="{% url 'dashboard' %}"
+                        class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'ranking' %}"
+                        class="{% if request.resolver_match.url_name == 'ranking' %}active{% endif %}">
+                            Ranking
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <h3 class="menu-title">Personagem</h3>
+                <ul class="menu-list">
+                    <li>
+                        <a href="{% url 'character_detail' %}"
+                        class="{% if request.resolver_match.url_name == 'character_detail' %}active{% endif %}">
+                            📊 Atributos
+                        </a>
+                    </li>
+                    <li><a href="{% url 'inventory' %}"
+                        class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">
+                            🎒 Inventário
+                        </a>
+                    </li>
+                    <li><a href="#">🏰 Guilda</a></li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <h3 class="menu-title">Cidade</h3>
+                <ul class="menu-list">
+                    <li>
+                        <a href="{% url 'training' %}"
+                        class="{% if request.resolver_match.url_name == 'training' %}active{% endif %}">
+                            ⚔️ Treinar
+                        </a>
+                    </li>
 
-    <footer class="fantasy-footer text-center">
-        <p class="mb-0">Feito com Django 💻 | Que sua espada permaneça afiada e sua magia seja poderosa</p>
+                    <li>
+                        <a href="{% url 'resting' %}"
+                        class="{% if request.resolver_match.url_name == 'resting' %}active{% endif %}">
+                            🛌 Descansar
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'jobs_list' %}"
+                        class="{% if request.resolver_match.url_name == 'jobs_list' %}active{% endif %}">
+                            ⚒️ Trabalhar
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'hunts_list' %}"
+                        class="{% if request.resolver_match.url_name == 'hunts_list' %}active{% endif %}">
+                            🗺️ Missões
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'combat:arena' %}"
+                        class="{% if request.resolver_match.url_name == 'arena' %}active{% endif %}">
+                            🏟️ Arena
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'craft' %}"
+                        class="{% if request.resolver_match.url_name == 'craft' %}active{% endif %}">
+                            🔧 Oficina
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'market' %}"
+                        class="{% if request.resolver_match.url_name == 'market' %}active{% endif %}">
+                            🏪 Entreposto Comercial
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{% url 'store' %}"
+                        class="{% if request.resolver_match.url_name == 'store' %}active{% endif %}">
+                            🛒 Empório
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="menu-section">
+                {% if user.is_authenticated %}
+                    <form method="post" action="/accounts/logout/" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="auth-btn logout-btn">
+                            <i class="fas fa-door-closed me-1"></i>Sair
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Coluna principal - Conteúdo -->
+        <div class="center-column">
+            {% block content %}
+            <!-- Conteúdo específico será inserido aqui -->
+            
+            <!-- Título da página atual -->
+            <h2 class="fantasy-title text-center mb-4" style="font-family: 'Cinzel', serif; color: var(--color-secondary);">Bem-vindo ao Reino de Eldoria</h2>
+            
+            <!-- Conteúdo da página principal aqui -->
+            <div style="background: #1A1A1A; color: #E8E8E8; padding: 20px; border-radius: 5px; border: 1px solid #444;">
+                <p>Selecione uma ação no menu à esquerda para começar sua aventura!</p>
+                <p>Explore masmorras, lute contra monstros, melhore suas habilidades e conquiste seu lugar no ranking dos maiores heróis de Eldoria.</p>
+            </div>
+            
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="game-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <p class="mb-0">Feito com Django | Que sua espada permaneça afiada e sua magia seja poderosa</p>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

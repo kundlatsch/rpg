@@ -1,49 +1,131 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
-<div class="container mt-4">
+
+<div class="hunts-page">
+    <div class="hunts-header">
+        <h1 class="hunts-title">🏹 Caçadas</h1>
+        <p class="hunts-subtitle">Enfrente criaturas poderosas e ganhe recompensas épicas</p>
+    </div>
 
     {% if request.session.alert %}
-        <div class="alert alert-warning">{{ request.session.alert }}</div>
+    <div class="hunt-alert">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+            <div class="alert-title">Aviso</div>
+            <div class="alert-message">{{ request.session.alert }}</div>
+        </div>
+    </div>
     {% endif %}
 
-    <h2 class="mb-4">Caçadas Disponíveis</h2>
+    <div class="hunts-container">
+        <div class="hunts-grid">
+            {% for hunt in hunts %}
+            <div class="hunt-card {% if character.level >= hunt.required_level %}hunt-available{% else %}hunt-locked{% endif %}">
+                <div class="hunt-card-header">
+                    <div class="hunt-icon">
+                        {% if character.level >= hunt.required_level %}🏹{% else %}🔒{% endif %}
+                    </div>
+                    <div class="hunt-title">
+                        <h3>{{ hunt.name }}</h3>
+                        <div class="hunt-level-requirement">
+                            <span class="requirement-label">Nível necessário:</span>
+                            <span class="requirement-value {% if character.level >= hunt.required_level %}requirement-met{% else %}requirement-failed{% endif %}">
+                                {{ hunt.required_level }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-    <ul class="list-group">
+                <div class="hunt-card-body">
+                    <div class="hunt-info-grid">
+                        <div class="hunt-info-item">
+                            <div class="info-icon">⏱️</div>
+                            <div class="info-content">
+                                <div class="info-label">Duração</div>
+                                <div class="info-value">{{ hunt.duration }} minutos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="hunt-info-item">
+                            <div class="info-icon">🎯</div>
+                            <div class="info-content">
+                                <div class="info-label">Dificuldade</div>
+                                <div class="info-value">
+                                    {% if hunt.difficulty == 1 %}Fácil{% endif %}
+                                    {% if hunt.difficulty == 2 %}Média{% endif %}
+                                    {% if hunt.difficulty == 3 %}Difícil{% endif %}
+                                    {% if hunt.difficulty == 4 %}Épica{% endif %}
+                                    {% if hunt.difficulty == 5 %}Lendária{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hunt-info-item">
+                            <div class="info-icon">⭐</div>
+                            <div class="info-content">
+                                <div class="info-label">Experiência</div>
+                                <div class="info-value">+{{ hunt.xp_reward }} XP</div>
+                            </div>
+                        </div>
+                        
+                        <div class="hunt-info-item">
+                            <div class="info-icon">💰</div>
+                            <div class="info-content">
+                                <div class="info-label">Recompensa</div>
+                                <div class="info-value">{{ hunt.gold_reward }} Ouro</div>
+                            </div>
+                        </div>
+                    </div>
 
-        {% for hunt in hunts %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="hunt-monsters-section">
+                        <h4 class="section-title">🦴 Monstros Possíveis</h4>
+                        <div class="monsters-grid">
+                            {% for hm in hunt.monsters.all %}
+                            <div class="monster-tag" title="{{ hm.monster.name }} - Nível {{ hm.monster.level }}">
+                                <span class="monster-icon">👹</span>
+                                <span class="monster-name">{{ hm.monster.name }}</span>
+                                <span class="monster-level">Lv. {{ hm.monster.level }}</span>
+                            </div>
+                            {% empty %}
+                            <div class="no-monsters">Nenhum monstro definido</div>
+                            {% endfor %}
+                        </div>
+                    </div>
 
-            <!-- LEFT -->
-            <div>
-                <strong>{{ hunt.name }}</strong><br>
-                <small class="text-muted">
-                    Duração: {{ hunt.duration }} min<br>
-                    Monstros possíveis:
-                </small>
-                <ul class="mb-1">
-                    {% for m in hunt.possible_monsters.all %}
-                        <li>{{ m.name }} (nível {{ m.level }})</li>
-                    {% endfor %}
-                </ul>
-            </div>
+                    <div class="hunt-description">
+                        <p>{{ hunt.description|default:"Enfrente criaturas perigosas nesta caçada." }}</p>
+                    </div>
+                </div>
 
-            <!-- RIGHT -->
-            <div class="text-end">
-                {% if character.level >= hunt.required_level %}
-                    <a href="{% url 'start_hunt' hunt.id %}" class="btn btn-primary btn-sm">
+                <div class="hunt-card-footer">
+                    {% if character.level >= hunt.required_level %}
+                    <a href="{% url 'start_hunt' hunt.id %}" class="hunt-btn hunt-btn-primary">
+                        <span class="btn-icon">🏹</span>
                         Iniciar Caçada
                     </a>
-                {% else %}
-                    <span class="badge bg-secondary mb-2">Bloqueado</span><br>
-                    <button class="btn btn-outline-secondary btn-sm" disabled>Indisponível</button>
-                {% endif %}
+                    {% else %}
+                    <div class="hunt-blocked">
+                        <div class="blocked-icon">🔒</div>
+                        <div class="blocked-message">
+                            <div class="blocked-title">Bloqueado</div>
+                            <div class="blocked-desc">Alcance nível {{ hunt.required_level }} para desbloquear</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-
-        </li>
-        {% endfor %}
-
-    </ul>
-
+            {% empty %}
+            <div class="no-hunts">
+                <div class="no-hunts-icon">🏕️</div>
+                <div class="no-hunts-message">
+                    <h3>Nenhuma Caçada Disponível</h3>
+                    <p>Complete missões para desbloquear novas caçadas ou volte mais tarde.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
+
 {% endblock %}

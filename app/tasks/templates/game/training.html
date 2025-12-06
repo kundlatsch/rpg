@@ -1,485 +1,193 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
 {% if alert %}
-<script>alert("{{ alert }}");</script>
+<div class="alert-overlay" id="alert-overlay">
+    <div class="alert-modal">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-message">{{ alert }}</div>
+        <button class="alert-close-btn" onclick="document.getElementById('alert-overlay').style.display='none'">OK</button>
+    </div>
+</div>
 {% endif %}
 
-<div class="scroll-container p-4 p-md-5 mt-4">
-  {% if character.training_start %}
+<div class="training-page">
+    
+    {% if character.training_start %}
     <!-- Tela quando já está treinando -->
-    <div class="text-center mb-4">
-      <h2 class="fantasy-title">💪 Você está Treinando</h2>
-      <p class="text-dark">Forjando seu corpo e mente para batalhas futuras</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Animação de treino -->
-    <div class="text-center my-5">
-      <div class="training-scene">
-        <!-- Fundo da academia medieval -->
-        <div class="training-room"></div>
-        
-        <!-- Equipamentos de treino -->
-        {% comment %} <div class="equipment dumbbells"></div> {% endcomment %}
-        <div class="equipment sword-rack"></div>
-        <div class="equipment shield-rack"></div>
-        
-        <!-- Personagem treinando -->
-        <div class="character-training">
-          <div class="training-activity" id="activity-1">💪</div>
-          <div class="training-activity" id="activity-2">🏃</div>
-          <div class="training-activity" id="activity-3">⚔️</div>
-          <div class="training-activity" id="activity-4">🛡️</div>
+    <div class="training-active">
+        <div class="training-header">
+            <h1 class="training-title">💪 Você está Treinando</h1>
+            <p class="training-subtitle">Forjando seu corpo e mente para batalhas futuras</p>
         </div>
         
-        <!-- Efeitos de treino -->
-        <div class="training-effects">
-          <div class="sweat-drop"></div>
-          <div class="sweat-drop"></div>
-          <div class="sweat-drop"></div>
-          <div class="energy-spark"></div>
-          <div class="energy-spark"></div>
+        <!-- Cena de treino animada -->
+        <div class="training-scene-container">
+            <div class="training-scene">
+                <!-- Personagem treinando -->
+                <div class="training-character">
+                    <div class="training-activity" id="activity-1">💪</div>
+                    <div class="training-activity" id="activity-2">🏃</div>
+                    <div class="training-activity" id="activity-3">⚔️</div>
+                    <div class="training-activity" id="activity-4">🛡️</div>
+                </div>
+                
+                <!-- Efeitos visuais -->
+                <div class="training-effects">
+                    <div class="effect sweat"></div>
+                    <div class="effect sweat"></div>
+                    <div class="effect sweat"></div>
+                    <div class="effect energy"></div>
+                    <div class="effect energy"></div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Informações do treino -->
-    <div class="row text-dark">
-      <div class="col-md-6 mb-4">
-        <div class="training-stat p-4 text-center">
-          <div class="stat-icon mb-2">⏳</div>
-          <h4 class="fantasy-title mb-2">Tempo Decorrido</h4>
-          <p class="stat-value" id="timer">0m 0s</p>
+        
+        <!-- Estatísticas do treino -->
+        <div class="training-stats-grid">
+            <div class="training-stat">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <h3 class="stat-title">Tempo Decorrido</h3>
+                    <div class="stat-value" id="training-timer">0m 0s</div>
+                </div>
+            </div>
+            
+            <div class="training-stat">
+                <div class="stat-icon">💪</div>
+                <div class="stat-content">
+                    <h3 class="stat-title">Energia</h3>
+                    <div class="stat-value">{{ config.training_stamina_per_minute }}/min</div>
+                </div>
+            </div>
+            
+            <div class="training-stat">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                    <h3 class="stat-title">Experiência</h3>
+                    <div class="stat-value">{{ config.training_xp_per_minute }}/min</div>
+                </div>
+            </div>
         </div>
-      </div>
-      
-      <div class="col-md-6 mb-4">
-        <div class="training-stat p-4 text-center">
-          <div class="stat-icon mb-2">💪</div>
-          <h4 class="fantasy-title mb-2">Stamina</h4>
-          <p class="stat-value">{{ config.training_stamina_per_minute }}/min</p>
+        
+        <!-- Botões de ação -->
+        <div class="training-actions">
+            <a href="{% url 'end_training' %}" class="training-btn training-btn-danger">
+                <span class="btn-icon">⛔</span>
+                Encerrar Treino
+            </a>
+            <a href="{% url 'dashboard' %}" class="training-btn training-btn-secondary">
+                <span class="btn-icon">🏰</span>
+                Voltar ao Dashboard
+            </a>
         </div>
-      </div>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Botões de ação -->
-    <div class="text-center mt-4">
-      <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{% url 'end_training' %}" class="fantasy-btn-danger">⛔ Encerrar Treino</a>
-        <a href="{% url 'dashboard' %}" class="fantasy-btn-secondary">🏰 Voltar ao Dashboard</a>
-      </div>
-    </div>
-
-    <script>
-      let startTime = new Date("{{ character.training_start|date:'Y-m-d H:i:s' }}");
-      setInterval(() => {
-        let now = new Date();
-        let diff = Math.floor((now - startTime) / 1000);
-        let min = Math.floor(diff / 60);
-        let sec = diff % 60;
-        document.getElementById('timer').textContent = `${min}m ${sec}s`;
-      }, 1000);
-    </script>
-
-  {% else %}
+    
+    {% else %}
     <!-- Tela antes de iniciar -->
-    <div class="text-center mb-4">
-      <h2 class="fantasy-title">🏋️ Preparação para Treino</h2>
-      <p class="text-dark">Fortaleça suas habilidades para os desafios que virão</p>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Informações do treino -->
-    <div class="row text-dark">
-      <div class="col-md-6 mb-4">
-        <div class="training-stat p-4 text-center">
-          <div class="stat-icon mb-2">⭐</div>
-          <h4 class="fantasy-title mb-2">Experiência</h4>
-          <p class="stat-value">{{ config.training_xp_per_minute }}/min</p>
+    <div class="training-setup">
+        <div class="training-header">
+            <h1 class="training-title">🏋️ Treinamento</h1>
+            <p class="training-subtitle">Fortaleça suas habilidades para os desafios que virão</p>
         </div>
-      </div>
-      
-      <div class="col-md-6 mb-4">
-        <div class="training-stat p-4 text-center">
-          <div class="stat-icon mb-2">💪</div>
-          <h4 class="fantasy-title mb-2">Stamina</h4>
-          <p class="stat-value">{{ config.training_stamina_per_minute }}/min</p>
+        
+        <!-- Benefícios do treino -->
+        <div class="training-benefits">
+            <div class="benefit-card">
+                <div class="benefit-icon">⚔️</div>
+                <div class="benefit-content">
+                    <h3 class="benefit-title">Ficando mais forte</h3>
+                    <p class="benefit-description">Treinar é uma maneira simples de ganhar experiência</p>
+                </div>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">🛡️</div>
+                <div class="benefit-content">
+                    <h3 class="benefit-title">No pain, no gain</h3>
+                    <p class="benefit-description">Quanto mais tempo você passar treinando, mais XP receberá</p>
+                </div>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">⚡</div>
+                <div class="benefit-content">
+                    <h3 class="benefit-title">Cansaço</h3>
+                    <p class="benefit-description">Você perderá energia de acordo com o tempo de treino</p>
+                </div>
+            </div>
+            
         </div>
-      </div>
+        
+        <!-- Estatísticas de treino -->
+        <div class="training-info-grid">
+            <div class="info-card">
+                <div class="info-icon">⭐</div>
+                <div class="info-content">
+                    <div class="info-title">Experiência por minuto</div>
+                    <div class="info-value">{{ config.training_xp_per_minute }} XP</div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">💪</div>
+                <div class="info-content">
+                    <div class="info-title">Energia consumida por minuto</div>
+                    <div class="info-value">{{ config.training_stamina_per_minute }}</div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-icon">⏱️</div>
+                <div class="info-content">
+                    <div class="info-title">Duração máxima</div>
+                    <div class="info-value">60 minutos</div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="training-actions">
+            <a href="{% url 'start_training' %}" class="training-btn training-btn-primary">
+                <span class="btn-icon">⚡</span>
+                Iniciar Treino
+            </a>
+            <a href="{% url 'dashboard' %}" class="training-btn training-btn-secondary">
+                <span class="btn-icon">🏰</span>
+                Voltar ao Dashboard
+            </a>
+        </div>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Botões de ação -->
-    <div class="text-center mt-4">
-      <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a href="{% url 'start_training' %}" class="fantasy-btn">⚡ Iniciar Treino</a>
-        <a href="{% url 'dashboard' %}" class="fantasy-btn-secondary">🏰 Voltar</a>
-      </div>
-    </div>
-  {% endif %}
+    {% endif %}
 </div>
 
-<style>
-  /* Estilos específicos para a página de treino */
-  .training-stat {
-    background: rgba(139, 69, 19, 0.1);
-    border-radius: 12px;
-    border: 2px solid #8B4513;
-    transition: transform 0.3s ease;
-  }
-  
-  .training-stat:hover {
-    transform: translateY(-5px);
-    background: rgba(139, 69, 19, 0.2);
-  }
-  
-  .stat-icon {
-    font-size: 2.5rem;
-  }
-  
-  .stat-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #8B4513;
-    margin: 0;
-    font-family: 'Cinzel', serif;
-  }
-  
-  /* Cena de treino */
-  .training-scene {
-    position: relative;
-    width: 350px;
-    height: 300px;
-    margin: 0 auto;
-    overflow: hidden;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Sala de treino */
-  .training-room {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to bottom, #53c3f7ff 0%, #0d51ceff 100%);
-    z-index: 1;
-  }
-  
-  .training-room::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40%;
-    background: linear-gradient(to bottom, #208817ff 0%, #0e4609ff 100%);
-    z-index: 2;
-  }
-  
-  .training-room::after {
-    content: "";
-    position: absolute;
-    bottom: 40%;
-    left: 20%;
-    width: 60%;
-    height: 2px;
-    background: rgba(5, 41, 5, 0.3);
-    z-index: 2;
-  }
-  
-  /* Equipamentos */
-  .equipment {
-    position: absolute;
-    z-index: 3;
-  }
-  
-  .dumbbells {
-    bottom: 50px;
-    left: 50px;
-    width: 40px;
-    height: 15px;
-    background: #8B4513;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
-  }
-  
-  .dumbbells::before,
-  .dumbbells::after {
-    content: "";
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    background: #8B4513;
-    border-radius: 50%;
-    top: -5px;
-  }
-  
-  .dumbbells::before {
-    left: -5px;
-  }
-  
-  .dumbbells::after {
-    right: -5px;
-  }
-  
-  .sword-rack {
-    bottom: 50px;
-    right: 50px;
-    width: 40px;
-    height: 60px;
-  }
-  
-  .sword-rack::before {
-    content: "⚔️";
-    position: absolute;
-    font-size: 2rem;
-    transform: rotate(-15deg);
-    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
-  }
-  
-  .shield-rack {
-    bottom: 50px;
-    right: 100px;
-    width: 40px;
-    height: 60px;
-  }
-  
-  .shield-rack::before {
-    content: "🛡️";
-    position: absolute;
-    font-size: 2rem;
-    transform: rotate(15deg);
-    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
-  }
-  
-  /* Personagem treinando */
-  .character-training {
-    position: absolute;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    width: 60px;
-    height: 100px;
-  }
-  
-  .training-activity {
-    position: absolute;
-    font-size: 3rem;
-    opacity: 0;
-    animation: activityCycle 12s infinite;
-  }
-  
-  #activity-1 {
-    animation-delay: 0s;
-  }
-  
-  #activity-2 {
-    animation-delay: 3s;
-  }
-  
-  #activity-3 {
-    animation-delay: 6s;
-  }
-  
-  #activity-4 {
-    animation-delay: 9s;
-  }
-  
-  @keyframes activityCycle {
-    0% {
-      opacity: 0;
-      transform: translateY(0) scale(0.8);
-    }
-    5% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    20% {
-      opacity: 1;
-      transform: translateY(-20px) scale(1.1);
-    }
-    25% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    30% {
-      opacity: 0;
-      transform: translateY(0) scale(0.8);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(0) scale(0.8);
-    }
-  }
-  
-  /* Efeitos de treino */
-  .training-effects {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 5;
-  }
-  
-  .sweat-drop {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-    opacity: 0;
-  }
-  
-  .sweat-drop:nth-child(1) {
-    top: 100px;
-    left: 48%;
-    width: 5px;
-    height: 5px;
-    animation: sweatDrop 3s infinite ease-in-out;
-  }
-  
-  .sweat-drop:nth-child(2) {
-    top: 110px;
-    left: 52%;
-    width: 4px;
-    height: 4px;
-    animation: sweatDrop 3s infinite ease-in-out 1s;
-  }
-  
-  .sweat-drop:nth-child(3) {
-    top: 105px;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    animation: sweatDrop 3s infinite ease-in-out 2s;
-  }
-  
-  @keyframes sweatDrop {
-    0% {
-      opacity: 0;
-      transform: translateY(0);
-    }
-    10% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(40px);
-    }
-  }
-  
-  .energy-spark {
-    position: absolute;
-    background: radial-gradient(circle, #FFD700 0%, #FF6B00 100%);
-    border-radius: 50%;
-    opacity: 0;
-    filter: blur(2px);
-  }
-  
-  .energy-spark:nth-child(4) {
-    top: 90px;
-    left: 45%;
-    width: 8px;
-    height: 8px;
-    animation: energySpark 4s infinite ease-in-out;
-  }
-  
-  .energy-spark:nth-child(5) {
-    top: 95px;
-    left: 55%;
-    width: 6px;
-    height: 6px;
-    animation: energySpark 4s infinite ease-in-out 2s;
-  }
-  
-  @keyframes energySpark {
-    0%, 100% {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.5);
-      box-shadow: 0 0 10px #FFD700, 0 0 20px #FF6B00;
-    }
-  }
-  
-  /* Botões */
-  .fantasy-btn-danger {
-    background: linear-gradient(to bottom, #8B0000, #660000);
-    border: 2px solid #FFD700;
-    color: #FFFFFF !important;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .fantasy-btn-danger:hover {
-    background: linear-gradient(to bottom, #660000, #8B0000);
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-    transform: translateY(-2px);
-    color: #FFFFFF !important;
-  }
-  
-  .fantasy-btn-secondary {
-    background: linear-gradient(to bottom, #654321, #4E342E);
-    border: 2px solid #8D6E63;
-    color: var(--color-light) !important;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .fantasy-btn-secondary:hover {
-    background: linear-gradient(to bottom, #4E342E, #654321);
-    box-shadow: 0 0 10px #8D6E63;
-    color: #FFF !important;
-    transform: translateY(-2px);
-  }
-  
-  .fantasy-btn {
-    background: linear-gradient(to bottom, #8B4513, #6B3100);
-    border: 2px solid var(--color-secondary);
-    color: var(--color-light) !important;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
-    font-family: 'Cinzel', serif;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .fantasy-btn:hover {
-    background: linear-gradient(to bottom, #6B3100, #8B4513);
-    box-shadow: 0 0 10px var(--color-secondary);
-    color: #FFF !important;
-    transform: translateY(-2px);
-  }
-</style>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Efeito de entrada para a página
-    const container = document.querySelector('.scroll-container');
-    container.style.opacity = '0';
-    container.style.transition = 'opacity 1s ease-in-out';
+    {% if character.training_start %}
+    // Timer para treino ativo
+    let trainingStartTime = new Date("{{ character.training_start|date:'Y-m-d H:i:s' }}");
     
-    setTimeout(() => {
-      container.style.opacity = '1';
-    }, 100);
-  });
+    function updateTrainingTimer() {
+        let now = new Date();
+        let diff = Math.floor((now - trainingStartTime) / 1000);
+        let hours = Math.floor(diff / 3600);
+        let minutes = Math.floor((diff % 3600) / 60);
+        let seconds = diff % 60;
+        
+        let timerText = '';
+        if (hours > 0) {
+            timerText = `${hours}h ${minutes}m ${seconds}s`;
+        } else {
+            timerText = `${minutes}m ${seconds}s`;
+        }
+        
+        document.getElementById('training-timer').textContent = timerText;
+    }
+    
+    setInterval(updateTrainingTimer, 1000);
+    updateTrainingTimer(); // Chamada inicial
+    {% endif %}
 </script>
 
 {% endblock %}

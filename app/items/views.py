@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import logging
 
-from .constants import RECIPE_LABELS
+from .constants import RECIPE_LABELS, RECIPE_EMOJIS
 
 logger = logging.getLogger(__name__)
 
@@ -562,6 +562,7 @@ def craft_view(request):
             for material, quantity in item.recipe.items():
                 prepared = {
                     'item_name': RECIPE_LABELS[material],
+                    'item_emoji': RECIPE_EMOJIS.get(material, '❓'),
                     'required_qty': int(quantity),
                     'current_qty': int(inventory.get(RECIPE_LABELS[material], 0)),
                 }

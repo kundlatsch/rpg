@@ -1,21 +1,25 @@
-<div class="market-listing-card rarity-{{ listing.item.rarity }}">
-    <div class="listing-header">
-        <span class="listing-emoji">{{ listing.item.emoji }}</span>
-        <div class="listing-info">
-            <h5 class="mb-1">{{ listing.item.name }}</h5>
-            <div class="listing-price">💰 {{ listing.price }} ouro cada</div>
-            <div class="listing-seller">Vendido por: {{ listing.seller.username }}</div>
-            <small class="text-dark">Disponível: {{ listing.quantity }}</small>
+<div class="market-listing market-rarity-{{ listing.item.rarity }}">
+    <div class="market-listing-header">
+        <span class="market-listing-emoji">{{ listing.item.emoji }}</span>
+        <div class="market-listing-info">
+            <div class="market-listing-name">{{ listing.item.name }}</div>
+            <div class="market-listing-price">💰 {{ listing.price }} ouro/un</div>
+            <div class="market-listing-seller">
+                📦 {{ listing.quantity_available }} disponíveis
+                {% if listing.seller != character %}
+                | 👤 {{ listing.seller.name }}
+                {% endif %}
+            </div>
         </div>
     </div>
     
-    <div class="listing-actions">
-        {% if listing.seller == user %}
-            <button class="btn-cancel-listing" data-listing-id="{{ listing.id }}">
+    <div class="market-listing-actions">
+        {% if listing.seller == character %}
+            <button class="market-action-btn market-cancel-btn" data-listing-id="{{ listing.id }}">
                 ❌ Cancelar
             </button>
         {% else %}
-            <button class="btn-buy" data-listing-id="{{ listing.id }}">
+            <button class="market-action-btn market-buy-btn" data-listing-id="{{ listing.id }}">
                 🛒 Comprar
             </button>
         {% endif %}

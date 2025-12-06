@@ -87,12 +87,13 @@ class CharacterJob(models.Model):
         elapsed = (timezone.now() - self.start_time).total_seconds() // 60
         return max(self.job.duration - int(elapsed), 0)
 
-
 class Hunt(models.Model):
     """Uma caçada disponível para o jogador escolher."""
     name = models.CharField(max_length=100)
     duration = models.IntegerField(default=5)  # minutos
     required_level = models.IntegerField(default=1)
+    description = models.TextField(default="Enfrente criaturas perigosas nesta caçada.")
+    difficulty = models.IntegerField(default=1, help_text="Dificuldade de 1 (mais fácil) a 5 (mais difícil).") 
 
     def __str__(self):
         return self.name
