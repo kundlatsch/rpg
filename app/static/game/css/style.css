@@ -1325,34 +1325,34 @@ body {
 }
 
 /* ======================
-   HUNTS PAGE STYLES
+   HUNTS PAGE - DARK FANTASY
    ====================== */
 
-/* Container principal */
+/* Container principal da página */
 .hunts-page {
-    padding: 30px;
+    padding: 25px;
     background: rgba(50, 50, 50, 0.9);
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 107, 107, 0.3);
+    max-width: 1200px;
     margin: 20px auto;
-    max-width: 1000px;
-    min-height: 600px;
+    position: relative; /* Importante para tooltips */
 }
 
-/* Cabeçalho */
+/* Cabeçalho da página */
 .hunts-header {
     text-align: center;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
     border-bottom: 2px solid rgba(255, 107, 107, 0.5);
 }
 
 .hunts-title {
     font-family: 'Cinzel', serif;
     color: #FF6B6B;
-    font-size: 2.5rem;
-    margin-bottom: 15px;
+    font-size: 2.2rem;
+    margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
     -webkit-background-clip: text;
@@ -1362,70 +1362,74 @@ body {
 
 .hunts-subtitle {
     color: #B0B0B0;
-    font-size: 1.2rem;
-    max-width: 800px;
-    margin: 0 auto;
+    font-size: 1rem;
+    font-family: 'MedievalSharp', cursive;
 }
 
 /* Alertas */
 .hunt-alert {
-    background: linear-gradient(145deg, rgba(255, 107, 107, 0.1), rgba(255, 215, 0, 0.1));
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 142, 142, 0.3));
     border: 2px solid rgba(255, 107, 107, 0.5);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 30px;
+    border-radius: 10px;
+    padding: 15px 20px;
     display: flex;
     align-items: center;
-    gap: 20px;
-    box-shadow: 0 5px 20px rgba(255, 107, 107, 0.2);
+    gap: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.alert-icon {
-    font-size: 2.5rem;
-    background: rgba(255, 107, 107, 0.2);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(255, 107, 107, 0.5);
+.hunt-alert-icon {
+    font-size: 1.5rem;
+    color: #FF6B6B;
 }
 
-.alert-content {
+.hunt-alert-content {
     flex: 1;
 }
 
-.alert-title {
-    color: #FF6B6B;
+.hunt-alert-title {
     font-family: 'Cinzel', serif;
-    font-size: 1.3rem;
-    margin-bottom: 5px;
+    color: #FFFFFF;
     font-weight: bold;
-}
-
-.alert-message {
-    color: #E0E0E0;
     font-size: 1rem;
-    line-height: 1.5;
+    margin-bottom: 3px;
 }
 
-/* Grid de caçadas */
+.hunt-alert-message {
+    color: #B0B0B0;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 0.9rem;
+}
+
+/* Container e grid de caçadas */
+.hunts-container {
+    margin-top: 20px;
+    position: relative; /* Contexto para tooltips */
+}
+
 .hunts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 30px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
 }
 
-/* Card de caçada */
+/* Card de caçada - ALTURA AJUSTADA PARA MAIOR */
 .hunt-card {
     background: linear-gradient(145deg, #2A2A2A, #3A3A3A);
-    border-radius: 15px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    min-height: 450px; /* Altura mínima maior */
+    position: relative;
+    /* REMOVIDO: overflow: hidden para permitir tooltips */
 }
 
 .hunt-card.hunt-available {
@@ -1434,15 +1438,15 @@ body {
 
 .hunt-card.hunt-locked {
     border-color: rgba(100, 100, 100, 0.5);
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 .hunt-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
 }
 
-.hunt-available:hover {
+.hunt-card.hunt-available:hover {
     border-color: #4ECDC4;
 }
 
@@ -1452,197 +1456,237 @@ body {
     padding: 20px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hunt-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
     background: rgba(0, 0, 0, 0.3);
-    width: 70px;
-    height: 70px;
-    border-radius: 12px;
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
 }
 
 .hunt-title {
     flex: 1;
+    min-width: 0;
 }
 
 .hunt-title h3 {
     color: #FFFFFF;
     font-family: 'Cinzel', serif;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .hunt-level-requirement {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.requirement-label {
-    color: #B0B0B0;
+    gap: 8px;
     font-size: 0.9rem;
 }
 
-.requirement-value {
-    font-weight: bold;
-    font-size: 1.2rem;
-    padding: 4px 12px;
-    border-radius: 20px;
+.hunt-requirement-label {
+    color: #B0B0B0;
+    font-family: 'MedievalSharp', cursive;
 }
 
-.requirement-met {
+.hunt-requirement-value {
+    font-weight: bold;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Cinzel', serif;
+}
+
+.hunt-requirement-met {
     background: rgba(78, 205, 196, 0.2);
     color: #4ECDC4;
     border: 1px solid rgba(78, 205, 196, 0.5);
 }
 
-.requirement-failed {
+.hunt-requirement-failed {
     background: rgba(255, 107, 107, 0.2);
     color: #FF6B6B;
     border: 1px solid rgba(255, 107, 107, 0.5);
 }
 
-/* Corpo do card */
+/* Corpo do card - FLEXGROW PARA EXPANDIR */
 .hunt-card-body {
-    padding: 25px;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 250px; /* Altura mínima para conteúdo */
 }
 
+/* Grid de informações */
 .hunt-info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
 }
 
 .hunt-info-item {
-    background: rgba(40, 40, 40, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 15px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
 }
 
-.info-icon {
-    font-size: 1.8rem;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.info-content {
-    flex: 1;
-}
-
-.info-label {
-    color: #B0B0B0;
+.hunt-info-value {
+    color: #e6e6e6;
     font-size: 0.9rem;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-family: 'MedievalSharp', cursive;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.info-value {
-    color: #FFFFFF;
-    font-size: 1.1rem;
+/* Badge de dificuldade */
+.hunt-difficulty-badge {
+    display: inline-block;
+    border-radius: 10px;
+    font-size: 0.8rem;
     font-weight: bold;
     font-family: 'Cinzel', serif;
 }
 
+/* .hunt-difficulty-1 { background: rgba(78, 205, 196, 0.2); color: #4ECDC4; }
+.hunt-difficulty-2 { background: rgba(255, 193, 7, 0.2); color: #FFC107; }
+.hunt-difficulty-3 { background: rgba(255, 107, 107, 0.2); color: #FF6B6B; }
+.hunt-difficulty-4 { background: rgba(168, 85, 247, 0.2); color: #A855F7; }
+.hunt-difficulty-5 { background: rgba(255, 215, 0, 0.2); color: #FFD700; } */
+
+.hunt-difficulty-1 { color: #4ECDC4; }
+.hunt-difficulty-2 { color: #FFC107; }
+.hunt-difficulty-3 { color: #FF6B6B; }
+.hunt-difficulty-4 { color: #A855F7; }
+.hunt-difficulty-5 { color: #FFD700; }
+
 /* Seção de monstros */
 .hunt-monsters-section {
-    margin-bottom: 20px;
+    margin-top: 5px;
 }
 
-.section-title {
+.hunt-section-title {
     color: #FF6B6B;
     font-family: 'Cinzel', serif;
-    font-size: 1.3rem;
-    margin-bottom: 15px;
+    font-size: 1rem;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
-.monsters-grid {
+.hunt-monsters-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-.monster-tag {
-    background: rgba(255, 107, 107, 0.1);
-    border: 1px solid rgba(255, 107, 107, 0.3);
-    border-radius: 8px;
-    padding: 10px 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* Emoji de monstro com tooltip - POSICIONAMENTO CORRIGIDO */
+.hunt-monster-emoji {
+    font-size: 1.8rem;
+    cursor: help;
+    position: relative;
     transition: all 0.3s ease;
+    display: inline-block;
+    line-height: 1;
 }
 
-.monster-tag:hover {
-    background: rgba(255, 107, 107, 0.2);
-    border-color: #FF6B6B;
-    transform: translateY(-2px);
+.hunt-monster-emoji:hover {
+    transform: scale(1.2);
 }
 
-.monster-icon {
-    font-size: 1.2rem;
-}
-
-.monster-name {
+/* TOOLTIP CORRIGIDO - POSICIONADO EM RELAÇÃO À PÁGINA */
+.hunt-monster-tooltip {
+    position: fixed; /* Usando fixed para posicionar em relação à viewport */
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid rgba(255, 107, 107, 0.5);
+    border-radius: 8px;
+    padding: 10px;
     color: #FFFFFF;
+    font-size: 0.9rem;
+    z-index: 9999; /* Z-index muito alto */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    min-width: 150px;
+    transform: translate(-50%, -100%); /* Centralizar acima do cursor */
+    top: 0;
+    left: 0;
+}
+
+/* Classe ativa para tooltip (controlada por JS) */
+.hunt-monster-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.hunt-tooltip-name {
+    font-family: 'Cinzel', serif;
     font-weight: bold;
+    color: #FF6B6B;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.hunt-tooltip-level {
+    color: #4ECDC4;
+    font-weight: bold;
+    font-family: 'Cinzel', serif;
+    text-align: center;
     font-size: 0.9rem;
 }
 
-.monster-level {
-    color: #4ECDC4;
-    font-size: 0.85rem;
-    font-weight: bold;
-    background: rgba(78, 205, 196, 0.1);
-    padding: 2px 8px;
-    border-radius: 12px;
-}
-
-.no-monsters {
-    color: #B0B0B0;
-    font-style: italic;
-    padding: 20px;
+.hunt-tooltip-drop {
+    color: #b1b1b1;
+    font-family: 'Cinzel', serif;
     text-align: center;
-    background: rgba(40, 40, 40, 0.5);
-    border-radius: 10px;
-    border: 1px dashed rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
 }
 
-/* Descrição */
+.hunt-no-monsters {
+    color: #666;
+    font-style: italic;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 8px;
+    background: rgba(40, 40, 40, 0.5);
+    border-radius: 6px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    font-family: 'MedievalSharp', cursive;
+}
+
+/* DESCRIÇÃO - REMOVIDO CORTE DE TEXTO */
 .hunt-description {
-    margin: 20px 0;
-    padding: 15px;
+    margin-top: auto;
+    padding: 12px;
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    border-left: 4px solid rgba(78, 205, 196, 0.5);
+    border-radius: 8px;
+    border-left: 3px solid rgba(78, 205, 196, 0.5);
+    flex-shrink: 0; /* Não encolher */
+    min-height: 60px; /* Altura mínima */
 }
 
 .hunt-description p {
-    color: #E0E0E0;
-    font-size: 1rem;
-    line-height: 1.6;
+    color: #B0B0B0;
+    font-size: 0.9rem;
+    line-height: 1.4;
     margin: 0;
+    font-family: 'MedievalSharp', cursive;
+    /* REMOVIDO: text-overflow e line-clamp */
 }
 
 /* Rodapé do card */
@@ -1652,200 +1696,228 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 70px;
+    flex-shrink: 0; /* Não encolher */
 }
 
+/* Botão de caçar */
 .hunt-btn {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 15px 35px;
+    gap: 10px;
+    padding: 12px 25px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-family: 'Cinzel', serif;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1rem;
     text-decoration: none;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    min-width: 200px;
     justify-content: center;
+    width: 100%;
+    max-width: 200px;
 }
 
 .hunt-btn-primary {
     background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
     color: white;
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
 }
 
 .hunt-btn-primary:hover {
     background: linear-gradient(45deg, #FF5252, #FF6B6B);
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
 }
 
-/* Bloqueado */
+.hunt-btn-icon {
+    font-size: 1.2rem;
+}
+
+/* Estado bloqueado */
 .hunt-blocked {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 20px;
-    background: rgba(100, 100, 100, 0.2);
-    border-radius: 10px;
-    border: 2px solid rgba(100, 100, 100, 0.5);
+    gap: 12px;
+    padding: 12px 20px;
+    background: rgba(60, 60, 60, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(100, 100, 100, 0.5);
     width: 100%;
+    max-width: 200px;
 }
 
-.blocked-icon {
-    font-size: 2rem;
+.hunt-blocked-icon {
+    font-size: 1.5rem;
     color: #666;
 }
 
-.blocked-message {
+.hunt-blocked-message {
     flex: 1;
 }
 
-.blocked-title {
+.hunt-blocked-title {
     color: #B0B0B0;
     font-family: 'Cinzel', serif;
-    font-size: 1.2rem;
-    margin-bottom: 5px;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
     font-weight: bold;
 }
 
-.blocked-desc {
+.hunt-blocked-desc {
     color: #888;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    font-family: 'MedievalSharp', cursive;
 }
 
-/* Nenhuma caçada */
+/* Nenhuma caçada disponível */
 .no-hunts {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 60px 40px;
+    padding: 40px 30px;
     background: rgba(40, 40, 40, 0.7);
-    border-radius: 15px;
+    border-radius: 12px;
     border: 2px dashed rgba(255, 255, 255, 0.1);
 }
 
 .no-hunts-icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
+    font-size: 3rem;
+    margin-bottom: 15px;
     opacity: 0.5;
 }
 
 .no-hunts-message h3 {
     color: #FF6B6B;
     font-family: 'Cinzel', serif;
-    font-size: 2rem;
-    margin-bottom: 15px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
 }
 
 .no-hunts-message p {
     color: #B0B0B0;
-    font-size: 1.1rem;
-    max-width: 600px;
+    font-size: 0.95rem;
+    max-width: 500px;
     margin: 0 auto;
-    line-height: 1.6;
+    line-height: 1.4;
+    font-family: 'MedievalSharp', cursive;
 }
 
 /* Responsividade */
 @media (max-width: 1200px) {
     .hunts-grid {
-        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-    }
-}
-
-@media (max-width: 992px) {
-    .hunts-page {
-        padding: 20px;
-    }
-    
-    .hunts-title {
-        font-size: 2rem;
-    }
-    
-    .hunts-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .hunt-info-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
     }
 }
 
 @media (max-width: 768px) {
     .hunts-page {
-        padding: 15px;
-        margin: 10px;
+        padding: 20px;
+        margin: 15px;
     }
     
     .hunts-title {
         font-size: 1.8rem;
     }
     
-    .hunts-subtitle {
-        font-size: 1rem;
+    .hunts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    
+    .hunt-card {
+        min-height: 430px;
+    }
+    
+    .hunt-card-header {
+        padding: 15px;
+    }
+    
+    .hunt-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.8rem;
+    }
+    
+    .hunt-title h3 {
+        font-size: 1.2rem;
+    }
+    
+    .hunt-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .hunt-btn, .hunt-blocked {
+        max-width: 180px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hunts-page {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .hunts-title {
+        font-size: 1.6rem;
+    }
+    
+    .hunts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .hunt-card {
+        min-height: 420px;
+        max-width: 350px;
+        margin: 0 auto;
+    }
+    
+    .hunt-card-body {
+        padding: 15px;
+    }
+    
+    .hunt-monsters-grid {
+        justify-content: center;
+    }
+    
+    .hunt-description {
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hunts-title {
+        font-size: 1.4rem;
+    }
+    
+    .hunt-card {
+        min-height: 410px;
     }
     
     .hunt-card-header {
         flex-direction: column;
         text-align: center;
-        gap: 15px;
+        gap: 10px;
     }
     
-    .hunt-icon {
-        width: 60px;
-        height: 60px;
-        font-size: 2rem;
+    .hunt-title h3 {
+        font-size: 1.1rem;
     }
     
     .hunt-level-requirement {
         justify-content: center;
     }
     
-    .monsters-grid {
-        flex-direction: column;
+    .hunt-info-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
     
-    .hunt-btn {
-        width: 100%;
-        padding: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .hunts-title {
-        font-size: 1.6rem;
-    }
-    
-    .hunt-title h3 {
-        font-size: 1.4rem;
-    }
-    
-    .hunt-info-item {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-    }
-    
-    .info-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
-    }
-    
-    .no-hunts {
-        padding: 40px 20px;
-    }
-    
-    .no-hunts-icon {
-        font-size: 3rem;
-    }
-    
-    .no-hunts-message h3 {
-        font-size: 1.5rem;
+    .hunt-btn, .hunt-blocked {
+        max-width: 100%;
     }
 }
 

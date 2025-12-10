@@ -112,6 +112,19 @@ class HuntMonster(models.Model):
     gold_drop = models.IntegerField(default=0)
     item_drops = models.ManyToManyField("items.Item", blank=True)
 
+    @property
+    def item_drops_display(self):
+        items = self.item_drops.all()
+
+        if not items:
+            return "Nenhum item"
+
+        formatted = []
+        for item in items:
+            formatted.append(f"{item.emoji} {item.name}")
+
+        return ", ".join(formatted)
+
     def __str__(self):
         return f"{self.monster.name} ({self.chance}%)"
 

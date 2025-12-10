@@ -28,67 +28,47 @@
                     </div>
                     <div class="hunt-title">
                         <h3>{{ hunt.name }}</h3>
+                        {% if hunt.difficulty == 1 %}<span class="hunt-difficulty-badge hunt-difficulty-{{ hunt.difficulty }}">Fácil</span>{% endif %}
+                        {% if hunt.difficulty == 2 %}<span class="hunt-difficulty-badge hunt-difficulty-{{ hunt.difficulty }}">Média</span>{% endif %}
+                        {% if hunt.difficulty == 3 %}<span class="hunt-difficulty-badge hunt-difficulty-{{ hunt.difficulty }}">Difícil</span>{% endif %}
+                        {% if hunt.difficulty == 4 %}<span class="hunt-difficulty-badge hunt-difficulty-{{ hunt.difficulty }}">Épica</span>{% endif %}
+                        {% if hunt.difficulty == 5 %}<span class="hunt-difficulty-badge hunt-difficulty-{{ hunt.difficulty }}">Lendária</span>{% endif %}
                         <div class="hunt-level-requirement">
-                            <span class="requirement-label">Nível necessário:</span>
+                            <span class="requirement-label">Nv. necessário:</span>
                             <span class="requirement-value {% if character.level >= hunt.required_level %}requirement-met{% else %}requirement-failed{% endif %}">
                                 {{ hunt.required_level }}
                             </span>
                         </div>
+                        
                     </div>
                 </div>
 
                 <div class="hunt-card-body">
                     <div class="hunt-info-grid">
                         <div class="hunt-info-item">
-                            <div class="info-icon">⏱️</div>
-                            <div class="info-content">
-                                <div class="info-label">Duração</div>
-                                <div class="info-value">{{ hunt.duration }} minutos</div>
-                            </div>
-                        </div>
-                        
-                        <div class="hunt-info-item">
-                            <div class="info-icon">🎯</div>
-                            <div class="info-content">
-                                <div class="info-label">Dificuldade</div>
-                                <div class="info-value">
-                                    {% if hunt.difficulty == 1 %}Fácil{% endif %}
-                                    {% if hunt.difficulty == 2 %}Média{% endif %}
-                                    {% if hunt.difficulty == 3 %}Difícil{% endif %}
-                                    {% if hunt.difficulty == 4 %}Épica{% endif %}
-                                    {% if hunt.difficulty == 5 %}Lendária{% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="hunt-info-item">
-                            <div class="info-icon">⭐</div>
-                            <div class="info-content">
-                                <div class="info-label">Experiência</div>
-                                <div class="info-value">+{{ hunt.xp_reward }} XP</div>
-                            </div>
-                        </div>
-                        
-                        <div class="hunt-info-item">
-                            <div class="info-icon">💰</div>
-                            <div class="info-content">
-                                <div class="info-label">Recompensa</div>
-                                <div class="info-value">{{ hunt.gold_reward }} Ouro</div>
-                            </div>
+                            <div class="hunt-info-value">⏱️ Duração: {{ hunt.duration }}min</div>
                         </div>
                     </div>
 
                     <div class="hunt-monsters-section">
-                        <h4 class="section-title">🦴 Monstros Possíveis</h4>
-                        <div class="monsters-grid">
+                        <h4 class="hunt-section-title">Monstros</h4>
+                        <div class="hunt-monsters-grid">
                             {% for hm in hunt.monsters.all %}
-                            <div class="monster-tag" title="{{ hm.monster.name }} - Nível {{ hm.monster.level }}">
-                                <span class="monster-icon">👹</span>
-                                <span class="monster-name">{{ hm.monster.name }}</span>
-                                <span class="monster-level">Lv. {{ hm.monster.level }}</span>
+                            <div class="hunt-monster-emoji" 
+                                data-monster-name="{{ hm.monster.name }}"
+                                data-monster-level="{{ hm.monster.level }}"
+                                data-monster-emoji="{{ hm.monster.emoji }}"
+                                data-monster-xp-drop="{{ hm.xp_drop }}"
+                                data-monster-gold-drop="{{ hm.gold_drop }}"
+                                data-monster-items-drop="{{ hm.item_drops_display }}">
+                                {{ hm.monster.emoji }}
+                                <div class="hunt-monster-tooltip">
+                                    <div class="hunt-tooltip-name">{{ hm.monster.name }}</div>
+                                    <div class="hunt-tooltip-level">Nível {{ hm.monster.level }}</div>
+                                </div>
                             </div>
                             {% empty %}
-                            <div class="no-monsters">Nenhum monstro definido</div>
+                            <div class="hunt-no-monsters">Nenhum monstro</div>
                             {% endfor %}
                         </div>
                     </div>
@@ -101,15 +81,15 @@
                 <div class="hunt-card-footer">
                     {% if character.level >= hunt.required_level %}
                     <a href="{% url 'start_hunt' hunt.id %}" class="hunt-btn hunt-btn-primary">
-                        <span class="btn-icon">🏹</span>
-                        Iniciar Caçada
+                        <span class="hunt-btn-icon">🏹</span>
+                        Caçar
                     </a>
                     {% else %}
                     <div class="hunt-blocked">
-                        <div class="blocked-icon">🔒</div>
-                        <div class="blocked-message">
-                            <div class="blocked-title">Bloqueado</div>
-                            <div class="blocked-desc">Alcance nível {{ hunt.required_level }} para desbloquear</div>
+                        <div class="hunt-blocked-icon">🔒</div>
+                        <div class="hunt-blocked-message">
+                            <div class="hunt-blocked-title">Bloqueado</div>
+                            <div class="hunt-blocked-desc">Nível {{ hunt.required_level }} necessário</div>
                         </div>
                     </div>
                     {% endif %}
@@ -127,5 +107,131 @@
         </div>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips para monstros
+    const monsterEmojis = document.querySelectorAll('.hunt-monster-emoji');
+    
+    monsterEmojis.forEach(emoji => {
+        const monsterName = emoji.getAttribute('data-monster-name');
+        const monsterLevel = emoji.getAttribute('data-monster-level');
+        const monsterXpDrop = emoji.getAttribute('data-monster-xp-drop');
+        const monsterGoldDrop = emoji.getAttribute('data-monster-gold-drop');
+        const monsterItemsDrop = emoji.getAttribute('data-monster-items-drop');
+        
+        // Criar um tooltip global único
+        let globalTooltip = document.getElementById('hunt-global-tooltip');
+        if (!globalTooltip) {
+            globalTooltip = document.createElement('div');
+            globalTooltip.id = 'hunt-global-tooltip';
+            globalTooltip.className = 'hunt-monster-tooltip';
+            document.body.appendChild(globalTooltip);
+            
+            // Estilos para o tooltip global
+            globalTooltip.style.cssText = `
+                position: fixed;
+                background: rgba(30, 30, 30, 0.95);
+                border: 1px solid rgba(255, 107, 107, 0.5);
+                border-radius: 8px;
+                padding: 10px;
+                color: #FFFFFF;
+                font-size: 0.9rem;
+                z-index: 9999;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s, visibility 0.3s;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+                pointer-events: none;
+                min-width: 150px;
+                transform: translate(-50%, -100%);
+                top: 0;
+                left: 0;
+            `;
+        }
+        
+        // Adicionar evento para tooltip
+        emoji.addEventListener('mouseenter', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = rect.left + (rect.width / 2);
+            const y = rect.top;
+            
+            // Atualizar conteúdo do tooltip
+            globalTooltip.innerHTML = `
+                <div class="hunt-tooltip-name">${monsterName}</div>
+                <div class="hunt-tooltip-level">Nível ${monsterLevel}</div>
+                <div class="hunt-tooltip-drop">Gold: ${monsterGoldDrop}</div>
+                <div class="hunt-tooltip-drop">XP: ${monsterXpDrop}</div>
+                <div class="hunt-tooltip-drop">Drops: ${monsterItemsDrop}</div>
+            `;
+            
+            // Posicionar tooltip
+            globalTooltip.style.left = x + 'px';
+            globalTooltip.style.top = (y - 10) + 'px';
+            globalTooltip.style.opacity = '1';
+            globalTooltip.style.visibility = 'visible';
+        });
+        
+        emoji.addEventListener('mouseleave', function(e) {
+            globalTooltip.style.opacity = '0';
+            globalTooltip.style.visibility = 'hidden';
+        });
+        
+        emoji.addEventListener('mousemove', function(e) {
+            // Atualizar posição do tooltip com o mouse
+            const x = e.clientX;
+            const y = e.clientY;
+            globalTooltip.style.left = x + 'px';
+            globalTooltip.style.top = (y - 40) + 'px';
+        });
+        
+        // Efeito de brilho para monstros raros
+        const level = parseInt(monsterLevel);
+        if (level >= 15) {
+            setInterval(() => {
+                emoji.style.filter = emoji.style.filter === 'drop-shadow(0 0 5px gold)' ? 
+                    'none' : 'drop-shadow(0 0 5px gold)';
+            }, 2000);
+        } else if (level >= 10) {
+            setInterval(() => {
+                emoji.style.filter = emoji.style.filter === 'drop-shadow(0 0 5px #A855F7)' ? 
+                    'none' : 'drop-shadow(0 0 5px #A855F7)';
+            }, 2500);
+        }
+    });
+    
+    // Efeito de entrada para os cards
+    const huntCards = document.querySelectorAll('.hunt-card');
+    huntCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s, transform 0.5s';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Efeito de brilho para caçadas desbloqueadas
+    const availableCards = document.querySelectorAll('.hunt-card.hunt-available');
+    availableCards.forEach(card => {
+        setInterval(() => {
+            card.style.borderColor = card.style.borderColor === 'rgba(78, 205, 196, 0.8)' ? 
+                'rgba(78, 205, 196, 0.5)' : 'rgba(78, 205, 196, 0.8)';
+        }, 3000);
+    });
+    
+    // Remover tooltip global ao sair da página
+    document.addEventListener('mouseleave', function(e) {
+        const globalTooltip = document.getElementById('hunt-global-tooltip');
+        if (globalTooltip) {
+            globalTooltip.style.opacity = '0';
+            globalTooltip.style.visibility = 'hidden';
+        }
+    });
+});
+</script>
 
 {% endblock %}
